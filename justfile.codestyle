@@ -1,0 +1,34 @@
+## Formatting and Linting
+
+## Scripts related to formatting code
+default_lang := 'all'
+
+# Can format 'ts', 'md', or 'all'. Defaults to all
+fmt lang=default_lang:
+  @just _fmt-{{lang}}
+
+# Can lint 'ts', 'md', or 'all'. Defaults to all
+lint lang=default_lang:
+  @just _lint-{{lang}}
+
+_fmt-all:
+  @just _fmt-ts
+
+@_lint-all:
+  -just _lint-md
+  -just _lint-ts
+
+[no-exit-message]
+_fmt-ts:
+  cd web; npm run format
+
+[no-exit-message]
+_lint-md:
+  docker run --rm -v $PWD:/workdir davidanson/markdownlint-cli2:v0.8.1 \
+    "**/*.md" \
+    "#web/node_modules" \
+    "#functions/node_modules"
+
+[no-exit-message]
+_lint-ts:
+  cd web; npm run lint

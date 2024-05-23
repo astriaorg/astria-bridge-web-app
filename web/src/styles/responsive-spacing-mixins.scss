@@ -1,0 +1,158 @@
+// This file provides classes for responsive spacing helpers,
+// that Bulma does not provide by default.
+// e.g. ml-6-desktops
+
+// Return value from $spacing-allowed map
+@function get-config($spacing, $value){
+    @return map-get(map-get($spacing-allowed, $spacing), $value);
+}
+
+// Choose which breakpoint to make responsive.
+// If you don't need some of them, just remove it from the list.
+$breakpoint-to-responsify: (
+    "mobile",
+    "tablet",
+    "table-only",
+    "touch",
+    "desktop",
+    "desktop-only",
+    "widescreen",
+    "widescreen-only",
+    "fullhd",
+);
+
+// Enable or disable making of specific classes
+$spacing-allowed: (
+    "margin": (
+        "globally-enabled": true,
+        "x": true,
+        "y": true,
+        "top": true,
+        "right": true,
+        "bottom": true,
+        "left": true,
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true,
+        "4": true,
+        "5": true,
+        "6": true,
+        "auto": true,
+    ),
+    "padding": (
+        "globally-enabled": true,
+        "x": true,
+        "y": true,
+        "top": true,
+        "right": true,
+        "bottom": true,
+        "left": true,
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true,
+        "4": true,
+        "5": true,
+        "6": true,
+        "auto": true,
+    ),
+);
+
+// Loop through $spacing-shortcuts, $spacing-values and $spacing-directions
+// in "helpers/spacings.sass" to make the responsive classes
+@mixin loop-spacings($bp-name){
+    // Loop through "margin" and "padding"
+    @each $property, $shortcut in $spacing-shortcuts{
+        // Check if margin or padding is enabled
+        @if get-config($property, "globally-enabled"){
+            // Loop through spacing values 0, 1, 2, 3, 4, 5, 6, auto
+            @each $name, $value in $spacing-values{
+                // Check if value is enabled
+                @if get-config($property, $name){
+                    // Make classes .m-1 etc
+                    .#{$shortcut}-#{$name}-#{$bp_name}{
+                        #{$property}: $value !important
+                    }
+                    // Make classes .m-x-1 etc
+                    @if $spacing-horizontal != null and get-config($property, "x"){
+                        .#{$shortcut}#{$spacing-horizontal}-#{$name}-#{$bp_name}{
+                            #{$property}-left: $value !important;
+                            #{$property}-right: $value !important;
+                        }
+                    }
+                    // Make classes .m-y-1 etc
+                    @if $spacing-vertical != null and get-config($property, "y"){
+                        .#{$shortcut}#{$spacing-vertical}-#{$name}-#{$bp_name}{
+                            #{$property}-top: $value !important;
+                            #{$property}-bottom: $value !important;
+                        }
+                    }
+                    // Loop through "top", "right", "bottom", "left"
+                    @each $direction, $suffix in $spacing-directions{
+                        // Check if direction is enabled
+                        @if get-config($property, $direction){
+                            // Make classes .mt-5-desktop etc
+                            .#{$shortcut}#{$suffix}-#{$name}-#{$bp_name}{
+                                #{$property}-#{$direction}: $value !important;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Loop through $breakpoints in "utilities/initial-variables.sass"
+@each $bp_name, $bp_map in $breakpoints{
+    // Check if we want to make classes for this breakpoint
+    @if index($breakpoint-to-responsify, $bp_name) != null{
+        @if $bp_name == "mobile"{
+            /* Mobile */
+            @include mobile{
+                @include loop-spacings($bp_name);
+            }
+        } @else if $bp_name == "tablet"{
+            /* Tablet */
+            @include tablet{
+                @include loop-spacings($bp_name);
+            }
+        } @else if $bp_name == "tablet-only"{
+            /* Tablet Only */
+            @include tablet-only{
+                @include loop-spacings($bp_name);
+            }
+        } @else if $bp_name == "touch"{
+            /* Touch */
+            @include touch{
+                @include loop-spacings($bp_name);
+            }
+        } @else if $bp_name == "desktop"{
+            /* Desktop */
+            @include desktop{
+                @include loop-spacings($bp_name);
+            }
+        } @else if $bp_name == "desktop-only"{
+            /* Desktop Only */
+            @include desktop-only{
+                @include loop-spacings($bp_name);
+            }
+        } @else if $bp_name == "widescreen"{
+            /* Widescreen */
+            @include widescreen{
+                @include loop-spacings($bp_name);
+            }
+        } @else if $bp_name == "widescreen-only"{
+            /* Widescreen Only */
+            @include widescreen-only{
+                @include loop-spacings($bp_name);
+            }
+        } @else if $bp_name == "fullhd"{
+            /* FullHD */
+            @include fullhd{
+                @include loop-spacings($bp_name);
+            }
+        }
+    }
+}

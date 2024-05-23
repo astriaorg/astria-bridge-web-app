@@ -1,0 +1,14 @@
+## Testing
+default_proj := 'all'
+
+# Can test 'web' project for now.
+test proj=default_proj:
+  @just _test-{{proj}}
+
+alias t := test
+
+@_test-all: _test-web
+
+[no-exit-message]
+_test-web:
+  cd web; CI=true npm run test

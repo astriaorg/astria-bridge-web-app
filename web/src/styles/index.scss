@@ -1,0 +1,177 @@
+html, body {
+  height: 100vh;
+}
+
+// fonts
+@import './fonts';
+
+// astria bulma overrides
+// NOTE - scss variable overrides be imported BEFORE bulma so that the overriden variables are
+// used in the bulma sass
+@import 'astria-colors';
+@import 'button-overrides';
+@import 'card-overrides';
+@import 'form-overrides';
+
+// bulma
+@import '../../node_modules/bulma/bulma';
+@import '../../node_modules/bulma/sass/utilities/initial-variables';
+@import '../../node_modules/bulma/sass/components/navbar';
+@import '../../node_modules/@creativebulma/bulma-tooltip/dist/bulma-tooltip';
+// NOTE - responsive-spacing-mixins weren't needed for v0, but i'm leaving them b/c
+  // i think they'll quickly be needed for v1
+//@import 'responsive-spacing-mixins';
+
+// NOTE - these css customizations must be imported AFTER bulma to override the css classes
+@import 'button-customizations';
+@import 'card-customizations';
+@import 'form-customizations';
+
+// body reset
+body {
+  margin: 0;
+  padding: 0;
+  background-color: $astria-black;
+}
+
+// navbar customizations
+.navbar {
+  background-color: transparent;
+  padding: 1rem 2rem;
+
+  .navbar-menu.is-active {
+    background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+    box-shadow: 1px 1px 1px -1px hsla(0, 0%, 100%, 0.5) inset;
+  }
+
+  &.is-transparent {
+    .navbar-dropdown {
+      background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+      box-shadow: 1px 1px 1px -1px hsla(0, 0%, 100%, 0.5) inset;
+
+      a.navbar-item:focus, a.navbar-item:hover {
+        color: $astria-text-light;
+      }
+    }
+  }
+
+}
+
+.is-fullheight-with-navbar {
+  // viewport height minus navbar height minus footer height minus margins
+  min-height: calc(100vh - 72px - 24px)
+}
+
+.notifications-toast-container {
+  position: fixed;
+  z-index: 9999;
+  padding: 1rem;
+  &.mid {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.top-left {
+    top: 0;
+    left: 0;
+  }
+
+  &.top-mid {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &.top-right {
+    top: 0;
+    right: 0;
+  }
+
+  &.bottom-left {
+    bottom: 0;
+    left: 0;
+    margin-bottom: 30px;
+  }
+
+  &.bottom-mid {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 30px;
+  }
+
+  &.bottom-right {
+    bottom: 0;
+    right: 0;
+    margin-bottom: 30px;
+  }
+
+  .notification {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/**
+ * Animations
+ */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-out {
+  animation-name: fadeOut;
+  animation-duration: 1.5s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation-name: fadeIn;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.75);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.icon-pulse {
+  animation-name: pulse;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.icon-pulse-slow {
+  animation-name: pulse;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.is-text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
