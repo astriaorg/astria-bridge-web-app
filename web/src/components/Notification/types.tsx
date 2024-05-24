@@ -1,3 +1,5 @@
+import React from "react";
+
 export enum NotificationType {
   INFO = "info",
   SUCCESS = "success",
@@ -9,7 +11,7 @@ export interface ModalOpts {
   modalType: NotificationType;
   title: string;
   message?: string;
-  component?: JSX.Element;
+  component?: React.JSX.Element;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -27,7 +29,7 @@ export enum ToastPosition {
 export interface ToastOpts {
   toastType: NotificationType;
   message?: string;
-  component?: JSX.Element;
+  component?: React.JSX.Element;
   position?: ToastPosition;
   onAcknowledge: () => void;
 }

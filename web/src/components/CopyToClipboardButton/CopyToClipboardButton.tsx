@@ -12,7 +12,7 @@ export default function CopyToClipboardButton({
   const copyToClipboard = (text: string) => {
     // we only want the icon to fade in after it's clicked, not on first page render.
     setFadeInClass("fade-in");
-    navigator.clipboard.writeText(text);
+    void navigator.clipboard.writeText(text);
     setCopyStatus("Copied!");
     setTimeout(() => setCopyStatus(""), 500);
   };
