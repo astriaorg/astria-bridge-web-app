@@ -14,6 +14,9 @@ generate-initial-web-env:
 install-web-deps:
   cd web && npm install
 
+# build types from protos
+build-protos:
+  cd web && npm run build-protos
 # builds the typescript for the front end app
 build-web:
   cd web && npm run build

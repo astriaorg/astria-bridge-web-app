@@ -29,3 +29,7 @@ web/build
 
 # gcloud
 gsa-key.json
+
+# generated types from protos
+web/src/protos-generated/*
+!web/src/protos-generated/.gitkeep
