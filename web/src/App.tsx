@@ -1,5 +1,8 @@
 import React, {useEffect} from 'react';
 import {getKeplrFromWindow} from "services/keplr";
+// NOTE - you'll notice constants is the only one imported by path.
+//  b/c we're using some polyfills that use node's built in `constants`,
+//  there's
 import {CelestiaChainInfo} from "./constants";
 import {Balances} from "types";
 import {Dec, DecUtils} from "@keplr-wallet/unit";
@@ -16,7 +19,7 @@ function App() {
   const [amount, setAmount] = React.useState<string>('');
 
   useEffect(() => {
-    init().then(_ => console.log('initialized'));
+    void init();
   }, []);
 
   const init = async () => {

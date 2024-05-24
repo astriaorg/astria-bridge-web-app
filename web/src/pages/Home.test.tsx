@@ -11,7 +11,7 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-describe("App", () => {
+describe("Home", () => {
   test("renders home page correctly", () => {
     renderWithRouter(<Home />);
     const homeElem = screen.getAllByText(/astria/i);

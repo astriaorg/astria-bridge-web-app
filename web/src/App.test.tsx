@@ -5,9 +5,9 @@ import App from "./App";
 import { renderWithRouter } from "testHelpers";
 
 describe("App", () => {
-  test("renders home page correctly", () => {
+  test("renders App correctly", () => {
     renderWithRouter(<App />);
-    const homeElem = screen.getAllByText(/astria/i);
+    const homeElem = screen.getAllByText(/get tia balance/i);
     expect(homeElem).toHaveLength(1);
   });
 });
