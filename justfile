@@ -1,4 +1,5 @@
 import 'justfile.codestyle'
+import 'justfile.starter-app'
 import 'justfile.tests'
 
 default:
@@ -28,17 +29,3 @@ deploy-hosting-preview:
 run-web-local:
   cp web/.env.example web/.env
   cd web && npm run start
-
-## Utilities
-
-# encodes a file as base64
-encode-base64 filepath:
-  base64 -i {{filepath}}
-
-# compacts contents of json file
-compact-json filepath:
-  cat {{filepath}} | jq -c
-
-# generate a bearer token for the actuation-gateway service
-generate-bearer-token:
-  openssl rand -base64 24 | tr -dc A-Za-z0-9 | head -c 32

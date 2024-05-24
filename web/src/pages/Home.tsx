@@ -6,7 +6,7 @@ export default function Home() {
       <div className="columns is-mobile is-centered is-vcentered is-fullheight-with-navbar">
         <div className="column is-narrow">
           <h1 className="title is-1 has-text-white has-text-weight-normal has-text-centered">
-            Bridge stuff.
+            Astria.
           </h1>
         </div>
       </div>

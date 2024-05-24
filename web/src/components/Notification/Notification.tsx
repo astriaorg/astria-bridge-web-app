@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ModalOpts, ToastOpts, NotificationType, ToastPosition } from "./types";
+import { type ModalOpts, type ToastOpts, NotificationType, ToastPosition } from "./types";
 
 interface NotificationProps {
   id: string;
@@ -45,17 +45,18 @@ function Notification({
   // modals can be used for confirmation dialogs
   const ModalElem = () => (
     <div className="modal is-active">
-      <div className="modal-background"></div>
+      <div className="modal-background" />
       <div className="modal-card has-background-danger">
         <header className={`modal-card-head ${modalBackgroundClass()}`}>
           <p className="modal-card-title has-text-white-ter">
             {modalOpts?.title}
           </p>
           <button
+            type="button"
             className="delete"
             aria-label="close"
             onClick={() => onRemove(id)}
-          ></button>
+            />
         </header>
         <section className="modal-card-body has-text-dark">
           {modalOpts?.message}
@@ -63,12 +64,13 @@ function Notification({
         </section>
         <footer className="modal-card-foot">
           <button
+            type="button"
             className={`button ${modalButtonClass()}`}
             onClick={onModalConfirm}
           >
             Confirm
           </button>
-          <button className="button is-light" onClick={onModalCancel}>
+          <button type="button" className="button is-light" onClick={onModalCancel}>
             Cancel
           </button>
         </footer>
@@ -105,10 +107,11 @@ function Notification({
       <div className="message-header">
         <p>{getToastTitle()}</p>
         <button
+          type="button"
           className="delete"
           aria-label="acknowledge"
           onClick={onToastAcknowledge}
-        ></button>
+        />
       </div>
       <div className="message-body">
         {toastOpts?.message}
@@ -119,7 +122,9 @@ function Notification({
 
   return (
     <div
-      className={`${isModal ? "" : "notifications-toast-container"} ${toastOpts?.position || ToastPosition.TOP_MID}`}
+      className={`${isModal ? "" : "notifications-toast-container"} ${
+        toastOpts?.position || ToastPosition.TOP_MID
+      }`}
     >
       {isModal ? <ModalElem /> : <ToastElem />}
     </div>

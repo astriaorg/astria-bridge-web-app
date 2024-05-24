@@ -1,7 +1,8 @@
 # Web
 
 This directory contains the source code and tooling for the front-end web
-portion of the Astria Bridge.
+portion of the Astria React starter. It contains some Astria assets (like
+fonts!), branded styling, and some common React components (but not many).
 
 ## Table of Contents
 
@@ -34,7 +35,7 @@ cp .env.example .env
 
 In the project directory, you can run:
 
-### `just run-web-local`
+### `npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
@@ -42,14 +43,14 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
-### `just test`
+### `npm test`
 
 Launches the test runner in the interactive watch mode.\
 See the section
 about [running tests](https://facebook.github.io/create-react-app/docs/running-tests)
 for more information.
 
-### `just build-web`
+### `npm run build`
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the

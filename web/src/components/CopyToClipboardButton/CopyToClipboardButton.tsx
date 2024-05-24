@@ -24,6 +24,7 @@ export default function CopyToClipboardButton({
   return (
     <>
       <button
+        type="button"
         key={textToCopy}
         onClick={() => copyToClipboard(textToCopy)}
         className="button has-text-light is-ghost"
@@ -31,7 +32,7 @@ export default function CopyToClipboardButton({
         {copyStatus && <div className="fade-out">{copyStatus}</div>}
         {!copyStatus && (
           <span className={`icon ${fadeInClass}`}>
-            <i className="fas fa-clipboard"></i>
+            <i className="fas fa-clipboard" />
           </span>
         )}
       </button>

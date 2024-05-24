@@ -1,6 +1,6 @@
 import React from "react";
 
-import {
+import type {
   AddNotificationOpts,
   Notification,
 } from "components/Notification/types";

@@ -11,6 +11,8 @@ fmt lang=default_lang:
 lint lang=default_lang:
   @just _lint-{{lang}}
 
+alias l := lint
+
 _fmt-all:
   @just _fmt-ts
 

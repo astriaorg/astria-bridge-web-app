@@ -14,7 +14,7 @@ jest.mock("react-router-dom", () => ({
 describe("App", () => {
   test("renders home page correctly", () => {
     renderWithRouter(<Home />);
-    const homeElem = screen.getAllByText(/just/i);
+    const homeElem = screen.getAllByText(/astria/i);
     expect(homeElem).toHaveLength(1);
   });
 });
