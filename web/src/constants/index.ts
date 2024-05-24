@@ -1,4 +1,4 @@
-import { ChainInfo } from "@keplr-wallet/types";
+import type { ChainInfo } from "@keplr-wallet/types";
 
 export const CelestiaChainInfo: ChainInfo = {
   // Chain-id of the celestia chain.

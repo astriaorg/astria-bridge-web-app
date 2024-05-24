@@ -1,4 +1,4 @@
-import { Keplr } from "@keplr-wallet/types";
+import type { Keplr } from "@keplr-wallet/types";
 
 export const getKeplrFromWindow: () => Promise<Keplr | undefined> =
   async () => {

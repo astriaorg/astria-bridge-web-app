@@ -4,7 +4,7 @@ import { getKeplrFromWindow } from "services/keplr";
 //  b/c we're using some polyfills that use node's built in `constants`,
 //  there's
 import { CelestiaChainInfo } from "./constants";
-import { Balances } from "types";
+import type { Balances } from "types";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { sendIbcTransfer } from "services/ibc";
 import { getJSON } from "services/api";
@@ -59,7 +59,7 @@ function App() {
         const amount = new Dec(balance.amount, tiaDecimal);
         setBalance(`${amount.toString(tiaDecimal)} TIA`);
       } else {
-        setBalance(`0 TIA`);
+        setBalance("0 TIA");
       }
     }
   };
@@ -106,7 +106,11 @@ function App() {
             <div>Address: {address}</div>
 
             <div>
-              <button className="keplr-button" onClick={getKeyFromKeplr}>
+              <button
+                type="button"
+                className="keplr-button"
+                onClick={getKeyFromKeplr}
+              >
                 Get Address
               </button>
             </div>
@@ -118,7 +122,7 @@ function App() {
 
           <div className="item-content">
             Balance: {balance}
-            <button className="keplr-button" onClick={getBalance}>
+            <button type="button" className="keplr-button" onClick={getBalance}>
               Get Balance
             </button>
           </div>
@@ -156,7 +160,11 @@ function App() {
               />
             </div>
 
-            <button className="keplr-button" onClick={sendBalance}>
+            <button
+              type="button"
+              className="keplr-button"
+              onClick={sendBalance}
+            >
               Send
             </button>
           </div>

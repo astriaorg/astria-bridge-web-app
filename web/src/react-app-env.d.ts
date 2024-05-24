@@ -1,6 +1,6 @@
 /// <reference types="react-scripts" />
 import type { MetaMaskInpageProvider } from "@metamask/providers";
-import { Keplr } from "@keplr-wallet/types";
+import type { Keplr } from "@keplr-wallet/types";
 
 declare global {
   interface Window {

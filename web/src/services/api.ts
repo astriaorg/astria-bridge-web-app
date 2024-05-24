@@ -8,7 +8,7 @@ export const getJSON = async <T>(
   url: string,
   init?: RequestInit,
 ): Promise<T> => {
-  let response = await fetch(url, init);
+  const response = await fetch(url, init);
   if (!response.ok) {
     throw new Error(response.statusText);
   }
