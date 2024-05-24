@@ -1,6 +1,11 @@
 import React from "react";
 
-import { type ModalOpts, type ToastOpts, NotificationType, ToastPosition } from "./types";
+import {
+  type ModalOpts,
+  type ToastOpts,
+  NotificationType,
+  ToastPosition,
+} from "./types";
 
 interface NotificationProps {
   id: string;
@@ -56,7 +61,7 @@ function Notification({
             className="delete"
             aria-label="close"
             onClick={() => onRemove(id)}
-            />
+          />
         </header>
         <section className="modal-card-body has-text-dark">
           {modalOpts?.message}
@@ -70,7 +75,11 @@ function Notification({
           >
             Confirm
           </button>
-          <button type="button" className="button is-light" onClick={onModalCancel}>
+          <button
+            type="button"
+            className="button is-light"
+            onClick={onModalCancel}
+          >
             Cancel
           </button>
         </footer>
