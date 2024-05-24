@@ -1,5 +1,4 @@
 import 'justfile.codestyle'
-import 'justfile.starter-app'
 import 'justfile.tests'
 
 default:
