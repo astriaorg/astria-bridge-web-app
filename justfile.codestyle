@@ -7,6 +7,8 @@ default_lang := 'all'
 fmt lang=default_lang:
   @just _fmt-{{lang}}
 
+alias f := fmt
+
 # Can lint 'ts', 'md', or 'all'. Defaults to all
 lint lang=default_lang:
   @just _lint-{{lang}}
