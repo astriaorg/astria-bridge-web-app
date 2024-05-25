@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import "styles/index.scss";
 import reportWebVitals from "./reportWebVitals";

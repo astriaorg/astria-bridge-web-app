@@ -7,7 +7,7 @@ import { renderWithRouter } from "testHelpers";
 describe("App", () => {
   test("renders App correctly", () => {
     renderWithRouter(<App />);
-    const homeElem = screen.getAllByText(/get tia balance/i);
+    const homeElem = screen.getAllByText(/Send TIA/i);
     expect(homeElem).toHaveLength(1);
   });
 });

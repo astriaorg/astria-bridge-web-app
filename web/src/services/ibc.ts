@@ -1,6 +1,7 @@
-import { CelestiaChainInfo, AstriaChainInfo } from "../constants";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import Long from "long";
+
+import { AstriaChainInfo, CelestiaChainInfo } from "chainInfos";
 
 // const SEQUENCER_ACCOUNT = '1c0c490f1b5528d8173c5de46d131160e4b2c0c3'
 // TODO - parameterize this
