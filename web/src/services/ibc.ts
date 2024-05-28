@@ -2,17 +2,16 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import Long from "long";
 
 import { AstriaChainInfo, CelestiaChainInfo } from "chainInfos";
-
-// const SEQUENCER_ACCOUNT = '1c0c490f1b5528d8173c5de46d131160e4b2c0c3'
-// TODO - parameterize this
-const SEQUENCER_ACCOUNT = "edf770a8915cd3f70309c918c3d16671f59161e2";
-const DENOM = "utia";
+import { getEnvVariable } from "utils";
 
 export const sendIbcTransfer = async (
   sender: string,
   recipient: string,
   amount: string,
 ) => {
+  const SEQUENCER_BRIDGE_ACCOUNT = getEnvVariable("SEQUENCER_BRIDGE_ACCOUNT");
+  const DENOM = getEnvVariable("SEQUENCER_BRIDGE_DENOM");
+
   if (window.keplr) {
     const keplr = window.keplr;
     const key = await window.keplr.getKey(CelestiaChainInfo.chainId);
@@ -56,7 +55,7 @@ export const sendIbcTransfer = async (
         },
         sender: sender,
         memo: memo,
-        receiver: SEQUENCER_ACCOUNT,
+        receiver: SEQUENCER_BRIDGE_ACCOUNT,
         // Timeout is in nanoseconds. Use Long.UZERO for default timeout
         timeoutTimestamp: Long.fromNumber(Date.now() + 600_000).multiply(
           1_000_000,
