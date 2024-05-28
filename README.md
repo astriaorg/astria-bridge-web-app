@@ -3,21 +3,38 @@
 This directory contains the source code and tooling for the front-end for
 the Astria bridge.
 
-## Components
+## `web` application directory structure
 
-* `public/index.html` - import styles, fonts; define react root element
-* `index.tsx` - React application setup; styles imported
-* `App.tsx` - main application component; define routes; use context providers
-* `chainInfos` - Celestia and Astria chain information
-* `components` - React components
-* `contexts` - React context definitions
-* `pages` - React components for each page
-* `providers` - React context provider definitions
-* `services` - api services; Keplr services; IBC services; 3rd party wrappers;
-etc.
-* `styles` - all style definitions; using scss
-* `types` - type definitions
-* `utils` - utility functions
+* `public/index.html`
+  * html meta stuff, import styles and fonts
+  * define React root element
+* `src/index.tsx`
+  * React application setup
+  * import styles
+* `src/App.tsx`
+  * main application component
+  * define routes
+  * use context providers
+* `src/chainInfos` - Celestia and Astria chain information
+* `src/components` - React components
+* `src/contexts` - React context definitions
+* `src/pages`
+  * React components for each page
+  * `src/pages/Layout.tsx`
+    * page layout component using `<Outlet />`
+    * contains `<Navbar />`, `<Notification />`
+* `src/providers` - React context provider definitions
+* `src/services`
+  * api services
+  * Keplr services
+  * IBC services
+  * 3rd party wrappers
+* `src/styles`
+  * all style definitions
+  * using scss
+  * using [bulma](https://bulma.io/documentation/) css framework
+* `src/types` - type definitions
+* `src/utils` - utility functions
 
 ## Commands
 
