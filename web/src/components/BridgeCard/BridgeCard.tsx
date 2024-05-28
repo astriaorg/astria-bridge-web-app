@@ -29,7 +29,7 @@ export default function BridgeCard(): React.ReactElement {
       );
     } catch (e) {
       if (e instanceof Error) {
-        console.log(e.message);
+        window.alert(`Failed to send IBC transfer: ${e.message}`)
       }
     }
   };
@@ -75,7 +75,7 @@ export default function BridgeCard(): React.ReactElement {
 
           {!isRecipientAddressValid && (
             // TODO - what validation should we do?
-            <p className="help is-danger">- Must be a valid address</p>
+            <p className="help is-danger">- Must be a valid EVM address</p>
           )}
         </div>
       </div>
