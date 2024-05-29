@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useSyncWalletProviders } from "hooks/useSyncWalletProviders";
-import { formatAddress } from "utils";
 
 export default function EthWalletConnector() {
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>();
@@ -31,38 +30,50 @@ export default function EthWalletConnector() {
 
   // display detected providers as connect buttons.
   return (
-    <>
-      <h2>Wallets Detected:</h2>
-      <div>
-        {providers.length > 0 ? (
-          providers?.map((provider: EIP6963ProviderDetail) => (
-            <button
-              type="button"
-              key={provider.info.uuid}
-              onClick={() => handleConnect(provider)}
-            >
-              <img src={provider.info.icon} alt={provider.info.name} />
-              <div>{provider.info.name}</div>
-            </button>
-          ))
-        ) : (
-          <div>No Announced Wallet Providers</div>
-        )}
-      </div>
-      <hr />
-      <h2>{userAccount ? "" : "No "}Wallet Selected</h2>
-      {userAccount && (
-        <div>
+    <div className="card p-5 wallet-provider-card">
+      <header className="card-header">
+        <p className="card-header-title is-size-5 has-text-weight-normal has-text-light">
+          Wallet Connector
+        </p>
+      </header>
+      <div className="card-content p-4">
+        <div className="mt-3">
+          <div className="heading">Wallets Detected</div>
           <div>
-            <img
-              src={selectedWallet?.info.icon}
-              alt={selectedWallet?.info.name}
-            />
-            <div>{selectedWallet?.info.name}</div>
-            <div>({formatAddress(userAccount)})</div>
+            {providers.length > 0 ? (
+              providers?.map((provider: EIP6963ProviderDetail) => (
+                <button
+                  type="button"
+                  className="button is-tall"
+                  key={provider.info.uuid}
+                  onClick={() => handleConnect(provider)}
+                >
+                  <img src={provider.info.icon} alt={provider.info.name} />
+                  <p>{provider.info.name}</p>
+                </button>
+              ))
+            ) : (
+              <div>No Announced Wallet Providers</div>
+            )}
           </div>
         </div>
-      )}
-    </>
+        <div className="mt-3">
+          <div className="heading">{userAccount ? "" : "No "}Wallet Selected</div>
+          {userAccount && (
+            <div>
+              <div>
+                <img
+                  className="wallet-provider-icon"
+                  src={selectedWallet?.info.icon}
+                  alt={selectedWallet?.info.name}
+                />
+                <div>{selectedWallet?.info.name}</div>
+                <div>({userAccount})</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
