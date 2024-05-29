@@ -14,7 +14,8 @@ const ethWalletProviderStore = {
   value: () => providers,
   subscribe: (callback: () => void) => {
     function onAnnouncement(event: EIP6963AnnounceProviderEvent) {
-      if (providers.map(p => p.info.uuid).includes(event.detail.info.uuid)) return;
+      if (providers.map((p) => p.info.uuid).includes(event.detail.info.uuid))
+        return;
       providers = [...providers, event.detail];
       callback();
     }
@@ -26,10 +27,14 @@ const ethWalletProviderStore = {
     window.dispatchEvent(new Event("eip6963:requestProvider"));
 
     // return a function that removes the event listener.
-    return () => window.removeEventListener("eip6963:announceProvider", onAnnouncement);
+    return () =>
+      window.removeEventListener("eip6963:announceProvider", onAnnouncement);
   },
 };
 
-
-export const useSyncProviders = () => useSyncExternalStore(ethWalletProviderStore.subscribe, ethWalletProviderStore.value, ethWalletProviderStore.value);
-
+export const useSyncWalletProviders = () =>
+  useSyncExternalStore(
+    ethWalletProviderStore.subscribe,
+    ethWalletProviderStore.value,
+    ethWalletProviderStore.value,
+  );

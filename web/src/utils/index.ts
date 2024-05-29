@@ -14,7 +14,9 @@ export function getEnvVariable(name: string): string {
 }
 
 export const formatBalance = (rawBalance: string) => {
-  const balance = (Number.parseInt(rawBalance) / 1000000000000000000).toFixed(2);
+  const balance = (Number.parseInt(rawBalance) / 1000000000000000000).toFixed(
+    2,
+  );
   return balance;
 };
 
@@ -25,6 +27,7 @@ export const formatChainAsNum = (chainIdHex: string) => {
 
 export const formatAddress = (addr: string) => {
   const upperAfterLastTwo = addr.slice(0, 2) + addr.slice(2);
-  return `${upperAfterLastTwo.substring(0, 5)}...${upperAfterLastTwo.substring(39)}`;
+  return `${upperAfterLastTwo.substring(0, 5)}...${upperAfterLastTwo.substring(
+    39,
+  )}`;
 };
-

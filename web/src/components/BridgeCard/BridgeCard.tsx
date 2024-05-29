@@ -29,7 +29,7 @@ export default function BridgeCard(): React.ReactElement {
       );
     } catch (e) {
       if (e instanceof Error) {
-        window.alert(`Failed to send IBC transfer: ${e.message}`)
+        window.alert(`Failed to send IBC transfer: ${e.message}`);
       }
     }
   };
