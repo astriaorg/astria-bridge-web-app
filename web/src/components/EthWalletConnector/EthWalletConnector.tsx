@@ -15,7 +15,7 @@ export default function EthWalletConnector() {
       });
 
       setSelectedWallet(providerWithInfo);
-      if (accounts instanceof Array && accounts.length > 0) {
+      if (Array.isArray(accounts) && accounts.length > 0) {
         console.log("Connected to", providerWithInfo.info.name, "with account", accounts[0]);
         setUserAccount(accounts[0]);
       }
