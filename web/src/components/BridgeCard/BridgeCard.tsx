@@ -7,29 +7,63 @@ import { NotificationType } from "components/Notification/types";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { NotificationsContext } from "contexts/NotificationsContext";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
+import { getJSON } from "services/api";
 import { sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
+import { Balances } from "types";
 
 export default function BridgeCard(): React.ReactElement {
+  const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
   const [recipientAddress, setRecipientAddress] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+
+  const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isRecipientAddressValid, setIsRecipientAddressValid] =
     useState<boolean>(false);
-  const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
 
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount } = useEthWallet();
 
+  // set recipient address if userAccount available,
+  // which means we got it from the eth wallet
   useEffect(() => {
     if (userAccount) {
       setRecipientAddress(userAccount);
     }
   }, [userAccount]);
 
+  // check if form is valid whenever values change
   useEffect(() => {
+    if (recipientAddress || amount) {
+      // have touched form when recipientAddress or amount change
+      setHasTouchedForm(true);
+    }
     checkIsFormValid(recipientAddress, amount);
   }, [recipientAddress, amount]);
+
+  const getBalance = async () => {
+    const key = await window.keplr?.getKey(CelestiaChainInfo.chainId);
+
+    if (key) {
+      const uri = `${CelestiaChainInfo.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
+
+      const data = await getJSON<Balances>(uri);
+      const balance = data.balances.find((balance) => balance.denom === "utia");
+      const tiaDecimal = CelestiaChainInfo.currencies.find(
+        (currency: { coinMinimalDenom: string }) =>
+          currency.coinMinimalDenom === "utia",
+      )?.coinDecimals;
+
+      if (balance) {
+        const amount = new Dec(balance.amount, tiaDecimal);
+        setBalance(`${amount.toString(tiaDecimal)} TIA`);
+      } else {
+        setBalance("0 TIA");
+      }
+    }
+  };
 
   const sendBalance = async () => {
     try {
@@ -40,6 +74,7 @@ export default function BridgeCard(): React.ReactElement {
       );
     } catch (e) {
       if (e instanceof Error) {
+        console.error(e.message);
         addNotification({
           toastOpts: {
             toastType: NotificationType.DANGER,
@@ -79,6 +114,7 @@ export default function BridgeCard(): React.ReactElement {
     try {
       const key = await keplr.getKey(CelestiaChainInfo.chainId);
       setFromAddress(key.bech32Address);
+      await getBalance();
     } catch (e) {
       if (e instanceof Error) {
         console.log(e.message);
@@ -117,6 +153,7 @@ export default function BridgeCard(): React.ReactElement {
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
     setIsAmountValid(amountValid);
+    // TODO - what validation should we do?
     const addressValid = addressInput.length > 0;
     setIsRecipientAddressValid(addressValid);
   };
@@ -158,8 +195,9 @@ export default function BridgeCard(): React.ReactElement {
               type="button"
               className="button is-ghost is-outlined-light is-tall"
               onClick={() => connectCelestiaWallet()}
+              disabled={fromAddress != ""}
             >
-              Connect Keplr Wallet
+              {fromAddress ? `${balance}` : "Connect Keplr Wallet"}
             </button>
           </div>
         </div>
@@ -178,7 +216,7 @@ export default function BridgeCard(): React.ReactElement {
           <span className="icon is-right mt-1">
             <p>TIA</p>
           </span>
-          {!isAmountValid && (
+          {!isAmountValid && hasTouchedForm && (
             <p className="help is-danger">
               - Amount must be a number greater than 0
             </p>
@@ -200,8 +238,7 @@ export default function BridgeCard(): React.ReactElement {
               value={recipientAddress}
             />
 
-            {!isRecipientAddressValid && (
-              // TODO - what validation should we do?
+            {!isRecipientAddressValid && hasTouchedForm && (
               <p className="help is-danger">- Must be a valid EVM address</p>
             )}
           </div>

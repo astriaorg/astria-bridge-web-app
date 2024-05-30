@@ -9,8 +9,8 @@ export const sendIbcTransfer = async (
   recipient: string,
   amount: string,
 ) => {
-  const SEQUENCER_BRIDGE_ACCOUNT = getEnvVariable("SEQUENCER_BRIDGE_ACCOUNT");
-  const DENOM = getEnvVariable("SEQUENCER_BRIDGE_DENOM");
+  const SEQUENCER_BRIDGE_ACCOUNT = getEnvVariable("REACT_APP_SEQUENCER_BRIDGE_ACCOUNT");
+  const DENOM = getEnvVariable("REACT_APP_SEQUENCER_BRIDGE_DENOM");
 
   if (window.keplr) {
     const keplr = window.keplr;
