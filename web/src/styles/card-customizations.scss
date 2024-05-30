@@ -43,6 +43,12 @@
     }
   }
 
+  & .card-spacer {
+    border-top: 1px $astria-white solid;
+    margin: 1rem 0;
+    width: 100%;
+  }
+
   .card-footer {
     border-top: none;
     box-shadow: none;

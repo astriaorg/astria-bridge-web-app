@@ -58,7 +58,9 @@ export default function EthWalletConnector() {
           </div>
         </div>
         <div className="mt-3">
-          <div className="heading">{userAccount ? "" : "No "}Wallet Selected</div>
+          <div className="heading">
+            {userAccount ? "" : "No "}Wallet Selected
+          </div>
           {userAccount && (
             <div>
               <div>
