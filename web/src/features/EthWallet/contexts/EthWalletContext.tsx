@@ -1,14 +1,6 @@
-import React, { createContext, ReactNode, useState } from "react";
+import type React from "react";
+import { createContext, type ReactNode, useState } from "react";
 import { useSyncWalletProviders } from "../hooks/useSyncWalletProviders";
-
-export interface EIP6963ProviderDetail {
-  provider: any;
-  info: {
-    name: string;
-    icon: string;
-    uuid: string;
-  };
-}
 
 export interface EthWalletContextProps {
   providers: EIP6963ProviderDetail[];

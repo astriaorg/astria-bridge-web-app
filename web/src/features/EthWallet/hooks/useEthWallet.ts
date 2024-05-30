@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import {
   EthWalletContext,
-  EthWalletContextProps,
+  type EthWalletContextProps,
 } from "../contexts/EthWalletContext";
 
 // hook to make EthWalletContext easier to access

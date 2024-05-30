@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import type React from "react";
+import { useContext, useEffect, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 
 import { CelestiaChainInfo } from "chainInfos";
@@ -13,7 +14,7 @@ export default function BridgeCard(): React.ReactElement {
   const [fromAddress, setFromAddress] = useState<string>("");
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [isRecipientAddressValid, setIsRecipientAddressValid] =
-    useState<boolean>(false); // [1
+    useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
 
@@ -23,9 +24,12 @@ export default function BridgeCard(): React.ReactElement {
   useEffect(() => {
     if (userAccount) {
       setRecipientAddress(userAccount);
-      checkIsFormValid(userAccount, amount);
     }
   }, [userAccount]);
+
+  useEffect(() => {
+    checkIsFormValid(recipientAddress, amount);
+  }, [recipientAddress, amount]);
 
   const sendBalance = async () => {
     try {
@@ -56,7 +60,11 @@ export default function BridgeCard(): React.ReactElement {
           component: (
             <p>
               Keplr wallet extension must be installed! You can find it{" "}
-              <a target="_blank" href="https://www.keplr.app/download">
+              <a
+                target="_blank"
+                href="https://www.keplr.app/download"
+                rel="noreferrer"
+              >
                 here
               </a>
               .
@@ -86,12 +94,20 @@ export default function BridgeCard(): React.ReactElement {
   };
 
   const connectEVMWallet = async () => {
+    // use existing userAccount if we've already got it
+    if (userAccount) {
+      setRecipientAddress(userAccount);
+      return;
+    }
+
     addNotification({
       modalOpts: {
         modalType: NotificationType.INFO,
         title: "Connect EVM Wallet",
         component: <EthWalletConnector />,
-        onCancel: () => {},
+        onCancel: () => {
+          setRecipientAddress("");
+        },
         onConfirm: () => {},
       },
     });
@@ -107,14 +123,12 @@ export default function BridgeCard(): React.ReactElement {
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
-    checkIsFormValid(recipientAddress, event.target.value);
   };
 
   const updateRecipientAddress = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRecipientAddress(event.target.value);
-    checkIsFormValid(event.target.value, amount);
   };
 
   return (
