@@ -1,11 +1,13 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 
 import { CelestiaChainInfo } from "chainInfos";
+import { NotificationType } from "components/Notification/types";
+import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { NotificationsContext } from "contexts/NotificationsContext";
+import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
-import { NotificationType } from "../Notification/types";
 
 export default function BridgeCard(): React.ReactElement {
   const [fromAddress, setFromAddress] = useState<string>("");
@@ -16,6 +18,14 @@ export default function BridgeCard(): React.ReactElement {
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
 
   const { addNotification } = useContext(NotificationsContext);
+  const { userAccount } = useEthWallet();
+
+  useEffect(() => {
+    if (userAccount) {
+      setRecipientAddress(userAccount);
+      checkIsFormValid(userAccount, amount);
+    }
+  }, [userAccount]);
 
   const sendBalance = async () => {
     try {
@@ -75,6 +85,18 @@ export default function BridgeCard(): React.ReactElement {
     }
   };
 
+  const connectEVMWallet = async () => {
+    addNotification({
+      modalOpts: {
+        modalType: NotificationType.INFO,
+        title: "Connect EVM Wallet",
+        component: <EthWalletConnector />,
+        onCancel: () => {},
+        onConfirm: () => {},
+      },
+    });
+  };
+
   const checkIsFormValid = (addressInput: string, amountInput: string) => {
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
@@ -114,6 +136,7 @@ export default function BridgeCard(): React.ReactElement {
               type="text"
               placeholder="celestia..."
               value={fromAddress}
+              readOnly
             />
           </div>
           <div className="mt-1">
@@ -172,6 +195,7 @@ export default function BridgeCard(): React.ReactElement {
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
+              onClick={() => connectEVMWallet()}
             >
               Connect EVM Wallet
             </button>
@@ -179,11 +203,12 @@ export default function BridgeCard(): React.ReactElement {
         </div>
       </div>
 
-      <div className="card-footer px-4 my-3">
+      <div className="card-footer px-4 my-5">
         <button
           type="button"
           className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
           onClick={() => sendBalance()}
+          disabled={!isAmountValid || !isRecipientAddressValid}
         >
           Deposit
         </button>

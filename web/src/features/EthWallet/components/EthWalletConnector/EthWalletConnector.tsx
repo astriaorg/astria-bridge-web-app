@@ -1,34 +1,10 @@
-import { useState } from "react";
-import { useSyncWalletProviders } from "hooks/useSyncWalletProviders";
+import React from "react";
+import { useEthWallet } from "../../hooks/useEthWallet";
 
 export default function EthWalletConnector() {
-  const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>();
-  const [userAccount, setUserAccount] = useState<string>("");
-  const providers = useSyncWalletProviders();
+  const { providers, selectedWallet, userAccount, handleConnect } =
+    useEthWallet();
 
-  // connect to the selected provider using eth_requestAccounts.
-  const handleConnect = async (providerWithInfo: EIP6963ProviderDetail) => {
-    try {
-      const accounts: unknown = await providerWithInfo.provider.request({
-        method: "eth_requestAccounts",
-      });
-
-      setSelectedWallet(providerWithInfo);
-      if (Array.isArray(accounts) && accounts.length > 0) {
-        console.log(
-          "Connected to",
-          providerWithInfo.info.name,
-          "with account",
-          accounts[0],
-        );
-        setUserAccount(accounts[0]);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // display detected providers as connect buttons.
   return (
     <div className="card p-5 wallet-provider-card">
       <header className="card-header">
@@ -41,7 +17,7 @@ export default function EthWalletConnector() {
           <div className="heading">Wallets Detected</div>
           <div>
             {providers.length > 0 ? (
-              providers?.map((provider: EIP6963ProviderDetail) => (
+              providers.map((provider) => (
                 <button
                   type="button"
                   className="button is-tall"
