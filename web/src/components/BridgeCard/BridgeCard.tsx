@@ -10,7 +10,7 @@ import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { getJSON } from "services/api";
 import { sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
-import { Balances } from "types";
+import type { Balances } from "types";
 
 export default function BridgeCard(): React.ReactElement {
   const [balance, setBalance] = useState<string>("0 TIA");
@@ -195,7 +195,7 @@ export default function BridgeCard(): React.ReactElement {
               type="button"
               className="button is-ghost is-outlined-light is-tall"
               onClick={() => connectCelestiaWallet()}
-              disabled={fromAddress != ""}
+              disabled={fromAddress !== ""}
             >
               {fromAddress ? `${balance}` : "Connect Keplr Wallet"}
             </button>
