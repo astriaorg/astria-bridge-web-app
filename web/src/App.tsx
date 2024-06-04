@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { CelestiaChainInfo } from "chainInfos";
+import { EthWalletContextProvider } from "features/EthWallet/contexts/EthWalletContext";
 import BridgePage from "pages/BridgePage/BridgePage";
 import Layout from "pages/Layout";
 import { NotificationsProvider } from "providers/NotificationsProvider";
@@ -33,11 +34,13 @@ export default function App(): React.ReactElement {
 
   return (
     <NotificationsProvider>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<BridgePage />} />
-        </Route>
-      </Routes>
+      <EthWalletContextProvider>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<BridgePage />} />
+          </Route>
+        </Routes>
+      </EthWalletContextProvider>
     </NotificationsProvider>
   );
 }
