@@ -2,14 +2,15 @@ import type { ChainInfo } from "@keplr-wallet/types";
 
 export const CelestiaChainInfo: ChainInfo = {
   // Chain-id of the celestia chain.
-  chainId: "celestia-local",
+  chainId: "celestia-local-0",
   // The name of the chain to be displayed to the user.
-  chainName: "celestia-local",
-  // RPC endpoint of the chain. In this case we are using blockapsis, as it's accepts connections from any host currently. No Cors limitations.
-  rpc: "ws://localhost:27050",
+  chainName: "celestia-local-0",
+  // RPC endpoint of the chain
+  // TODO - use envar
+  rpc: "http://rpc.app.celestia.localdev.me",
   // REST endpoint of the chain.
-  // rest: 'https://api-mocha.pops.one',
-  rest: "http://localhost:1317",
+  // TODO - use envar
+  rest: "http://rest.app.celestia.localdev.me",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -81,15 +82,15 @@ export const CelestiaChainInfo: ChainInfo = {
 
 export const AstriaChainInfo: ChainInfo = {
   // Chain-id of the Astria chain.
-  chainId: "astria",
+  chainId: "sequencer-test-chain-0",
   // The name of the chain to be displayed to the user.
-  chainName: "astria",
+  chainName: "sequencer-test-chain-0",
   // RPC endpoint of the chain. In this case we are using blockapsis, as it's accepts connections from any host currently. No Cors limitations.
-  // rpc: 'https://rpc.sequencer.dusk-4.devnet.astria.org',
-  rpc: "ws://localhost:26657",
+  // TODO - use envar
+  rpc: "http://rpc.sequencer.localdev.me",
   // REST endpoint of the chain.
-  // rest: 'https://api-mocha.pops.one',
-  rest: "http://localhost:26657",
+  // TODO - use envar
+  rest: "http://rpc.sequencer.localdev.me",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
