@@ -35,7 +35,7 @@ export const sendIbcTransfer = async (
       offlineSigner,
     );
     const account = await client.getAccount(key.bech32Address);
-    const memo = JSON.stringify({"rollupAddress": recipient});
+    const memo = JSON.stringify({rollupAddress: recipient});
     const fee = {
       amount: [
         {
