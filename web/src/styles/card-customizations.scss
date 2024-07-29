@@ -10,23 +10,6 @@
   }
 }
 
-.access-request-card {
-  header.card-header {
-    button {
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-  }
-  footer.card-footer {
-    .buttons {
-      .button {
-        border-top-right-radius: 0;
-        border-top-left-radius: 0;
-      }
-    }
-  }
-}
-
 .card {
   &.disabled {
     opacity: 0.5;
@@ -60,8 +43,32 @@
     }
   }
 
+  & .card-spacer {
+    border-top: 1px $astria-white solid;
+    margin: 1rem 0;
+    width: 100%;
+  }
+
   .card-footer {
     border-top: none;
     box-shadow: none;
+  }
+}
+
+.wallet-provider-card {
+  & .card-content {
+    & .button {
+      margin-right: 0.5rem;
+      &.is-tall img {
+        height: 40px;
+        width: 40px;
+        margin-right: 0.5rem;
+      }
+    }
+
+    & .wallet-provider-icon {
+      height: 40px;
+      width: 40px;
+    }
   }
 }

@@ -51,7 +51,7 @@ function Notification({
   const ModalElem = () => (
     <div className="modal is-active">
       <div className="modal-background" />
-      <div className="modal-card has-background-danger">
+      <div className={`modal-card ${modalBackgroundClass()}`}>
         <header className={`modal-card-head ${modalBackgroundClass()}`}>
           <p className="modal-card-title has-text-white-ter">
             {modalOpts?.title}

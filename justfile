@@ -8,7 +8,7 @@ default:
 
 # copies web/.env.example to web/.env
 generate-initial-web-env:
-  cp web/.env.example web/.envlocaldev
+  cp web/.env.example web/.env
 
 # installs npm deps for web
 install-web-deps:
@@ -26,5 +26,4 @@ deploy-hosting-preview:
 # run front end app locally,
 # with file watching that triggers rebuilds
 run-web-local:
-  cp web/.env.example web/.env
   cd web && npm run start
