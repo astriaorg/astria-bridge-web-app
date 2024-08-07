@@ -2,6 +2,7 @@
 default_proj := 'all'
 
 # Can test 'web' project for now.
+[group('test')]
 test proj=default_proj:
   @just _test-{{proj}}
 

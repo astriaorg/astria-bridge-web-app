@@ -3,28 +3,16 @@
 ## Scripts related to formatting code
 default_lang := 'all'
 
-# Can format 'ts', 'md', or 'all'. Defaults to all
-fmt lang=default_lang:
-  @just _fmt-{{lang}}
-
-alias f := fmt
-
 # Can lint 'ts', 'md', or 'all'. Defaults to all
+[group('lint')]
 lint lang=default_lang:
   @just _lint-{{lang}}
 
 alias l := lint
 
-_fmt-all:
-  @just _fmt-ts
-
 @_lint-all:
   -just _lint-md
   -just _lint-ts
-
-[no-exit-message]
-_fmt-ts:
-  cd web; npm run format
 
 [no-exit-message]
 _lint-md:
@@ -36,3 +24,17 @@ _lint-md:
 [no-exit-message]
 _lint-ts:
   cd web; npm run lint
+
+# Can format 'ts', 'md', or 'all'. Defaults to all
+[group('format')]
+fmt lang=default_lang:
+  @just _fmt-{{lang}}
+
+alias f := fmt
+
+_fmt-all:
+  @just _fmt-ts
+
+[no-exit-message]
+_fmt-ts:
+  cd web; npm run format
