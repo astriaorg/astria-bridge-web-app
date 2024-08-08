@@ -30,7 +30,7 @@ export default function BridgeCard(): React.ReactElement {
   // which means we got it from the eth wallet
   useEffect(() => {
     if (userAccount) {
-      setRecipientAddress(userAccount);
+      setRecipientAddress(userAccount.address);
     }
   }, [userAccount]);
 
@@ -132,7 +132,7 @@ export default function BridgeCard(): React.ReactElement {
   const connectEVMWallet = async () => {
     // use existing userAccount if we've already got it
     if (userAccount) {
-      setRecipientAddress(userAccount);
+      setRecipientAddress(userAccount.address);
       return;
     }
 
@@ -172,7 +172,7 @@ export default function BridgeCard(): React.ReactElement {
     <div className="card p-5">
       <header className="card-header">
         <p className="card-header-title is-size-5 has-text-weight-normal has-text-light">
-          Deposit TIA
+          Deposit
         </p>
       </header>
 
@@ -227,7 +227,7 @@ export default function BridgeCard(): React.ReactElement {
       <div className="card-spacer" />
 
       <div className="field">
-        <label className="field-label">Recipient address</label>
+        <label className="field-label">To</label>
         <div className="is-flex is-flex-direction-row is-justify-content-space-between">
           <div className="control mt-1 mr-5 is-flex-grow-1">
             <input
