@@ -5,10 +5,11 @@ import { NotificationType } from "components/Notification/types";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { getKeplrFromWindow } from "services/keplr";
 import { CelestiaChainInfo } from "chainInfos";
+import { getAstriaWithdrawerService } from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount, selectedWallet } = useEthWallet();
+  const { userAccount, selectedWallet, provider: provider } = useEthWallet();
 
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
@@ -16,8 +17,10 @@ export default function WithdrawCard(): React.ReactElement {
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [toAddress, setToAddress] = useState<string>("");
+  const [isToAddressValid, setIsToAddressValid] = useState<boolean>(false);
 
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (userAccount?.address) {
@@ -28,10 +31,8 @@ export default function WithdrawCard(): React.ReactElement {
     }
   }, [userAccount]);
 
-  // check if form is valid whenever values change
   useEffect(() => {
     if (amount || toAddress) {
-      // have touched form when recipientAddress or amount change
       setHasTouchedForm(true);
     }
     checkIsFormValid(amount, toAddress);
@@ -40,22 +41,14 @@ export default function WithdrawCard(): React.ReactElement {
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
   };
-  const updateFromAddress = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setFromAddress(event.target.value);
-  };
 
-  const checkIsFormValid = (addressInput: string, amountInput: string) => {
+  const checkIsFormValid = (amountInput: string, toAddressInput: string) => {
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
     setIsAmountValid(amountValid);
-    const addressValid = addressInput.length > 0;
-    // setIsRecipientAddressValid(addressValid);
-  };
-
-  const getBalance = async () => {
-
+    // TODO - add more validation for addresses?
+    const isToAddressValid = toAddressInput.length > 0;
+    setIsToAddressValid(isToAddressValid);
   };
 
   const connectCelestiaWallet = async () => {
@@ -103,13 +96,10 @@ export default function WithdrawCard(): React.ReactElement {
   };
 
   const connectEVMWallet = async () => {
-    // use existing userAccount if we've already got it
     if (userAccount) {
       setFromAddress(userAccount.address);
       return;
     }
-
-    // TODO - get balance
 
     addNotification({
       modalOpts: {
@@ -125,86 +115,136 @@ export default function WithdrawCard(): React.ReactElement {
     });
   };
 
-  return <div className="card p-5">
-    <header className="card-header">
-      <p className="card-header-title is-size-5 has-text-weight-normal has-text-light">
-        Withdraw
-      </p>
-    </header>
-    <div className="card-spacer" />
+  const handleWithdraw = async () => {
+    if (!selectedWallet || !isAmountValid || !toAddress) {
+      console.warn("Withdrawal cannot proceed: missing required fields or fields are invalid", {
+        selectedWallet,
+        isAmountValid,
+        toAddress,
+      });
+      return;
+    }
 
-    <div className="field">
-      <label className="field-label">From</label>
-      <div className="is-flex is-flex-direction-row is-justify-content-space-between">
-        <div className="control mt-1 mr-5 is-flex-grow-1">
+    setIsLoading(true);
+    try {
+      const service = getAstriaWithdrawerService(selectedWallet.provider, fromAddress);
+      const tx = await service.withdrawToIbcChain(toAddress, amount, "");
+      console.log(tx);
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.SUCCESS,
+          message: "Withdrawal successful!",
+          onAcknowledge: () => {
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Withdrawal failed:", error);
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.DANGER,
+          message: "Withdrawal failed. Please try again.",
+          onAcknowledge: () => {
+          },
+        },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="card p-5">
+      <header className="card-header">
+        <p className="card-header-title is-size-5 has-text-weight-normal has-text-light">
+          Withdraw
+        </p>
+      </header>
+      <div className="card-spacer" />
+
+      <div className="field">
+        <label className="field-label">From</label>
+        <div className="is-flex is-flex-direction-row is-justify-content-space-between">
+          <div className="control mt-1 mr-5 is-flex-grow-1">
+            <input
+              className="input"
+              type="text"
+              placeholder="0x..."
+              value={fromAddress}
+              readOnly
+            />
+          </div>
+          <div className="mt-1">
+            <button
+              type="button"
+              className="button is-ghost is-outlined-light is-tall"
+              onClick={() => connectEVMWallet()}
+              disabled={fromAddress !== ""}
+            >
+              {fromAddress ? `${balance}` : "Connect EVM Wallet"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="field">
+        <label className="field-label">Amount</label>
+        <div className="control has-icons-right mt-1">
           <input
             className="input"
             type="text"
-            placeholder="0x..."
-            value={fromAddress}
-            onChange={updateFromAddress}
+            placeholder="0.00"
+            onChange={updateAmount}
+            value={amount}
           />
-        </div>
-        <div className="mt-1">
-          <button
-            type="button"
-            className="button is-ghost is-outlined-light is-tall"
-            onClick={() => connectEVMWallet()}
-            disabled={fromAddress !== ""}
-          >
-            {fromAddress ? `${balance}` : "Connect EVM Wallet"}
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div className="field">
-      <label className="field-label">Amount</label>
-      <div className="control has-icons-right mt-1">
-        <input
-          className="input"
-          type="text"
-          placeholder="0.00"
-          onChange={updateAmount}
-          value={amount}
-        />
-        <span className="icon is-right mt-1">
+          <span className="icon is-right mt-1">
             <p>TIA</p>
           </span>
-        {!isAmountValid && hasTouchedForm && (
-          <p className="help is-danger">
-            - Amount must be a number greater than 0
-          </p>
-        )}
-      </div>
-    </div>
-
-    <div className="card-spacer" />
-
-    <div className="field">
-      <label className="field-label">To</label>
-      <div className="is-flex is-flex-direction-row is-justify-content-space-between">
-        <div className="control mt-1 mr-5 is-flex-grow-1">
-          <input
-            className="input"
-            type="text"
-            placeholder="celestia..."
-            value={toAddress}
-            readOnly
-          />
-        </div>
-        <div className="mt-1">
-          <button
-            type="button"
-            className="button is-ghost is-outlined-light is-tall"
-            onClick={() => connectCelestiaWallet()}
-            disabled={toAddress !== ""}
-          >
-            Connect Keplr Wallet
-          </button>
+          {!isAmountValid && hasTouchedForm && (
+            <p className="help is-danger">
+              - Amount must be a number greater than 0
+            </p>
+          )}
         </div>
       </div>
-    </div>
 
-  </div>;
+      <div className="card-spacer" />
+
+      <div className="field">
+        <label className="field-label">To</label>
+        <div className="is-flex is-flex-direction-row is-justify-content-space-between">
+          <div className="control mt-1 mr-5 is-flex-grow-1">
+            <input
+              className="input"
+              type="text"
+              placeholder="celestia..."
+              value={toAddress}
+              readOnly
+            />
+          </div>
+          <div className="mt-1">
+            <button
+              type="button"
+              className="button is-ghost is-outlined-light is-tall"
+              onClick={() => connectCelestiaWallet()}
+              disabled={toAddress !== ""}
+            >
+              Connect Keplr Wallet
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="card-footer px-4 my-5">
+        <button
+          type="button"
+          className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
+          onClick={handleWithdraw}
+          disabled={!isAmountValid || !isToAddressValid || isLoading}
+        >
+          {isLoading ? "Processing..." : "Withdraw"}
+        </button>
+      </div>
+    </div>
+  );
 }
