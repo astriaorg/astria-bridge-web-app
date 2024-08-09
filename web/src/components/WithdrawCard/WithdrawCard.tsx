@@ -1,89 +1,54 @@
-import type React from "react";
-import { useContext, useEffect, useState } from "react";
-import { Dec, DecUtils } from "@keplr-wallet/unit";
-
-import { CelestiaChainInfo } from "chainInfos";
+import React, { useContext, useEffect, useState } from "react";
+import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
+import { NotificationsContext } from "contexts/NotificationsContext";
 import { NotificationType } from "components/Notification/types";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
-import { NotificationsContext } from "contexts/NotificationsContext";
-import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
-import { getJSON } from "services/api";
-import { sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
-import type { Balances } from "types";
+import { CelestiaChainInfo } from "chainInfos";
+import { getAstriaWithdrawerService } from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 
-export default function BridgeCard(): React.ReactElement {
+export default function WithdrawCard(): React.ReactElement {
+  const { addNotification } = useContext(NotificationsContext);
+  const { userAccount, selectedWallet, provider: provider } = useEthWallet();
+
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
-  const [recipientAddress, setRecipientAddress] = useState<string>("");
+
   const [amount, setAmount] = useState<string>("");
+  const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
+  const [toAddress, setToAddress] = useState<string>("");
+  const [isToAddressValid, setIsToAddressValid] = useState<boolean>(false);
 
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
-  const [isRecipientAddressValid, setIsRecipientAddressValid] =
-    useState<boolean>(false);
-  const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { addNotification } = useContext(NotificationsContext);
-  const { userAccount } = useEthWallet();
-
-  // set recipient address if userAccount available,
-  // which means we got it from the eth wallet
   useEffect(() => {
-    if (userAccount) {
-      setRecipientAddress(userAccount.address);
+    if (userAccount?.address) {
+      setFromAddress(userAccount.address);
+    }
+    if (userAccount?.balance) {
+      setBalance(`${userAccount.balance} TIA`);
     }
   }, [userAccount]);
 
-  // check if form is valid whenever values change
   useEffect(() => {
-    if (recipientAddress || amount) {
-      // have touched form when recipientAddress or amount change
+    if (amount || toAddress) {
       setHasTouchedForm(true);
     }
-    checkIsFormValid(recipientAddress, amount);
-  }, [recipientAddress, amount]);
+    checkIsFormValid(amount, toAddress);
+  }, [amount, toAddress]);
 
-  const getBalance = async () => {
-    const key = await window.keplr?.getKey(CelestiaChainInfo.chainId);
-
-    if (key) {
-      const uri = `${CelestiaChainInfo.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
-
-      const data = await getJSON<Balances>(uri);
-      const balance = data.balances.find((balance) => balance.denom === "utia");
-      const tiaDecimal = CelestiaChainInfo.currencies.find(
-        (currency: { coinMinimalDenom: string }) =>
-          currency.coinMinimalDenom === "utia",
-      )?.coinDecimals;
-
-      if (balance) {
-        const amount = new Dec(balance.amount, tiaDecimal);
-        setBalance(`${amount.toString(tiaDecimal)} TIA`);
-      } else {
-        setBalance("0 TIA");
-      }
-    }
+  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(event.target.value);
   };
 
-  const sendBalance = async () => {
-    try {
-      await sendIbcTransfer(
-        fromAddress,
-        recipientAddress,
-        DecUtils.getTenExponentN(6).mul(new Dec(amount)).truncate().toString(),
-      );
-    } catch (e) {
-      if (e instanceof Error) {
-        console.error(e.message);
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message: "Failed to send IBC transfer",
-            onAcknowledge: () => {},
-          },
-        });
-      }
-    }
+  const checkIsFormValid = (amountInput: string, toAddressInput: string) => {
+    const amount = Number.parseFloat(amountInput);
+    const amountValid = amount > 0;
+    setIsAmountValid(amountValid);
+    // TODO - add more validation for addresses?
+    const isToAddressValid = toAddressInput.length > 0;
+    setIsToAddressValid(isToAddressValid);
   };
 
   const connectCelestiaWallet = async () => {
@@ -105,7 +70,8 @@ export default function BridgeCard(): React.ReactElement {
               .
             </p>
           ),
-          onAcknowledge: () => {},
+          onAcknowledge: () => {
+          },
         },
       });
       return;
@@ -113,8 +79,7 @@ export default function BridgeCard(): React.ReactElement {
 
     try {
       const key = await keplr.getKey(CelestiaChainInfo.chainId);
-      setFromAddress(key.bech32Address);
-      await getBalance();
+      setToAddress(key.bech32Address);
     } catch (e) {
       if (e instanceof Error) {
         console.log(e.message);
@@ -123,16 +88,16 @@ export default function BridgeCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.DANGER,
           message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {},
+          onAcknowledge: () => {
+          },
         },
       });
     }
   };
 
   const connectEVMWallet = async () => {
-    // use existing userAccount if we've already got it
     if (userAccount) {
-      setRecipientAddress(userAccount.address);
+      setFromAddress(userAccount.address);
       return;
     }
 
@@ -142,40 +107,59 @@ export default function BridgeCard(): React.ReactElement {
         title: "Connect EVM Wallet",
         component: <EthWalletConnector />,
         onCancel: () => {
-          setRecipientAddress("");
+          setFromAddress("");
         },
-        onConfirm: () => {},
+        onConfirm: () => {
+        },
       },
     });
   };
 
-  const checkIsFormValid = (addressInput: string, amountInput: string) => {
-    const amount = Number.parseFloat(amountInput);
-    const amountValid = amount > 0;
-    setIsAmountValid(amountValid);
-    // TODO - what validation should we do?
-    const addressValid = addressInput.length > 0;
-    setIsRecipientAddressValid(addressValid);
-  };
+  const handleWithdraw = async () => {
+    if (!selectedWallet || !isAmountValid || !toAddress) {
+      console.warn("Withdrawal cannot proceed: missing required fields or fields are invalid", {
+        selectedWallet,
+        isAmountValid,
+        toAddress,
+      });
+      return;
+    }
 
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
-  };
-
-  const updateRecipientAddress = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRecipientAddress(event.target.value);
+    setIsLoading(true);
+    try {
+      const service = getAstriaWithdrawerService(selectedWallet.provider, fromAddress);
+      const tx = await service.withdrawToIbcChain(toAddress, amount, "");
+      console.log(tx);
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.SUCCESS,
+          message: "Withdrawal successful!",
+          onAcknowledge: () => {
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Withdrawal failed:", error);
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.DANGER,
+          message: "Withdrawal failed. Please try again.",
+          onAcknowledge: () => {
+          },
+        },
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="card p-5">
       <header className="card-header">
         <p className="card-header-title is-size-5 has-text-weight-normal has-text-light">
-          Deposit
+          Withdraw
         </p>
       </header>
-
       <div className="card-spacer" />
 
       <div className="field">
@@ -185,7 +169,7 @@ export default function BridgeCard(): React.ReactElement {
             <input
               className="input"
               type="text"
-              placeholder="celestia..."
+              placeholder="0x..."
               value={fromAddress}
               readOnly
             />
@@ -194,10 +178,10 @@ export default function BridgeCard(): React.ReactElement {
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectCelestiaWallet()}
+              onClick={() => connectEVMWallet()}
               disabled={fromAddress !== ""}
             >
-              {fromAddress ? `${balance}` : "Connect Keplr Wallet"}
+              {fromAddress ? `${balance}` : "Connect EVM Wallet"}
             </button>
           </div>
         </div>
@@ -233,22 +217,19 @@ export default function BridgeCard(): React.ReactElement {
             <input
               className="input"
               type="text"
-              placeholder="0x..."
-              onChange={updateRecipientAddress}
-              value={recipientAddress}
+              placeholder="celestia..."
+              value={toAddress}
+              readOnly
             />
-
-            {!isRecipientAddressValid && hasTouchedForm && (
-              <p className="help is-danger">- Must be a valid EVM address</p>
-            )}
           </div>
           <div className="mt-1">
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectEVMWallet()}
+              onClick={() => connectCelestiaWallet()}
+              disabled={toAddress !== ""}
             >
-              Connect EVM Wallet
+              Connect Keplr Wallet
             </button>
           </div>
         </div>
@@ -258,10 +239,10 @@ export default function BridgeCard(): React.ReactElement {
         <button
           type="button"
           className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
-          onClick={() => sendBalance()}
-          disabled={!isAmountValid || !isRecipientAddressValid}
+          onClick={handleWithdraw}
+          disabled={!isAmountValid || !isToAddressValid || isLoading}
         >
-          Deposit
+          {isLoading ? "Processing..." : "Withdraw"}
         </button>
       </div>
     </div>

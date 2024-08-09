@@ -17,6 +17,7 @@
     "@types/react-dom": "^18.2.8",
     "@types/uuid": "^9.0.8",
     "bulma": "^0.9.4",
+    "ethers": "^6.13.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.50.0",
@@ -40,7 +41,11 @@
     "lint-apply-unsafe": "biome lint --apply-unsafe ./src ./public"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",

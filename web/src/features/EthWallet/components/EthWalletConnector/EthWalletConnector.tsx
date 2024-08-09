@@ -46,7 +46,7 @@ export default function EthWalletConnector() {
                   alt={selectedWallet?.info.name}
                 />
                 <div>{selectedWallet?.info.name}</div>
-                <div>({userAccount})</div>
+                <div>({userAccount.address})</div>
               </div>
             </div>
           )}
