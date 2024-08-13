@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 
 export interface EthWalletContextProps {
   providers: EIP6963ProviderDetail[];
-  selectedWallet: EIP6963ProviderDetail | undefined;  // TODO - refactor to be an ethers.Provider to make things easier?
+  selectedWallet: EIP6963ProviderDetail | undefined; // TODO - refactor to be an ethers.Provider to make things easier?
   userAccount: UserAccount | undefined;
   provider: ethers.BrowserProvider | undefined;
   signer: ethers.Signer | undefined;
@@ -19,10 +19,11 @@ export const EthWalletContext = createContext<
 >(undefined);
 
 export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
-                                                                              children,
-                                                                            }) => {
+  children,
+}) => {
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>();
-  const [selectedProvider, setSelectedProvider] = useState<ethers.BrowserProvider>();
+  const [selectedProvider, setSelectedProvider] =
+    useState<ethers.BrowserProvider>();
   const [userAccount, setUserAccount] = useState<UserAccount>();
   const [signer, setSigner] = useState<ethers.Signer>();
   const providers = useSyncWalletProviders();
@@ -38,7 +39,9 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
         const address = accounts[0];
 
         // create an ethers provider and signer
-        const ethersProvider = new ethers.BrowserProvider(providerWithInfo.provider);
+        const ethersProvider = new ethers.BrowserProvider(
+          providerWithInfo.provider,
+        );
         setSelectedProvider(ethersProvider);
         const ethersSigner = await ethersProvider.getSigner();
         setSigner(ethersSigner);
@@ -58,7 +61,6 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
           "with account",
           address,
         );
-
       }
     } catch (error) {
       console.error("Failed to connect to wallet.", error);

@@ -10,16 +10,14 @@ import { getAstriaWithdrawerService } from "features/EthWallet/services/AstriaWi
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount, selectedWallet, provider } = useEthWallet();
+  const { userAccount, selectedWallet } = useEthWallet();
 
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
-
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [toAddress, setToAddress] = useState<string>("");
   const [isToAddressValid, setIsToAddressValid] = useState<boolean>(false);
-
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -47,7 +45,6 @@ export default function WithdrawCard(): React.ReactElement {
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
     setIsAmountValid(amountValid);
-    // TODO - add more validation for addresses?
     const isToAddressValid = toAddressInput.length > 0;
     setIsToAddressValid(isToAddressValid);
   };
@@ -71,8 +68,7 @@ export default function WithdrawCard(): React.ReactElement {
               .
             </p>
           ),
-          onAcknowledge: () => {
-          },
+          onAcknowledge: () => {},
         },
       });
       return;
@@ -89,8 +85,7 @@ export default function WithdrawCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.DANGER,
           message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {
-          },
+          onAcknowledge: () => {},
         },
       });
     }
@@ -110,33 +105,37 @@ export default function WithdrawCard(): React.ReactElement {
         onCancel: () => {
           setFromAddress("");
         },
-        onConfirm: () => {
-        },
+        onConfirm: () => {},
       },
     });
   };
 
   const handleWithdraw = async () => {
     if (!selectedWallet || !isAmountValid || !toAddress) {
-      console.warn("Withdrawal cannot proceed: missing required fields or fields are invalid", {
-        selectedWallet,
-        isAmountValid,
-        toAddress,
-      });
+      console.warn(
+        "Withdrawal cannot proceed: missing required fields or fields are invalid",
+        {
+          selectedWallet,
+          isAmountValid,
+          toAddress,
+        },
+      );
       return;
     }
 
     setIsLoading(true);
     try {
-      const withdrawerSvc = getAstriaWithdrawerService(selectedWallet.provider, fromAddress);
+      const withdrawerSvc = getAstriaWithdrawerService(
+        selectedWallet.provider,
+        fromAddress,
+      );
       const tx = await withdrawerSvc.withdrawToIbcChain(toAddress, amount, "");
       console.log(tx);
       addNotification({
         toastOpts: {
           toastType: NotificationType.SUCCESS,
           message: "Withdrawal successful!",
-          onAcknowledge: () => {
-          },
+          onAcknowledge: () => {},
         },
       });
     } catch (error) {
@@ -145,8 +144,7 @@ export default function WithdrawCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.DANGER,
           message: "Withdrawal failed. Please try again.",
-          onAcknowledge: () => {
-          },
+          onAcknowledge: () => {},
         },
       });
     } finally {
@@ -155,18 +153,11 @@ export default function WithdrawCard(): React.ReactElement {
   };
 
   return (
-    <div className="card p-5">
-      <header className="card-header">
-        <p className="card-header-title is-size-5 has-text-weight-normal has-text-light">
-          Withdraw
-        </p>
-      </header>
-      <div className="card-spacer" />
-
+    <div>
       <div className="field">
         <label className="field-label">From</label>
-        <div className="is-flex is-flex-direction-row is-justify-content-space-between">
-          <div className="control mt-1 mr-5 is-flex-grow-1">
+        <div className="is-flex is-flex-direction-column">
+          <div className="control mt-1 is-flex-grow-1">
             <input
               className="input"
               type="text"
@@ -175,15 +166,18 @@ export default function WithdrawCard(): React.ReactElement {
               readOnly
             />
           </div>
-          <div className="mt-1">
+          <div className="mt-3">
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
               onClick={() => connectEVMWallet()}
               disabled={fromAddress !== ""}
             >
-              {fromAddress ? `${balance}` : "Connect EVM Wallet"}
+              {fromAddress ? "Connected to EVM Wallet" : "Connect EVM Wallet"}
             </button>
+            {fromAddress && (
+              <p className="mt-2 has-text-light">Balance: {balance}</p>
+            )}
           </div>
         </div>
       </div>
@@ -201,20 +195,51 @@ export default function WithdrawCard(): React.ReactElement {
           <span className="icon is-right mt-1">
             <p>TIA</p>
           </span>
-          {!isAmountValid && hasTouchedForm && (
-            <p className="help is-danger">
-              - Amount must be a number greater than 0
-            </p>
-          )}
         </div>
+        {!isAmountValid && hasTouchedForm && (
+          <p className="help is-danger mt-2">
+            Amount must be a number greater than 0
+          </p>
+        )}
       </div>
 
-      <div className="card-spacer" />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "100%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "80%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "60%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "40%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "20%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "10%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "5%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "1%", margin: "0 auto" }}
+      />
 
       <div className="field">
         <label className="field-label">To</label>
-        <div className="is-flex is-flex-direction-row is-justify-content-space-between">
-          <div className="control mt-1 mr-5 is-flex-grow-1">
+        <div className="is-flex is-flex-direction-column">
+          <div className="control mt-1 is-flex-grow-1">
             <input
               className="input"
               type="text"
@@ -223,15 +248,20 @@ export default function WithdrawCard(): React.ReactElement {
               readOnly
             />
           </div>
-          <div className="mt-1">
+          <div className="mt-3">
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
               onClick={() => connectCelestiaWallet()}
               disabled={toAddress !== ""}
             >
-              Connect Keplr Wallet
+              {toAddress ? "Connected to Keplr Wallet" : "Connect Keplr Wallet"}
             </button>
+            {!isToAddressValid && hasTouchedForm && (
+              <p className="help is-danger mt-2">
+                Must be a valid Celestia address
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -241,7 +271,13 @@ export default function WithdrawCard(): React.ReactElement {
           type="button"
           className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
           onClick={handleWithdraw}
-          disabled={!isAmountValid || !isToAddressValid || isLoading}
+          disabled={
+            !isAmountValid ||
+            !isToAddressValid ||
+            isLoading ||
+            !fromAddress ||
+            !toAddress
+          }
         >
           {isLoading ? "Processing..." : "Withdraw"}
         </button>

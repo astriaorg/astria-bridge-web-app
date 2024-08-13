@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
 
-const WITHDRAWER_CONTRACT_ADDRESS = "0xA58639fB5458e65E4fA917FF951C390292C24A15";
+const WITHDRAWER_CONTRACT_ADDRESS =
+  "0xA58639fB5458e65E4fA917FF951C390292C24A15";
 
 const ABI = [
   "function withdrawToSequencer(string destinationChainAddress) payable",
-  "function withdrawToIbcChain(string destinationChainAddress, string memo) payable"
+  "function withdrawToIbcChain(string destinationChainAddress, string memo) payable",
 ];
 
 /**
@@ -37,22 +38,33 @@ export class AstriaWithdrawerService {
     return this.contractPromise;
   }
 
-  async withdrawToSequencer(destinationChainAddress: string, amount: string): Promise<ethers.ContractTransactionResponse> {
+  async withdrawToSequencer(
+    destinationChainAddress: string,
+    amount: string,
+  ): Promise<ethers.ContractTransactionResponse> {
     try {
       const amountWei = ethers.parseEther(amount);
       const contract = await this.getContract();
-      return contract.withdrawToSequencer(destinationChainAddress, { value: amountWei });
+      return contract.withdrawToSequencer(destinationChainAddress, {
+        value: amountWei,
+      });
     } catch (error) {
       console.error("Error in withdrawToSequencer:", error);
       throw error;
     }
   }
 
-  async withdrawToIbcChain(destinationChainAddress: string, amount: string, memo: string): Promise<ethers.ContractTransactionResponse> {
+  async withdrawToIbcChain(
+    destinationChainAddress: string,
+    amount: string,
+    memo: string,
+  ): Promise<ethers.ContractTransactionResponse> {
     try {
       const amountWei = ethers.parseEther(amount);
       const contract = await this.getContract();
-      return contract.withdrawToIbcChain(destinationChainAddress, memo, { value: amountWei });
+      return contract.withdrawToIbcChain(destinationChainAddress, memo, {
+        value: amountWei,
+      });
     } catch (error) {
       console.error("Error in withdrawToIbcChain:", error);
       throw error;
@@ -60,6 +72,9 @@ export class AstriaWithdrawerService {
   }
 }
 
-export const getAstriaWithdrawerService = (provider: ethers.Eip1193Provider, address: string): AstriaWithdrawerService => {
+export const getAstriaWithdrawerService = (
+  provider: ethers.Eip1193Provider,
+  address: string,
+): AstriaWithdrawerService => {
   return new AstriaWithdrawerService(provider, address);
 };

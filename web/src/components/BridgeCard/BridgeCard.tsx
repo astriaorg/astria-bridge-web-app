@@ -169,19 +169,11 @@ export default function BridgeCard(): React.ReactElement {
   };
 
   return (
-    <div className="card p-5">
-      <header className="card-header">
-        <p className="card-header-title is-size-5 has-text-weight-normal has-text-light">
-          Deposit
-        </p>
-      </header>
-
-      <div className="card-spacer" />
-
+    <div>
       <div className="field">
         <label className="field-label">From</label>
-        <div className="is-flex is-flex-direction-row is-justify-content-space-between">
-          <div className="control mt-1 mr-5 is-flex-grow-1">
+        <div className="is-flex is-flex-direction-column">
+          <div className="control mt-1 is-flex-grow-1">
             <input
               className="input"
               type="text"
@@ -190,21 +182,26 @@ export default function BridgeCard(): React.ReactElement {
               readOnly
             />
           </div>
-          <div className="mt-1">
+          <div className="mt-3">
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
               onClick={() => connectCelestiaWallet()}
               disabled={fromAddress !== ""}
             >
-              {fromAddress ? `${balance}` : "Connect Keplr Wallet"}
+              {fromAddress
+                ? "Connected to Keplr Wallet"
+                : "Connect Keplr Wallet"}
             </button>
+            {fromAddress && (
+              <p className="mt-2 has-text-light">Balance: {balance}</p>
+            )}
           </div>
         </div>
       </div>
 
       <div className="field">
-        <label className="field-label">Amount</label>
+        <label className="field-label">Amount to deposit</label>
         <div className="control has-icons-right mt-1">
           <input
             className="input"
@@ -216,20 +213,51 @@ export default function BridgeCard(): React.ReactElement {
           <span className="icon is-right mt-1">
             <p>TIA</p>
           </span>
-          {!isAmountValid && hasTouchedForm && (
-            <p className="help is-danger">
-              - Amount must be a number greater than 0
-            </p>
-          )}
         </div>
+        {!isAmountValid && hasTouchedForm && (
+          <p className="help is-danger mt-2">
+            Amount must be a number greater than 0
+          </p>
+        )}
       </div>
 
-      <div className="card-spacer" />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "100%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "80%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "60%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "40%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "20%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "10%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "5%", margin: "0 auto" }}
+      />
+      <div
+        className="card-spacer mt-1"
+        style={{ width: "1%", margin: "0 auto" }}
+      />
 
       <div className="field">
         <label className="field-label">To</label>
-        <div className="is-flex is-flex-direction-row is-justify-content-space-between">
-          <div className="control mt-1 mr-5 is-flex-grow-1">
+        <div className="is-flex is-flex-direction-column">
+          <div className="control mt-1 is-flex-grow-1">
             <input
               className="input"
               type="text"
@@ -237,19 +265,21 @@ export default function BridgeCard(): React.ReactElement {
               onChange={updateRecipientAddress}
               value={recipientAddress}
             />
-
-            {!isRecipientAddressValid && hasTouchedForm && (
-              <p className="help is-danger">- Must be a valid EVM address</p>
-            )}
           </div>
-          <div className="mt-1">
+          <div className="mt-3">
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
+              disabled={recipientAddress !== ""}
               onClick={() => connectEVMWallet()}
             >
-              Connect EVM Wallet
+              {recipientAddress
+                ? "Connected to EVM Wallet"
+                : "Connect EVM Wallet"}
             </button>
+            {!isRecipientAddressValid && hasTouchedForm && (
+              <p className="help is-danger mt-2">Must be a valid EVM address</p>
+            )}
           </div>
         </div>
       </div>
@@ -259,7 +289,12 @@ export default function BridgeCard(): React.ReactElement {
           type="button"
           className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
           onClick={() => sendBalance()}
-          disabled={!isAmountValid || !isRecipientAddressValid}
+          disabled={
+            !isAmountValid ||
+            !isRecipientAddressValid ||
+            !fromAddress ||
+            !recipientAddress
+          }
         >
           Deposit
         </button>
