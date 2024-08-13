@@ -1,7 +1,7 @@
 import type React from "react";
 import { createContext, type ReactNode, useState } from "react";
 import { useSyncWalletProviders } from "../hooks/useSyncWalletProviders";
-import { UserAccount } from "../types";
+import type { UserAccount } from "../types";
 import { formatBalance } from "utils";
 import { ethers } from "ethers";
 

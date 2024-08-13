@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import type React from "react";
+import { useContext, useEffect, useState } from "react";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { NotificationsContext } from "contexts/NotificationsContext";
 import { NotificationType } from "components/Notification/types";
@@ -9,7 +10,7 @@ import { getAstriaWithdrawerService } from "features/EthWallet/services/AstriaWi
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount, selectedWallet, provider: provider } = useEthWallet();
+  const { userAccount, selectedWallet, provider } = useEthWallet();
 
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
