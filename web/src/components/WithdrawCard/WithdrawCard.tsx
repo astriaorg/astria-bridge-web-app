@@ -127,8 +127,8 @@ export default function WithdrawCard(): React.ReactElement {
 
     setIsLoading(true);
     try {
-      const service = getAstriaWithdrawerService(selectedWallet.provider, fromAddress);
-      const tx = await service.withdrawToIbcChain(toAddress, amount, "");
+      const withdrawerSvc = getAstriaWithdrawerService(selectedWallet.provider, fromAddress);
+      const tx = await withdrawerSvc.withdrawToIbcChain(toAddress, amount, "");
       console.log(tx);
       addNotification({
         toastOpts: {
