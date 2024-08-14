@@ -87,47 +87,47 @@ export default function BridgeCard(): React.ReactElement {
   };
 
   const connectCelestiaWallet = async () => {
-    const keplr = await getKeplrFromWindow();
-    if (!keplr) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          component: (
-            <p>
-              Keplr wallet extension must be installed! You can find it{" "}
-              <a
-                target="_blank"
-                href="https://www.keplr.app/download"
-                rel="noreferrer"
-              >
-                here
-              </a>
-              .
-            </p>
-          ),
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
+  const keplr = await getKeplrFromWindow();
+  if (!keplr) {
+    addNotification({
+      toastOpts: {
+        toastType: NotificationType.DANGER,
+        component: (
+          <p>
+            Keplr wallet extension must be installed! You can find it{" "}
+            <a
+              target="_blank"
+              href="https://www.keplr.app/download"
+              rel="noreferrer"
+            >
+              here
+            </a>
+            .
+          </p>
+        ),
+        onAcknowledge: () => {},
+      },
+    });
+    return;
+  }
 
-    try {
-      const key = await keplr.getKey(CelestiaChainInfo.chainId);
-      setFromAddress(key.bech32Address);
-      await getBalance();
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e.message);
-      }
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {},
-        },
-      });
+  try {
+    const key = await keplr.getKey(CelestiaChainInfo.chainId);
+    setFromAddress(key.bech32Address);
+    await getBalance(); // Move getBalance call here
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e.message);
     }
-  };
+    addNotification({
+      toastOpts: {
+        toastType: NotificationType.DANGER,
+        message: "Failed to get key from Keplr wallet.",
+        onAcknowledge: () => {},
+      },
+    });
+  }
+};
 
   const connectEVMWallet = async () => {
     // use existing userAccount if we've already got it
