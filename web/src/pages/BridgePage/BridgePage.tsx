@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import BridgeCard from "components/BridgeCard/BridgeCard";
+import type React from "react";
+import { useState } from "react";
+import DepositCard from "components/DepositCard/DepositCard";
 import WithdrawCard from "components/WithdrawCard/WithdrawCard";
 
 type TabType = "Deposit" | "Withdraw";
@@ -11,15 +12,20 @@ interface TabProps {
 }
 
 const Tab: React.FC<TabProps> = ({ label, isActive, onClick }) => (
-  <li className={isActive ? "is-active" : ""} onClick={() => onClick(label)}>
-    <a>{label}</a>
+  <li
+    className={isActive ? "is-active" : ""}
+    onClick={() => onClick(label)}
+    onKeyUp={() => onClick(label)}
+  >
+    {/* biome-ignore lint/a11y/useValidAnchor: Biome unfortunately uses anchors for tabs */}
+    <a onClick={() => {}}>{label}</a>
   </li>
 );
 
 const TabContent: React.FC<{ activeTab: TabType }> = ({ activeTab }) => {
   switch (activeTab) {
     case "Deposit":
-      return <BridgeCard />;
+      return <DepositCard />;
     case "Withdraw":
       return <WithdrawCard />;
     default:

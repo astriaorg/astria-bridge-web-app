@@ -12,7 +12,7 @@ import { sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
 import type { Balances } from "types";
 
-export default function BridgeCard(): React.ReactElement {
+export default function DepositCard(): React.ReactElement {
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
   const [recipientAddress, setRecipientAddress] = useState<string>("");
