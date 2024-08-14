@@ -229,7 +229,11 @@ export default function DepositCard(): React.ReactElement {
         )}
       </div>
 
-      <AnimatedArrowSpacer isAnimating={isAnimating} />
+      {isAnimating ? (
+        <AnimatedArrowSpacer isAnimating={isAnimating} />
+      ) : (
+        <div className="card-spacer" />
+      )}
 
       <div className="field">
         <label className="field-label">To</label>

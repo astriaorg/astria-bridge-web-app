@@ -208,7 +208,11 @@ export default function WithdrawCard(): React.ReactElement {
         )}
       </div>
 
-      {isAnimating && <AnimatedArrowSpacer isAnimating={isAnimating} />}
+      {isAnimating ? (
+        <AnimatedArrowSpacer isAnimating={isAnimating} />
+      ) : (
+        <div className="card-spacer" />
+      )}
 
       <div className="field">
         <label className="field-label">To</label>
