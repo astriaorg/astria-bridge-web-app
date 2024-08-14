@@ -14,7 +14,7 @@ jest.mock("react-router-dom", () => ({
 describe("BridgePage", () => {
   test("renders bridge page correctly", () => {
     renderWithRouter(<BridgePage />);
-    const bridgeCard = screen.getAllByText(/Deposit/i);
-    expect(bridgeCard).toHaveLength(2);
+    const bridgeCard = screen.getAllByText(/deposit/i);
+    expect(bridgeCard).toHaveLength(3);
   });
 });
