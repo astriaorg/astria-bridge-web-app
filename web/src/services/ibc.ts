@@ -25,7 +25,7 @@ export const sendIbcTransfer = async (
         await keplr.experimentalSuggestChain(AstriaChainInfo);
       } catch (e) {
         if (e instanceof Error) {
-          console.log(e.message);
+          console.warn(e.message);
         }
       }
     }
