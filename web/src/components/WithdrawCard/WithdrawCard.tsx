@@ -2,6 +2,7 @@ import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { NotificationsContext } from "contexts/NotificationsContext";
+import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import { NotificationType } from "components/Notification/types";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { getKeplrFromWindow } from "services/keplr";
@@ -20,6 +21,7 @@ export default function WithdrawCard(): React.ReactElement {
   const [isToAddressValid, setIsToAddressValid] = useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   useEffect(() => {
     if (userAccount?.address) {
@@ -124,13 +126,15 @@ export default function WithdrawCard(): React.ReactElement {
     }
 
     setIsLoading(true);
+    setIsAnimating(true);
     try {
-      const withdrawerSvc = getAstriaWithdrawerService(
-        selectedWallet.provider,
+      const withdrawerSvc = getAstriaWithdrawerService(selectedWallet.provider);
+      await withdrawerSvc.withdrawToIbcChain(
         fromAddress,
+        toAddress,
+        amount,
+        "",
       );
-      const tx = await withdrawerSvc.withdrawToIbcChain(toAddress, amount, "");
-      console.log(tx);
       addNotification({
         toastOpts: {
           toastType: NotificationType.SUCCESS,
@@ -149,6 +153,7 @@ export default function WithdrawCard(): React.ReactElement {
       });
     } finally {
       setIsLoading(false);
+      setTimeout(() => setIsAnimating(false), 2000);
     }
   };
 
@@ -203,38 +208,7 @@ export default function WithdrawCard(): React.ReactElement {
         )}
       </div>
 
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "100%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "80%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "60%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "40%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "20%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "10%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "5%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "1%", margin: "0 auto" }}
-      />
+      {isAnimating && <AnimatedArrowSpacer isAnimating={isAnimating} />}
 
       <div className="field">
         <label className="field-label">To</label>

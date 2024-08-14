@@ -4,6 +4,7 @@ import { Dec, DecUtils } from "@keplr-wallet/unit";
 
 import { CelestiaChainInfo } from "chainInfos";
 import { NotificationType } from "components/Notification/types";
+import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { NotificationsContext } from "contexts/NotificationsContext";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
@@ -22,6 +23,8 @@ export default function DepositCard(): React.ReactElement {
   const [isRecipientAddressValid, setIsRecipientAddressValid] =
     useState<boolean>(false);
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount } = useEthWallet();
@@ -66,6 +69,8 @@ export default function DepositCard(): React.ReactElement {
   };
 
   const sendBalance = async () => {
+    setIsLoading(true);
+    setIsAnimating(true);
     try {
       await sendIbcTransfer(
         fromAddress,
@@ -83,6 +88,9 @@ export default function DepositCard(): React.ReactElement {
           },
         });
       }
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setIsAnimating(false), 2000);
     }
   };
 
@@ -221,38 +229,7 @@ export default function DepositCard(): React.ReactElement {
         )}
       </div>
 
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "100%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "80%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "60%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "40%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "20%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "10%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "5%", margin: "0 auto" }}
-      />
-      <div
-        className="card-spacer mt-1"
-        style={{ width: "1%", margin: "0 auto" }}
-      />
+      <AnimatedArrowSpacer isAnimating={isAnimating} />
 
       <div className="field">
         <label className="field-label">To</label>
@@ -296,7 +273,7 @@ export default function DepositCard(): React.ReactElement {
             !recipientAddress
           }
         >
-          Deposit
+          {isLoading ? "Processing..." : "Deposit"}
         </button>
       </div>
     </div>
