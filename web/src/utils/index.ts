@@ -25,14 +25,7 @@ export const formatChainAsNum = (chainIdHex: string) => {
   return chainIdNum;
 };
 
-export const formatAddress = (addr: string) => {
-  const upperAfterLastTwo = addr.slice(0, 2) + addr.slice(2);
-  return `${upperAfterLastTwo.substring(0, 5)}...${upperAfterLastTwo.substring(
-    39,
-  )}`;
-};
-
 export const capitalize = (str: string): string => {
   const lowered = str.toLowerCase();
-  return lowered.charAt(0).toUpperCase() + str.slice(1);
+  return lowered.charAt(0).toUpperCase() + lowered.slice(1);
 };
