@@ -1,8 +1,6 @@
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
-
-import { CelestiaChainInfo } from "chainInfos";
 import { NotificationType } from "components/Notification/types";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
@@ -12,22 +10,26 @@ import { getJSON } from "services/api";
 import { sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
 import type { Balances } from "types";
+import Dropdown from "../Dropdown/Dropdown";
+import { useIbcChainSelection } from "../../features/IbcChainSelector/IbcChainSelector";
 
 export default function DepositCard(): React.ReactElement {
-  const [balance, setBalance] = useState<string>("0 TIA");
-  const [fromAddress, setFromAddress] = useState<string>("");
-  const [recipientAddress, setRecipientAddress] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
-
-  const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
-  const [isRecipientAddressValid, setIsRecipientAddressValid] =
-    useState<boolean>(false);
-  const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
-
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount } = useEthWallet();
+
+  const { selectedIbcChain, selectIbcChain, ibcChainsOptions } =
+    useIbcChainSelection();
+
+  const [balance, setBalance] = useState<string>("0 TIA");
+  const [fromAddress, setFromAddress] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
+  const [isRecipientAddressValid, setIsRecipientAddressValid] =
+    useState<boolean>(false);
+  const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // set recipient address if userAccount available,
   // which means we got it from the eth wallet
@@ -47,14 +49,17 @@ export default function DepositCard(): React.ReactElement {
   }, [recipientAddress, amount]);
 
   const getBalance = async () => {
-    const key = await window.keplr?.getKey(CelestiaChainInfo.chainId);
+    if (!selectedIbcChain) {
+      return;
+    }
+    const key = await window.keplr?.getKey(selectedIbcChain.chainId);
 
     if (key) {
-      const uri = `${CelestiaChainInfo.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
+      const uri = `${selectedIbcChain.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
 
       const data = await getJSON<Balances>(uri);
       const balance = data.balances.find((balance) => balance.denom === "utia");
-      const tiaDecimal = CelestiaChainInfo.currencies.find(
+      const tiaDecimal = selectedIbcChain.currencies.find(
         (currency: { coinMinimalDenom: string }) =>
           currency.coinMinimalDenom === "utia",
       )?.coinDecimals;
@@ -94,7 +99,17 @@ export default function DepositCard(): React.ReactElement {
     }
   };
 
-  const connectCelestiaWallet = async () => {
+  const connectKeplrWallet = async () => {
+    if (!selectedIbcChain) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please select a chain first.",
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
     const keplr = await getKeplrFromWindow();
     if (!keplr) {
       addNotification({
@@ -120,12 +135,12 @@ export default function DepositCard(): React.ReactElement {
     }
 
     try {
-      const key = await keplr.getKey(CelestiaChainInfo.chainId);
+      const key = await keplr.getKey(selectedIbcChain.chainId);
       setFromAddress(key.bech32Address);
       await getBalance();
     } catch (e) {
       if (e instanceof Error) {
-        console.log(e.message);
+        console.error(e.message);
       }
       addNotification({
         toastOpts: {
@@ -190,17 +205,24 @@ export default function DepositCard(): React.ReactElement {
               readOnly
             />
           </div>
-          <div className="mt-3">
+          <div className="mt-3 is-flex is-flex-direction-row is-justify-content-space-evenly">
+            <Dropdown
+              placeholder="Select a chain"
+              options={ibcChainsOptions}
+              onSelect={(selected) => selectIbcChain(selected)}
+            />
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectCelestiaWallet()}
+              onClick={() => connectKeplrWallet()}
               disabled={fromAddress !== ""}
             >
               {fromAddress
                 ? "Connected to Keplr Wallet"
                 : "Connect Keplr Wallet"}
             </button>
+          </div>
+          <div>
             {fromAddress && (
               <p className="mt-2 has-text-light">Balance: {balance}</p>
             )}

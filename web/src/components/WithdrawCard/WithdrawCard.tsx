@@ -4,14 +4,21 @@ import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { NotificationsContext } from "contexts/NotificationsContext";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import { NotificationType } from "components/Notification/types";
-import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { getKeplrFromWindow } from "services/keplr";
 import { CelestiaChainInfo } from "chainInfos";
-import { getAstriaWithdrawerService } from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
+import {
+  EthWalletConnector,
+  getAstriaWithdrawerService,
+} from "features/EthWallet";
+import { useIbcChainSelection } from "features/IbcChainSelector";
+import Dropdown from "../Dropdown/Dropdown";
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount, selectedWallet } = useEthWallet();
+
+  const { selectedIbcChain, selectIbcChain, ibcChainsOptions } =
+    useIbcChainSelection();
 
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
@@ -51,7 +58,19 @@ export default function WithdrawCard(): React.ReactElement {
     setIsToAddressValid(isToAddressValid);
   };
 
-  const connectCelestiaWallet = async () => {
+  const connectKeplrWallet = async () => {
+    console.log({ selectedIbcChain });
+    if (!selectedIbcChain) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please select a chain first.",
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
+
     const keplr = await getKeplrFromWindow();
     if (!keplr) {
       addNotification({
@@ -81,7 +100,7 @@ export default function WithdrawCard(): React.ReactElement {
       setToAddress(key.bech32Address);
     } catch (e) {
       if (e instanceof Error) {
-        console.log(e.message);
+        console.error(e.message);
       }
       addNotification({
         toastOpts: {
@@ -226,20 +245,27 @@ export default function WithdrawCard(): React.ReactElement {
               readOnly
             />
           </div>
-          <div className="mt-3">
-            <button
-              type="button"
-              className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectCelestiaWallet()}
-              disabled={toAddress !== ""}
-            >
-              {toAddress ? "Connected to Keplr Wallet" : "Connect Keplr Wallet"}
-            </button>
+          <div>
             {!isToAddressValid && hasTouchedForm && (
               <p className="help is-danger mt-2">
                 Must be a valid Celestia address
               </p>
             )}
+          </div>
+          <div className="mt-3 is-flex is-flex-direction-row is-justify-content-space-evenly">
+            <Dropdown
+              placeholder="Select a chain"
+              options={ibcChainsOptions}
+              onSelect={(selected) => selectIbcChain(selected)}
+            />
+            <button
+              type="button"
+              className="button is-ghost is-outlined-light is-tall"
+              onClick={() => connectKeplrWallet()}
+              disabled={toAddress !== ""}
+            >
+              {toAddress ? "Connected to Keplr Wallet" : "Connect Keplr Wallet"}
+            </button>
           </div>
         </div>
       </div>

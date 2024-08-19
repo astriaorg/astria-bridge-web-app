@@ -27,7 +27,7 @@ export default function App(): React.ReactElement {
       await keplr.experimentalSuggestChain(CelestiaChainInfo);
     } catch (e) {
       if (e instanceof Error) {
-        console.log(e.message);
+        console.error(e.message);
       }
     }
   };
