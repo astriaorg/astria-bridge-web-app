@@ -74,7 +74,9 @@ export function generateChainInfo(envVars: {
         coinDecimals: Number.parseInt(envVars.FEE_CURRENCIES_COIN_DECIMALS, 10),
         gasPriceStep: {
           low: Number.parseFloat(envVars.FEE_CURRENCIES_GAS_PRICE_STEP_LOW),
-          average: Number.parseFloat(envVars.FEE_CURRENCIES_GAS_PRICE_STEP_AVERAGE),
+          average: Number.parseFloat(
+            envVars.FEE_CURRENCIES_GAS_PRICE_STEP_AVERAGE,
+          ),
           high: Number.parseFloat(envVars.FEE_CURRENCIES_GAS_PRICE_STEP_HIGH),
         },
       },
@@ -86,7 +88,7 @@ export function parseMultiChainEnvVars(): IbcChains {
   const chainConfigs: IbcChains = {};
   const chainIds = getEnvVariable("REACT_APP_IBC_CHAINS")?.split(",");
 
-  chainIds.forEach((chainId) => {
+  for (const chainId of chainIds) {
     const prefix = `REACT_APP_${chainId}`;
     const envVars = {
       CHAIN_ID: getEnvVariable(`${prefix}_CHAIN_ID`),
@@ -134,7 +136,7 @@ export function parseMultiChainEnvVars(): IbcChains {
     if (envVars.RPC_ENDPOINT && envVars.REST_ENDPOINT) {
       chainConfigs[capitalize(chainId)] = generateChainInfo(envVars);
     }
-  });
+  }
 
   return chainConfigs;
 }

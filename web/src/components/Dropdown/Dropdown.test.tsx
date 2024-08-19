@@ -1,9 +1,9 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Dropdown, { DropdownOption } from "./Dropdown"; // Adjust the import path as needed
+import Dropdown, { type DropdownOption } from "./Dropdown"; // Adjust the import path as needed
 
-const mockOptions: DropdownOption[] = [
+const mockOptions: DropdownOption<string>[] = [
   { label: "Option 1", value: "option1" },
   { label: "Option 2", value: "option2" },
   { label: "Option 3", value: "option3" },
@@ -11,14 +11,18 @@ const mockOptions: DropdownOption[] = [
 
 describe("Dropdown Component", () => {
   test("renders with placeholder text", () => {
-    render(<Dropdown options={mockOptions} onSelect={() => {
-    }} placeholder="Select an item" />);
+    render(
+      <Dropdown
+        options={mockOptions}
+        onSelect={() => {}}
+        placeholder="Select an item"
+      />,
+    );
     expect(screen.getByText("Select an item")).toBeInTheDocument();
   });
 
   test("opens dropdown when clicked", () => {
-    render(<Dropdown options={mockOptions} onSelect={() => {
-    }} />);
+    render(<Dropdown options={mockOptions} onSelect={() => {}} />);
     const dropdownButton = screen.getByRole("button");
     fireEvent.click(dropdownButton);
     expect(screen.getByRole("menu")).toBeInTheDocument();
@@ -39,19 +43,19 @@ describe("Dropdown Component", () => {
   });
 
   test("displays selected option", () => {
-    render(<Dropdown options={mockOptions} onSelect={() => {
-    }} />);
+    render(<Dropdown options={mockOptions} onSelect={() => {}} />);
     expect(screen.getByText("Option 2")).toBeInTheDocument();
   });
 
   test("highlights selected option in dropdown", () => {
-    render(<Dropdown options={mockOptions} onSelect={() => {
-    }} />);
+    render(<Dropdown options={mockOptions} onSelect={() => {}} />);
     const dropdownButton = screen.getByRole("button");
     fireEvent.click(dropdownButton);
 
     const selectedOption = screen.getByText("Option 3");
-    expect(selectedOption?.parentElement?.parentElement?.parentElement).toHaveClass("is-active");
+    expect(
+      selectedOption?.parentElement?.parentElement?.parentElement,
+    ).toHaveClass("is-active");
   });
 
   test("calls onSelect with correct value when option is clicked", () => {

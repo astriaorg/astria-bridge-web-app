@@ -10,12 +10,12 @@ export function useIbcChainSelection() {
 
   const ibcChainsOptions = useMemo(() => {
     return Object.entries(ChainConfigs).map(
-      ([chainLabel, chain]): DropdownOption => ({
+      ([chainLabel, chain]): DropdownOption<ChainInfo> => ({
         label: chainLabel,
         value: chain,
       }),
     );
-  }, [ChainConfigs]);
+  }, []);
 
   const selectIbcChain = (chain: ChainInfo) => {
     setSelectedIbcChain(chain);
