@@ -2,7 +2,6 @@ import {
   getEnvVariable,
   formatBalance,
   formatChainAsNum,
-  formatAddress,
   capitalize,
 } from "utils"; // Adjust the import path as needed
 
