@@ -25,7 +25,7 @@ export const sendIbcTransfer = async (
         await keplr.experimentalSuggestChain(AstriaChainInfo);
       } catch (e) {
         if (e instanceof Error) {
-          console.log(e.message);
+          console.warn(e.message);
         }
       }
     }
@@ -35,7 +35,7 @@ export const sendIbcTransfer = async (
       offlineSigner,
     );
     const account = await client.getAccount(key.bech32Address);
-    const memo = JSON.stringify({rollupAddress: recipient});
+    const memo = JSON.stringify({ rollupDepositAddress: recipient });
     const fee = {
       amount: [
         {

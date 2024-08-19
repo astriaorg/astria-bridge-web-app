@@ -1,9 +1,8 @@
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
-
-import { CelestiaChainInfo } from "chainInfos";
 import { NotificationType } from "components/Notification/types";
+import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { NotificationsContext } from "contexts/NotificationsContext";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
@@ -11,26 +10,32 @@ import { getJSON } from "services/api";
 import { sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
 import type { Balances } from "types";
+import Dropdown from "../Dropdown/Dropdown";
+import { useIbcChainSelection } from "../../features/IbcChainSelector/IbcChainSelector";
 
-export default function BridgeCard(): React.ReactElement {
-  const [balance, setBalance] = useState<string>("0 TIA");
-  const [fromAddress, setFromAddress] = useState<string>("");
-  const [recipientAddress, setRecipientAddress] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
-
-  const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
-  const [isRecipientAddressValid, setIsRecipientAddressValid] =
-    useState<boolean>(false);
-  const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
-
+export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount } = useEthWallet();
+
+  const { selectedIbcChain, selectIbcChain, ibcChainsOptions } =
+    useIbcChainSelection();
+
+  const [balance, setBalance] = useState<string>("0 TIA");
+  const [fromAddress, setFromAddress] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
+  const [isRecipientAddressValid, setIsRecipientAddressValid] =
+    useState<boolean>(false);
+  const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // set recipient address if userAccount available,
   // which means we got it from the eth wallet
   useEffect(() => {
     if (userAccount) {
-      setRecipientAddress(userAccount);
+      setRecipientAddress(userAccount.address);
     }
   }, [userAccount]);
 
@@ -44,14 +49,17 @@ export default function BridgeCard(): React.ReactElement {
   }, [recipientAddress, amount]);
 
   const getBalance = async () => {
-    const key = await window.keplr?.getKey(CelestiaChainInfo.chainId);
+    if (!selectedIbcChain) {
+      return;
+    }
+    const key = await window.keplr?.getKey(selectedIbcChain.chainId);
 
     if (key) {
-      const uri = `${CelestiaChainInfo.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
+      const uri = `${selectedIbcChain.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
 
       const data = await getJSON<Balances>(uri);
       const balance = data.balances.find((balance) => balance.denom === "utia");
-      const tiaDecimal = CelestiaChainInfo.currencies.find(
+      const tiaDecimal = selectedIbcChain.currencies.find(
         (currency: { coinMinimalDenom: string }) =>
           currency.coinMinimalDenom === "utia",
       )?.coinDecimals;
@@ -66,6 +74,8 @@ export default function BridgeCard(): React.ReactElement {
   };
 
   const sendBalance = async () => {
+    setIsLoading(true);
+    setIsAnimating(true);
     try {
       await sendIbcTransfer(
         fromAddress,
@@ -83,10 +93,23 @@ export default function BridgeCard(): React.ReactElement {
           },
         });
       }
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setIsAnimating(false), 2000);
     }
   };
 
-  const connectCelestiaWallet = async () => {
+  const connectKeplrWallet = async () => {
+    if (!selectedIbcChain) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please select a chain first.",
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
     const keplr = await getKeplrFromWindow();
     if (!keplr) {
       addNotification({
@@ -112,12 +135,12 @@ export default function BridgeCard(): React.ReactElement {
     }
 
     try {
-      const key = await keplr.getKey(CelestiaChainInfo.chainId);
+      const key = await keplr.getKey(selectedIbcChain.chainId);
       setFromAddress(key.bech32Address);
       await getBalance();
     } catch (e) {
       if (e instanceof Error) {
-        console.log(e.message);
+        console.error(e.message);
       }
       addNotification({
         toastOpts: {
@@ -132,7 +155,7 @@ export default function BridgeCard(): React.ReactElement {
   const connectEVMWallet = async () => {
     // use existing userAccount if we've already got it
     if (userAccount) {
-      setRecipientAddress(userAccount);
+      setRecipientAddress(userAccount.address);
       return;
     }
 
@@ -169,19 +192,11 @@ export default function BridgeCard(): React.ReactElement {
   };
 
   return (
-    <div className="card p-5">
-      <header className="card-header">
-        <p className="card-header-title is-size-5 has-text-weight-normal has-text-light">
-          Deposit TIA
-        </p>
-      </header>
-
-      <div className="card-spacer" />
-
+    <div>
       <div className="field">
         <label className="field-label">From</label>
-        <div className="is-flex is-flex-direction-row is-justify-content-space-between">
-          <div className="control mt-1 mr-5 is-flex-grow-1">
+        <div className="is-flex is-flex-direction-column">
+          <div className="control mt-1 is-flex-grow-1">
             <input
               className="input"
               type="text"
@@ -190,21 +205,33 @@ export default function BridgeCard(): React.ReactElement {
               readOnly
             />
           </div>
-          <div className="mt-1">
+          <div className="mt-3 is-flex is-flex-direction-row is-justify-content-space-evenly">
+            <Dropdown
+              placeholder="Select a chain"
+              options={ibcChainsOptions}
+              onSelect={(selected) => selectIbcChain(selected)}
+            />
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectCelestiaWallet()}
+              onClick={() => connectKeplrWallet()}
               disabled={fromAddress !== ""}
             >
-              {fromAddress ? `${balance}` : "Connect Keplr Wallet"}
+              {fromAddress
+                ? "Connected to Keplr Wallet"
+                : "Connect Keplr Wallet"}
             </button>
+          </div>
+          <div>
+            {fromAddress && (
+              <p className="mt-2 has-text-light">Balance: {balance}</p>
+            )}
           </div>
         </div>
       </div>
 
       <div className="field">
-        <label className="field-label">Amount</label>
+        <label className="field-label">Amount to deposit</label>
         <div className="control has-icons-right mt-1">
           <input
             className="input"
@@ -216,20 +243,24 @@ export default function BridgeCard(): React.ReactElement {
           <span className="icon is-right mt-1">
             <p>TIA</p>
           </span>
-          {!isAmountValid && hasTouchedForm && (
-            <p className="help is-danger">
-              - Amount must be a number greater than 0
-            </p>
-          )}
         </div>
+        {!isAmountValid && hasTouchedForm && (
+          <p className="help is-danger mt-2">
+            Amount must be a number greater than 0
+          </p>
+        )}
       </div>
 
-      <div className="card-spacer" />
+      {isAnimating ? (
+        <AnimatedArrowSpacer isAnimating={isAnimating} />
+      ) : (
+        <div className="card-spacer" />
+      )}
 
       <div className="field">
-        <label className="field-label">Recipient address</label>
-        <div className="is-flex is-flex-direction-row is-justify-content-space-between">
-          <div className="control mt-1 mr-5 is-flex-grow-1">
+        <label className="field-label">To</label>
+        <div className="is-flex is-flex-direction-column">
+          <div className="control mt-1 is-flex-grow-1">
             <input
               className="input"
               type="text"
@@ -237,19 +268,21 @@ export default function BridgeCard(): React.ReactElement {
               onChange={updateRecipientAddress}
               value={recipientAddress}
             />
-
-            {!isRecipientAddressValid && hasTouchedForm && (
-              <p className="help is-danger">- Must be a valid EVM address</p>
-            )}
           </div>
-          <div className="mt-1">
+          <div className="mt-3">
             <button
               type="button"
               className="button is-ghost is-outlined-light is-tall"
+              disabled={recipientAddress !== ""}
               onClick={() => connectEVMWallet()}
             >
-              Connect EVM Wallet
+              {recipientAddress
+                ? "Connected to EVM Wallet"
+                : "Connect EVM Wallet"}
             </button>
+            {!isRecipientAddressValid && hasTouchedForm && (
+              <p className="help is-danger mt-2">Must be a valid EVM address</p>
+            )}
           </div>
         </div>
       </div>
@@ -259,9 +292,14 @@ export default function BridgeCard(): React.ReactElement {
           type="button"
           className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
           onClick={() => sendBalance()}
-          disabled={!isAmountValid || !isRecipientAddressValid}
+          disabled={
+            !isAmountValid ||
+            !isRecipientAddressValid ||
+            !fromAddress ||
+            !recipientAddress
+          }
         >
-          Deposit
+          {isLoading ? "Processing..." : "Deposit"}
         </button>
       </div>
     </div>

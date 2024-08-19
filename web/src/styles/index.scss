@@ -5,12 +5,13 @@ html, body {
 // fonts
 @import './fonts';
 
-// astria bulma overrides
-// NOTE - scss variable overrides be imported BEFORE bulma so that the overriden variables are
-// used in the bulma sass
+// astria bulma overrides override bulma variables
+// NOTE - scss variable overrides must be imported BEFORE bulma,
+//  so that the overriden variables are used in the bulma sass
 @import 'astria-colors';
 @import 'button-overrides';
 @import 'card-overrides';
+@import 'dropdown-overrides';
 @import 'form-overrides';
 
 // bulma
@@ -22,6 +23,7 @@ html, body {
   // i think they'll quickly be needed for v1
 //@import 'responsive-spacing-mixins';
 
+// astria bulma customizations override bulma classes
 // NOTE - these css customizations must be imported AFTER bulma to override the css classes
 @import 'button-customizations';
 @import 'card-customizations';

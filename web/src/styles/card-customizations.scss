@@ -53,12 +53,53 @@
     border-top: none;
     box-shadow: none;
   }
+
+  .tabs.is-fullwidth.is-large {
+    ul {
+      li {
+        // Default tab styles
+        a {
+          color: $astria-grey-dark;
+          border-bottom: 2px solid transparent;
+          transition: all 0.3s ease;
+        }
+
+        &.is-active {
+          a {
+            color: $astria-white; // Assuming you have a primary color defined
+            border-bottom-color: $astria-white;
+            font-weight: bold;
+            position: relative;
+
+            &::after {
+              content: '';
+              position: absolute;
+              bottom: -2px;
+              left: 0;
+              width: 100%;
+              height: 2px;
+              background: linear-gradient(to right, transparent, $astria-white, transparent);
+            }
+          }
+        }
+
+        &:hover:not(.is-active) {
+          a {
+            color: darken($astria-white, 15%);
+            border-bottom-color: rgba($astria-white, 0.3);
+          }
+        }
+      }
+    }
+  }
+
 }
 
 .wallet-provider-card {
   & .card-content {
     & .button {
       margin-right: 0.5rem;
+
       &.is-tall img {
         height: 40px;
         width: 40px;
