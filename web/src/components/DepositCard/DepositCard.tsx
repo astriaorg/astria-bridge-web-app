@@ -6,12 +6,11 @@ import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDown
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { NotificationsContext } from "contexts/NotificationsContext";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
-import { getJSON } from "services/api";
-import { sendIbcTransfer } from "services/ibc";
+import { getBalance, sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
-import type { Balances } from "types";
+import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
+import { StargateClient } from "@cosmjs/stargate";
 import Dropdown from "../Dropdown/Dropdown";
-import { useIbcChainSelection } from "../../features/IbcChainSelector/IbcChainSelector";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
@@ -29,6 +28,7 @@ export default function DepositCard(): React.ReactElement {
     useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // set recipient address if userAccount available,
@@ -48,28 +48,19 @@ export default function DepositCard(): React.ReactElement {
     checkIsFormValid(recipientAddress, amount);
   }, [recipientAddress, amount]);
 
-  const getBalance = async () => {
+  const getAndSetBalance = async () => {
     if (!selectedIbcChain) {
       return;
     }
-    const key = await window.keplr?.getKey(selectedIbcChain.chainId);
-
-    if (key) {
-      const uri = `${selectedIbcChain.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
-
-      const data = await getJSON<Balances>(uri);
-      const balance = data.balances.find((balance) => balance.denom === "utia");
-      const tiaDecimal = selectedIbcChain.currencies.find(
-        (currency: { coinMinimalDenom: string }) =>
-          currency.coinMinimalDenom === "utia",
-      )?.coinDecimals;
-
-      if (balance) {
-        const amount = new Dec(balance.amount, tiaDecimal);
-        setBalance(`${amount.toString(tiaDecimal)} TIA`);
-      } else {
-        setBalance("0 TIA");
-      }
+    try {
+      setIsLoadingBalance(true);
+      const balance = await getBalance(selectedIbcChain);
+      setBalance(balance);
+    } catch (e) {
+      console.error(e);
+      setBalance("Error fetching balance");
+    } finally {
+      setIsLoadingBalance(false);
     }
   };
 
@@ -137,7 +128,7 @@ export default function DepositCard(): React.ReactElement {
     try {
       const key = await keplr.getKey(selectedIbcChain.chainId);
       setFromAddress(key.bech32Address);
-      await getBalance();
+      await getAndSetBalance();
     } catch (e) {
       if (e instanceof Error) {
         console.error(e.message);
@@ -223,8 +214,11 @@ export default function DepositCard(): React.ReactElement {
             </button>
           </div>
           <div>
-            {fromAddress && (
+            {fromAddress && !isLoadingBalance && (
               <p className="mt-2 has-text-light">Balance: {balance}</p>
+            )}
+            {fromAddress && isLoadingBalance && (
+              <p className="mt-2 has-text-light">Balance: <i className="fas fa-spinner fa-pulse"></i></p>
             )}
           </div>
         </div>

@@ -1,8 +1,10 @@
-import { SigningStargateClient } from "@cosmjs/stargate";
+import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
+import type { ChainInfo } from "@keplr-wallet/types";
 import Long from "long";
 
 import { AstriaChainInfo, CelestiaChainInfo } from "chainInfos";
 import { getEnvVariable } from "utils";
+import { Dec } from "@keplr-wallet/unit";
 
 export const sendIbcTransfer = async (
   sender: string,
@@ -78,4 +80,30 @@ export const sendIbcTransfer = async (
       console.error("Account not found");
     }
   }
+};
+
+export const getBalance = async (selectedIbcChain: ChainInfo): Promise<string> => {
+  const key = await window.keplr?.getKey(selectedIbcChain.chainId);
+
+  if (key) {
+    const client = await StargateClient.connect(selectedIbcChain.rpc);
+    const balances = await client.getAllBalances(key.bech32Address);
+
+    const tiaBalance = balances.find((balance) => balance.denom === "utia");
+
+    // calculate precision
+    const tiaDecimal = selectedIbcChain.currencies.find(
+      (currency: { coinMinimalDenom: string }) =>
+        currency.coinMinimalDenom === "utia",
+    )?.coinDecimals;
+
+    if (tiaBalance) {
+      const amount = new Dec(tiaBalance.amount, tiaDecimal);
+      return `${amount.toString(tiaDecimal)} TIA`;
+    } else {
+      return "0 TIA";
+    }
+  }
+
+  throw new Error("Failed to get key from Keplr wallet.");
 };
