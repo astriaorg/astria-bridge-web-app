@@ -1,7 +1,7 @@
 defaultUrl := 'http://rest.app.celestia.localdev.me'
 defaultAddress := 'celestia1m0ksdjl2p5nzhqy3p47fksv52at3ln885xvl96'
 [group('utils')]
-@celestia-test-rest-api url=defaultUrl address=defaultAddress:
+@celestia-get-balances url=defaultUrl address=defaultAddress:
   #!/bin/sh
   curl '{{ url }}/cosmos/bank/v1beta1/balances/{{ address }}?pagination.limit=1000' \
     -H 'accept: */*' \
