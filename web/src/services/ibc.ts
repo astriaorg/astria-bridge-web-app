@@ -89,17 +89,15 @@ export const getBalance = async (selectedIbcChain: ChainInfo): Promise<string> =
     const client = await StargateClient.connect(selectedIbcChain.rpc);
     const balances = await client.getAllBalances(key.bech32Address);
 
-    const tiaBalance = balances.find((balance) => balance.denom === "utia");
+    const denom = selectedIbcChain.currencies[0].coinDenom;
+    const minimalDenom = selectedIbcChain.currencies[0].coinMinimalDenom;
+    const decimals = selectedIbcChain.currencies[0].coinDecimals;
 
-    // calculate precision
-    const tiaDecimal = selectedIbcChain.currencies.find(
-      (currency: { coinMinimalDenom: string }) =>
-        currency.coinMinimalDenom === "utia",
-    )?.coinDecimals;
+    const balance = balances.find((balance) => balance.denom === minimalDenom);
 
-    if (tiaBalance) {
-      const amount = new Dec(tiaBalance.amount, tiaDecimal);
-      return `${amount.toString(tiaDecimal)} TIA`;
+    if (balance) {
+      const amount = new Dec(balance.amount, decimals);
+      return `${amount.toString(decimals)} ${denom}`;
     } else {
       return "0 TIA";
     }
