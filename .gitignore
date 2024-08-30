@@ -29,3 +29,6 @@ web/build
 
 # gcloud
 gsa-key.json
+
+# ai digest
+codebase.md
