@@ -1,23 +1,15 @@
 import type { ChainInfo } from "@keplr-wallet/types";
-import { capitalize, getEnvVariable } from "../utils";
+import { capitalize, getEnvVariable } from "utils";
 
-// IbcChains maps labels to ChainInfo objects
+export type IbcChainInfo = {
+  ibcChannel: string;
+  iconSourceUrl: string;
+} & ChainInfo;
+
+// IbcChains maps labels to IbcChainInfo objects
 export type IbcChains = {
-  [label: string]: ChainInfo;
+  [label: string]: IbcChainInfo;
 };
-
-// type EvmChainInfo = {
-//   chainId: string;
-//   rpc: string;
-//   rest: string;
-//   withdrawerContractAddress: string;
-//
-// };
-//
-// export type EvmChains = {
-//   // TODO
-//   [key: string]: {};
-// };
 
 export function generateChainInfo(envVars: {
   CHAIN_ID: string;
@@ -38,12 +30,16 @@ export function generateChainInfo(envVars: {
   FEE_CURRENCIES_GAS_PRICE_STEP_LOW: string;
   FEE_CURRENCIES_GAS_PRICE_STEP_AVERAGE: string;
   FEE_CURRENCIES_GAS_PRICE_STEP_HIGH: string;
-}): ChainInfo {
+  IBC_CHANNEL: string;
+  ICON_SOURCE_URL: string;
+}): IbcChainInfo {
   return {
     chainId: envVars.CHAIN_ID,
     chainName: envVars.CHAIN_NAME,
     rpc: envVars.RPC_ENDPOINT,
     rest: envVars.REST_ENDPOINT,
+    ibcChannel: envVars.IBC_CHANNEL,
+    iconSourceUrl: envVars.ICON_SOURCE_URL,
     stakeCurrency: {
       coinDenom: envVars.STAKE_CURRENCY_COIN_DENOM,
       coinMinimalDenom: envVars.STAKE_CURRENCY_COIN_MINIMAL_DENOM,
@@ -95,6 +91,8 @@ export function parseMultiChainEnvVars(): IbcChains {
       CHAIN_NAME: getEnvVariable(`${prefix}_CHAIN_NAME`),
       RPC_ENDPOINT: getEnvVariable(`${prefix}_RPC_ENDPOINT`),
       REST_ENDPOINT: getEnvVariable(`${prefix}_REST_ENDPOINT`),
+      IBC_CHANNEL: getEnvVariable(`${prefix}_IBC_CHANNEL`),
+      ICON_SOURCE_URL: getEnvVariable(`${prefix}_ICON_SOURCE_URL`),
       STAKE_CURRENCY_COIN_DENOM: getEnvVariable(
         `${prefix}_STAKE_CURRENCY_COIN_DENOM`,
       ),

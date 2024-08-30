@@ -1,23 +1,22 @@
 import { useState, useMemo } from "react";
-import type { ChainInfo } from "@keplr-wallet/types";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
-import { ChainConfigs } from "config/chains";
+import { ChainConfigs, type IbcChainInfo } from "config/chains";
 
 export function useIbcChainSelection() {
-  const [selectedIbcChain, setSelectedIbcChain] = useState<ChainInfo | null>(
+  const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
     null,
   );
 
   const ibcChainsOptions = useMemo(() => {
     return Object.entries(ChainConfigs).map(
-      ([chainLabel, chain]): DropdownOption<ChainInfo> => ({
+      ([chainLabel, chain]): DropdownOption<IbcChainInfo> => ({
         label: chainLabel,
         value: chain,
       }),
     );
   }, []);
 
-  const selectIbcChain = (chain: ChainInfo) => {
+  const selectIbcChain = (chain: IbcChainInfo) => {
     setSelectedIbcChain(chain);
   };
 

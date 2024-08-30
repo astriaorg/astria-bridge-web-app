@@ -1,91 +1,85 @@
-import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
-import type { ChainInfo } from "@keplr-wallet/types";
 import Long from "long";
-
-import { AstriaChainInfo, CelestiaChainInfo } from "chainInfos";
-import { getEnvVariable } from "utils";
+import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
+import type { IbcChainInfo } from "config/chains";
+import { getEnvVariable } from "utils";
 
 export const sendIbcTransfer = async (
+  selectedIbcChain: IbcChainInfo,
   sender: string,
   recipient: string,
   amount: string,
 ) => {
-  const SEQUENCER_BRIDGE_ACCOUNT = getEnvVariable(
+  const keplr = window.keplr;
+  if (!keplr) {
+    throw new Error("Keplr extension not installed");
+  }
+
+  const key = await keplr.getKey(selectedIbcChain.chainId);
+  const sourceChainId = selectedIbcChain.chainId;
+  const offlineSigner = keplr.getOfflineSigner(sourceChainId);
+
+  const client = await SigningStargateClient.connectWithSigner(
+    selectedIbcChain.rpc,
+    offlineSigner,
+  );
+  const account = await client.getAccount(key.bech32Address);
+  if (!account) {
+    throw new Error("Failed to get account from Keplr wallet.");
+  }
+  const sequencer_bridge_account = getEnvVariable(
     "REACT_APP_SEQUENCER_BRIDGE_ACCOUNT",
   );
   const denom = getEnvVariable("REACT_APP_SEQUENCER_BRIDGE_DENOM");
-
-  if (window.keplr) {
-    const keplr = window.keplr;
-    const key = await window.keplr.getKey(CelestiaChainInfo.chainId);
-    const sourceChainId = CelestiaChainInfo.chainId;
-    const offlineSigner = keplr.getOfflineSigner(sourceChainId);
-
-    if (keplr) {
-      try {
-        await keplr.experimentalSuggestChain(AstriaChainInfo);
-      } catch (e) {
-        if (e instanceof Error) {
-          console.warn(e.message);
-        }
-      }
-    }
-
-    const client = await SigningStargateClient.connectWithSigner(
-      CelestiaChainInfo.rpc,
-      offlineSigner,
-    );
-    const account = await client.getAccount(key.bech32Address);
-    const memo = JSON.stringify({ rollupDepositAddress: recipient });
-    const fee = {
-      amount: [
-        {
-          denom: denom,
-          amount: "0",
-        },
-      ],
-      gas: "180000",
-    };
-
-    const msgIBCTransfer = {
-      typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
-      value: {
-        sourcePort: "transfer",
-        sourceChannel: "channel-0",
-        token: {
-          denom: denom,
-          amount: amount,
-        },
-        sender: sender,
-        memo: memo,
-        receiver: SEQUENCER_BRIDGE_ACCOUNT,
-        // Timeout is in nanoseconds. Use Long.UZERO for default timeout
-        timeoutTimestamp: Long.fromNumber(Date.now() + 600_000).multiply(
-          1_000_000,
-        ),
+  const memo = JSON.stringify({ rollupDepositAddress: recipient });
+  const fee = {
+    amount: [
+      {
+        denom: denom,
+        amount: "0",
       },
-    };
+    ],
+    gas: "180000",
+  };
 
-    // Sign and broadcast the transaction
-    if (account) {
-      const result = await client.signAndBroadcast(
-        account.address,
-        [msgIBCTransfer],
-        fee,
-        memo, // FIXME - is this memo needed after realizing we moved it to `value`?
-      );
-      console.log("Transaction result: ", result);
-    } else {
-      console.error("Account not found");
-    }
-  }
+  const msgIBCTransfer = {
+    typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
+    value: {
+      sourcePort: "transfer",
+      sourceChannel: selectedIbcChain.ibcChannel,
+      token: {
+        denom: denom,
+        amount: amount,
+      },
+      sender: sender,
+      memo: memo,
+      receiver: sequencer_bridge_account,
+      // Timeout is in nanoseconds. Use Long.UZERO for default timeout
+      timeoutTimestamp: Long.fromNumber(Date.now() + 600_000).multiply(
+        1_000_000,
+      ),
+    },
+  };
+
+  // sign and broadcast the transaction
+  const result = await client.signAndBroadcast(
+    account.address,
+    [msgIBCTransfer],
+    fee,
+    memo, // FIXME - is this memo needed after realizing we moved it to `value`?
+  );
+  console.log("Transaction result: ", result);
 };
 
 export const getBalance = async (
-  selectedIbcChain: ChainInfo,
+  selectedIbcChain: IbcChainInfo,
 ): Promise<string> => {
-  const key = await window.keplr?.getKey(selectedIbcChain.chainId);
+  const keplr = window.keplr;
+  if (!keplr) {
+    throw new Error("Keplr extension not installed");
+  }
+
+  const key = await keplr?.getKey(selectedIbcChain.chainId);
   if (!key) {
     throw new Error("Failed to get key from Keplr wallet.");
   }
@@ -97,11 +91,13 @@ export const getBalance = async (
   const minimalDenom = selectedIbcChain.currencies[0].coinMinimalDenom;
   const decimals = selectedIbcChain.currencies[0].coinDecimals;
 
+  // find correct balance based on denom
   const balance = balances.find((balance) => balance.denom === minimalDenom);
 
-  if (balance) {
-    const amount = new Dec(balance.amount, decimals);
-    return `${amount.toString(decimals)} ${denom}`;
+  if (!balance) {
+    return "0 TIA";
   }
-  return "0 TIA";
+
+  const amount = new Dec(balance.amount, decimals);
+  return `${amount.toString(decimals)} ${denom}`;
 };

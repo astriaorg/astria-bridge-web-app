@@ -9,7 +9,6 @@ import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { getBalance, sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
-import { StargateClient } from "@cosmjs/stargate";
 import Dropdown from "../Dropdown/Dropdown";
 
 export default function DepositCard(): React.ReactElement {
@@ -65,10 +64,22 @@ export default function DepositCard(): React.ReactElement {
   };
 
   const sendBalance = async () => {
+    if (!selectedIbcChain) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please select a chain first.",
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
+
     setIsLoading(true);
     setIsAnimating(true);
     try {
       await sendIbcTransfer(
+        selectedIbcChain,
         fromAddress,
         recipientAddress,
         DecUtils.getTenExponentN(6).mul(new Dec(amount)).truncate().toString(),
