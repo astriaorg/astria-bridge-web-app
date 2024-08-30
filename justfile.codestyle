@@ -4,9 +4,14 @@
 default_lang := 'all'
 
 # Can lint 'ts', 'md', or 'all'. Defaults to all
-[group('lint')]
+[group('codestyle')]
 lint lang=default_lang:
   @just _lint-{{lang}}
+
+# lint and fix issues that can be fixed. pass "unsafe" to also apply unsafe fixes.
+[group('codestyle')]
+lint-ts-apply unsafe='':
+  cd web; npm run lint-apply{{ if unsafe == "unsafe" { "-unsafe" } else { "" } }}
 
 alias l := lint
 
@@ -26,7 +31,7 @@ _lint-ts:
   cd web; npm run lint
 
 # Can format 'ts', 'md', or 'all'. Defaults to all
-[group('format')]
+[group('codestyle')]
 fmt lang=default_lang:
   @just _fmt-{{lang}}
 

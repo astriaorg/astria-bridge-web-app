@@ -5,7 +5,6 @@ import { NotificationsContext } from "contexts/NotificationsContext";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import { NotificationType } from "components/Notification/types";
 import { getKeplrFromWindow } from "services/keplr";
-import { CelestiaChainInfo } from "chainInfos";
 import {
   EthWalletConnector,
   getAstriaWithdrawerService,
@@ -96,7 +95,7 @@ export default function WithdrawCard(): React.ReactElement {
     }
 
     try {
-      const key = await keplr.getKey(CelestiaChainInfo.chainId);
+      const key = await keplr.getKey(selectedIbcChain.chainId);
       setToAddress(key.bech32Address);
     } catch (e) {
       if (e instanceof Error) {

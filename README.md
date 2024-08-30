@@ -40,10 +40,10 @@ the Astria bridge.
 
 ```bash
 # install npm deps and run web app locally
-just install-web-deps
-just generate-initial-web-env
-just run-web-local
+just web init-env
+just web install
+just web run
 
 # build web app static files
-just build-web
+just web build
 ```

@@ -1,0 +1,18 @@
+_default:
+  @just --list
+
+# copies web/.env.example to web/.env
+init-env:
+  cp .env.example .env
+
+# installs npm deps for web
+install:
+  npm install
+
+# builds the typescript for the front end app
+build:
+  npm run build
+
+# run front end app locally, with file watching that triggers rebuilds
+run:
+  npm run start

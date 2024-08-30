@@ -1,3 +1,3 @@
-import { useIbcChainSelection } from "./IbcChainSelector";
+import { useIbcChainSelection } from "./hooks/useIbcChainSelection";
 
 export { useIbcChainSelection };
