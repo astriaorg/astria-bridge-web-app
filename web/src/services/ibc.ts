@@ -14,7 +14,7 @@ export const sendIbcTransfer = async (
   const SEQUENCER_BRIDGE_ACCOUNT = getEnvVariable(
     "REACT_APP_SEQUENCER_BRIDGE_ACCOUNT",
   );
-  const DENOM = getEnvVariable("REACT_APP_SEQUENCER_BRIDGE_DENOM");
+  const denom = getEnvVariable("REACT_APP_SEQUENCER_BRIDGE_DENOM");
 
   if (window.keplr) {
     const keplr = window.keplr;
@@ -41,7 +41,7 @@ export const sendIbcTransfer = async (
     const fee = {
       amount: [
         {
-          denom: DENOM,
+          denom: denom,
           amount: "0",
         },
       ],
@@ -54,7 +54,7 @@ export const sendIbcTransfer = async (
         sourcePort: "transfer",
         sourceChannel: "channel-0",
         token: {
-          denom: DENOM,
+          denom: denom,
           amount: amount,
         },
         sender: sender,
@@ -82,26 +82,26 @@ export const sendIbcTransfer = async (
   }
 };
 
-export const getBalance = async (selectedIbcChain: ChainInfo): Promise<string> => {
+export const getBalance = async (
+  selectedIbcChain: ChainInfo,
+): Promise<string> => {
   const key = await window.keplr?.getKey(selectedIbcChain.chainId);
-
-  if (key) {
-    const client = await StargateClient.connect(selectedIbcChain.rpc);
-    const balances = await client.getAllBalances(key.bech32Address);
-
-    const denom = selectedIbcChain.currencies[0].coinDenom;
-    const minimalDenom = selectedIbcChain.currencies[0].coinMinimalDenom;
-    const decimals = selectedIbcChain.currencies[0].coinDecimals;
-
-    const balance = balances.find((balance) => balance.denom === minimalDenom);
-
-    if (balance) {
-      const amount = new Dec(balance.amount, decimals);
-      return `${amount.toString(decimals)} ${denom}`;
-    } else {
-      return "0 TIA";
-    }
+  if (!key) {
+    throw new Error("Failed to get key from Keplr wallet.");
   }
 
-  throw new Error("Failed to get key from Keplr wallet.");
+  const client = await StargateClient.connect(selectedIbcChain.rpc);
+  const balances = await client.getAllBalances(key.bech32Address);
+
+  const denom = selectedIbcChain.currencies[0].coinDenom;
+  const minimalDenom = selectedIbcChain.currencies[0].coinMinimalDenom;
+  const decimals = selectedIbcChain.currencies[0].coinDecimals;
+
+  const balance = balances.find((balance) => balance.denom === minimalDenom);
+
+  if (balance) {
+    const amount = new Dec(balance.amount, decimals);
+    return `${amount.toString(decimals)} ${denom}`;
+  }
+  return "0 TIA";
 };

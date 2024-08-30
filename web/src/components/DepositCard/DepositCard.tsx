@@ -218,7 +218,9 @@ export default function DepositCard(): React.ReactElement {
               <p className="mt-2 has-text-light">Balance: {balance}</p>
             )}
             {fromAddress && isLoadingBalance && (
-              <p className="mt-2 has-text-light">Balance: <i className="fas fa-spinner fa-pulse"></i></p>
+              <p className="mt-2 has-text-light">
+                Balance: <i className="fas fa-spinner fa-pulse" />
+              </p>
             )}
           </div>
         </div>
