@@ -9,7 +9,7 @@ import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { getBalance, sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
-import Dropdown from "../Dropdown/Dropdown";
+import Dropdown from "components/Dropdown/Dropdown";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
@@ -211,6 +211,7 @@ export default function DepositCard(): React.ReactElement {
             <Dropdown
               placeholder="Select a chain"
               options={ibcChainsOptions}
+              defaultOption={ibcChainsOptions[0]}
               onSelect={(selected) => selectIbcChain(selected)}
             />
             <button
@@ -283,9 +284,7 @@ export default function DepositCard(): React.ReactElement {
               disabled={recipientAddress !== ""}
               onClick={() => connectEVMWallet()}
             >
-              {recipientAddress
-                ? "Connected to EVM Wallet"
-                : "Connect EVM Wallet"}
+              {userAccount ? "Connected to EVM Wallet" : "Connect EVM Wallet"}
             </button>
             {!isRecipientAddressValid && hasTouchedForm && (
               <p className="help is-danger mt-2">Must be a valid EVM address</p>

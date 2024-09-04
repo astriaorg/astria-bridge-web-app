@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export interface DropdownOption<T> {
   label: string;
@@ -10,16 +10,25 @@ interface DropdownProps<T> {
   options: DropdownOption<T>[];
   onSelect: (value: T) => void;
   placeholder?: string;
+  defaultOption?: DropdownOption<T>;
 }
 
 function Dropdown<T>({
   options,
   onSelect,
   placeholder = "Select an option",
+  defaultOption,
 }: DropdownProps<T>) {
   const [isActive, setIsActive] = useState(false);
   const [selectedOption, setSelectedOption] =
-    useState<DropdownOption<T> | null>(null);
+    useState<DropdownOption<T> | null>(defaultOption || null);
+
+  useEffect(() => {
+    if (defaultOption) {
+      setSelectedOption(defaultOption);
+      onSelect(defaultOption.value);
+    }
+  }, [defaultOption, onSelect]);
 
   const handleSelect = (option: DropdownOption<T>) => {
     setSelectedOption(option);

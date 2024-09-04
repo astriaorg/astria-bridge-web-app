@@ -10,7 +10,7 @@ import {
   getAstriaWithdrawerService,
 } from "features/EthWallet";
 import { useIbcChainSelection } from "features/IbcChainSelector";
-import Dropdown from "../Dropdown/Dropdown";
+import Dropdown from "components/Dropdown/Dropdown";
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
@@ -256,6 +256,7 @@ export default function WithdrawCard(): React.ReactElement {
               placeholder="Select a chain"
               options={ibcChainsOptions}
               onSelect={(selected) => selectIbcChain(selected)}
+              defaultOption={ibcChainsOptions[0]}
             />
             <button
               type="button"

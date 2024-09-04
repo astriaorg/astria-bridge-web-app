@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
-import { ChainConfigs, type IbcChainInfo } from "config/chains";
+import type { IbcChainInfo } from "config/chains";
+import { getAppConfig } from "config";
 
 export function useIbcChainSelection() {
   const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
@@ -8,7 +9,7 @@ export function useIbcChainSelection() {
   );
 
   const ibcChainsOptions = useMemo(() => {
-    return Object.entries(ChainConfigs).map(
+    return Object.entries(getAppConfig().ibcChains).map(
       ([chainLabel, chain]): DropdownOption<IbcChainInfo> => ({
         label: chainLabel,
         value: chain,

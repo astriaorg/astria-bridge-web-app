@@ -2,6 +2,7 @@ const webpack = require("webpack");
 
 // This file is used by react-app-rewired.
 // Needed to browserify crypto for some cosmos key stuff I believe.
+// FIXME - is this still needed?
 module.exports = function override(config) {
   const fallback = config.resolve.fallback || {};
   Object.assign(fallback, {
