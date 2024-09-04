@@ -4,6 +4,14 @@ import { Dec } from "@keplr-wallet/unit";
 import type { IbcChainInfo } from "config/chains";
 import { getEnvVariable } from "utils";
 
+/**
+ * Send an IBC transfer from the selected chain to the recipient address.
+ * Set `memo` on the tx so the sequencer knows to bridge to an EVM chain.
+ * @param selectedIbcChain
+ * @param sender
+ * @param recipient
+ * @param amount
+ */
 export const sendIbcTransfer = async (
   selectedIbcChain: IbcChainInfo,
   sender: string,
@@ -30,6 +38,7 @@ export const sendIbcTransfer = async (
   const sequencer_bridge_account = getEnvVariable(
     "REACT_APP_SEQUENCER_BRIDGE_ACCOUNT",
   );
+  // TODO - does this need to be configurable in the ui?
   const feeDenom = selectedIbcChain.feeCurrencies[0].coinMinimalDenom;
   const memo = JSON.stringify({ rollupDepositAddress: recipient });
   const fee = {
@@ -48,7 +57,7 @@ export const sendIbcTransfer = async (
       sourcePort: "transfer",
       sourceChannel: selectedIbcChain.ibcChannel,
       token: {
-        // TODO - the token should be selectable
+        // TODO - should be configurable/selectable in the ui
         denom: selectedIbcChain.currencies[0].coinMinimalDenom,
         amount: amount,
       },
@@ -67,7 +76,6 @@ export const sendIbcTransfer = async (
     account.address,
     [msgIBCTransfer],
     fee,
-    memo, // FIXME - is this memo needed after realizing we moved it to `value`?
   );
   console.log("Transaction result: ", result);
 };
