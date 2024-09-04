@@ -30,12 +30,12 @@ export const sendIbcTransfer = async (
   const sequencer_bridge_account = getEnvVariable(
     "REACT_APP_SEQUENCER_BRIDGE_ACCOUNT",
   );
-  const denom = getEnvVariable("REACT_APP_CELESTIA_FEE_CURRENCIES_COIN_MINIMAL_DENOM");
+  const feeDenom = selectedIbcChain.feeCurrencies[0].coinMinimalDenom;
   const memo = JSON.stringify({ rollupDepositAddress: recipient });
   const fee = {
     amount: [
       {
-        denom: denom,
+        denom: feeDenom,
         amount: "0",
       },
     ],
@@ -48,7 +48,8 @@ export const sendIbcTransfer = async (
       sourcePort: "transfer",
       sourceChannel: selectedIbcChain.ibcChannel,
       token: {
-        denom: denom,
+        // TODO - the token should be selectable
+        denom: selectedIbcChain.currencies[0].coinMinimalDenom,
         amount: amount,
       },
       sender: sender,
