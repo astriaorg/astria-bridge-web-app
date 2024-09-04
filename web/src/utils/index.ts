@@ -13,19 +13,14 @@ export function getEnvVariable(name: string): string {
   return value;
 }
 
+/**
+ * Format balance to 2 decimal places
+ * @param rawBalance
+ */
 export const formatBalance = (rawBalance: string) => {
-  const balance = (Number.parseInt(rawBalance) / 1000000000000000000).toFixed(
-    2,
-  );
-  return balance;
+  return (Number.parseInt(rawBalance) / 1_000_000_000_000_000_000).toFixed(2);
 };
 
 export const formatChainAsNum = (chainIdHex: string) => {
-  const chainIdNum = Number.parseInt(chainIdHex);
-  return chainIdNum;
-};
-
-export const capitalize = (str: string): string => {
-  const lowered = str.toLowerCase();
-  return lowered.charAt(0).toUpperCase() + lowered.slice(1);
+  return Number.parseInt(chainIdHex);
 };

@@ -4,7 +4,7 @@ export type AppConfig = {
   ibcChains: IbcChains;
 };
 
-export function getAppConfig() {
+export function getAppConfig(): AppConfig {
   return {
     ibcChains: parseMultiChainEnvVars(),
   };

@@ -1,12 +1,12 @@
 import type { ChainInfo } from "@keplr-wallet/types";
-import { capitalize, getEnvVariable } from "utils";
+import { getEnvVariable } from "utils";
 
 export type IbcChainInfo = {
   ibcChannel: string;
   iconSourceUrl: string;
 } & ChainInfo;
 
-// IbcChains maps labels to IbcChainInfo objects
+// IbcChains type maps labels to IbcChainInfo objects
 export type IbcChains = {
   [label: string]: IbcChainInfo;
 };
@@ -86,9 +86,10 @@ export function parseMultiChainEnvVars(): IbcChains {
 
   for (const chainId of chainIds) {
     const prefix = `REACT_APP_${chainId}`;
+    const chainName = getEnvVariable(`${prefix}_CHAIN_NAME`);
     const envVars = {
       CHAIN_ID: getEnvVariable(`${prefix}_CHAIN_ID`),
-      CHAIN_NAME: getEnvVariable(`${prefix}_CHAIN_NAME`),
+      CHAIN_NAME: chainName,
       RPC_ENDPOINT: getEnvVariable(`${prefix}_RPC_ENDPOINT`),
       REST_ENDPOINT: getEnvVariable(`${prefix}_REST_ENDPOINT`),
       IBC_CHANNEL: getEnvVariable(`${prefix}_IBC_CHANNEL`),
@@ -132,7 +133,7 @@ export function parseMultiChainEnvVars(): IbcChains {
     };
 
     if (envVars.RPC_ENDPOINT && envVars.REST_ENDPOINT) {
-      chainConfigs[capitalize(chainId)] = generateChainInfo(envVars);
+      chainConfigs[chainName] = generateChainInfo(envVars);
     }
   }
 

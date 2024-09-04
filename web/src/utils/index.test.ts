@@ -1,9 +1,4 @@
-import {
-  getEnvVariable,
-  formatBalance,
-  formatChainAsNum,
-  capitalize,
-} from "utils"; // Adjust the import path as needed
+import { getEnvVariable, formatBalance, formatChainAsNum } from "utils";
 
 describe("Utility Functions", () => {
   describe("getEnvVariable", () => {
@@ -43,22 +38,6 @@ describe("Utility Functions", () => {
       expect(formatChainAsNum("0x1")).toBe(1);
       expect(formatChainAsNum("0xa")).toBe(10);
       expect(formatChainAsNum("0x2710")).toBe(10000);
-    });
-  });
-
-  describe("capitalize", () => {
-    it("should capitalize the first letter of a string", () => {
-      expect(capitalize("hello")).toBe("Hello");
-      expect(capitalize("WORLD")).toBe("World");
-      expect(capitalize("tEsT")).toBe("Test");
-    });
-
-    it("should handle empty strings", () => {
-      expect(capitalize("")).toBe("");
-    });
-
-    it("should handle single-character strings", () => {
-      expect(capitalize("a")).toBe("A");
     });
   });
 });
