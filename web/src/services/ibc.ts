@@ -30,7 +30,7 @@ export const sendIbcTransfer = async (
   const sequencer_bridge_account = getEnvVariable(
     "REACT_APP_SEQUENCER_BRIDGE_ACCOUNT",
   );
-  const denom = getEnvVariable("REACT_APP_SEQUENCER_BRIDGE_DENOM");
+  const denom = getEnvVariable("REACT_APP_CELESTIA_FEE_CURRENCIES_COIN_MINIMAL_DENOM");
   const memo = JSON.stringify({ rollupDepositAddress: recipient });
   const fee = {
     amount: [
