@@ -17,7 +17,6 @@ interface NotificationProps {
 }
 
 // Notification is used for toast and modal notifications
-// TODO - refactor into `features/Notification`
 function Notification({
   id,
   onRemove,

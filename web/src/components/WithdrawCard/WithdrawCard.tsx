@@ -1,9 +1,9 @@
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
-import { NotificationsContext } from "contexts/NotificationsContext";
+import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import { NotificationType } from "components/Notification/types";
+import { NotificationType } from "features/Notifications/components/Notification/types";
 import { getKeplrFromWindow } from "services/keplr";
 import {
   EthWalletConnector,

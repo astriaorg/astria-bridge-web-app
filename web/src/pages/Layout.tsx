@@ -3,8 +3,8 @@ import { useContext } from "react";
 import { Outlet } from "react-router-dom";
 
 import Navbar from "components/Navbar/Navbar";
-import Notification from "components/Notification/Notification";
-import { NotificationsContext } from "contexts/NotificationsContext";
+import Notification from "features/Notifications/components/Notification/Notification";
+import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
 
 /**
  * Layout component with Navbar and footer.

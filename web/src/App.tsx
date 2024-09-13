@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { EthWalletContextProvider } from "features/EthWallet/contexts/EthWalletContext";
 import BridgePage from "pages/BridgePage/BridgePage";
 import Layout from "pages/Layout";
-import { NotificationsProvider } from "providers/NotificationsProvider";
+import { NotificationsProvider } from "features/Notifications/contexts/NotificationsContext";
 
 /**
  * App component with routes.
