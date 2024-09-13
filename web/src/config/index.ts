@@ -1,4 +1,4 @@
-import { getIbcChains, type IbcChains } from "./chains";
+import type { IbcChains } from "./chainConfigs";
 
 /**
  * Represents the configuration object for the application.
@@ -8,15 +8,5 @@ import { getIbcChains, type IbcChains } from "./chains";
  */
 export type AppConfig = {
   ibcChains: IbcChains;
+  sequencerBridgeAccount: string;
 };
-
-/**
- * Returns the application configuration.
- *
- * @return {AppConfig} The application configuration object.
- */
-export function getAppConfig(): AppConfig {
-  return {
-    ibcChains: getIbcChains(),
-  };
-}

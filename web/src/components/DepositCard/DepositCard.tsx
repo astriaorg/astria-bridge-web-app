@@ -10,13 +10,15 @@ import { getBalance, sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
 import Dropdown from "components/Dropdown/Dropdown";
+import { useConfig } from "config/hooks/useConfig";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount } = useEthWallet();
+  const { ibcChains } = useConfig();
 
   const { selectedIbcChain, selectIbcChain, ibcChainsOptions } =
-    useIbcChainSelection();
+    useIbcChainSelection(ibcChains);
 
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");

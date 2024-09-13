@@ -1,7 +1,7 @@
 import type { ChainInfo } from "@keplr-wallet/types";
-import { getEnvVariable } from "utils";
-import { ibcChains as localIbcChains } from "./chainConfigs/local";
-import { ibcChains as duskIbcChains } from "./chainConfigs/dusk";
+import { getEnvVariable } from "config/env";
+import { ibcChains as localIbcChains } from "./local";
+import { ibcChains as duskIbcChains } from "./dusk";
 
 /**
  * Represents information about an IBC (Inter-Blockchain Communication) chain.
@@ -33,6 +33,7 @@ export function getIbcChains(): IbcChains {
   try {
     const ibcChains = getEnvVariable("REACT_APP_IBC_CHAINS");
     if (ibcChains) {
+      // TODO - validate the JSON against type
       return JSON.parse(ibcChains);
     }
   } catch (e) {

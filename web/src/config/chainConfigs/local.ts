@@ -1,4 +1,4 @@
-import type { IbcChainInfo, IbcChains } from "../chains";
+import type { IbcChainInfo, IbcChains } from ".";
 
 const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.

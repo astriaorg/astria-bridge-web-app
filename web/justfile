@@ -1,9 +1,9 @@
 _default:
   @just --list
 
-# copies web/.env.example to web/.env
+# copies web/.env.example to web/.env.local
 init-env:
-  cp .env.example .env
+  cp .env.example .env.local
 
 # installs npm deps for web
 install:

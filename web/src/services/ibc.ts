@@ -1,8 +1,8 @@
 import Long from "long";
 import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
-import type { IbcChainInfo } from "config/chains";
-import { getEnvVariable } from "utils";
+import type { IbcChainInfo } from "config/chainConfigs";
+import { getEnvVariable } from "config/env";
 
 /**
  * Send an IBC transfer from the selected chain to the recipient address.

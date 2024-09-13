@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { getEnvVariable } from "utils";
 
 const ABI = [
   "function withdrawToSequencer(string destinationChainAddress) payable",
@@ -17,28 +16,23 @@ export class AstriaWithdrawerService {
   private readonly contractAddress: string;
   private contractPromise: Promise<ethers.Contract> | null = null;
 
-  private constructor(walletProvider: ethers.Eip1193Provider) {
+  private constructor(
+    walletProvider: ethers.Eip1193Provider,
+    contractAddress: string,
+  ) {
     this.walletProvider = new ethers.BrowserProvider(walletProvider);
-    try {
-      this.contractAddress = getEnvVariable(
-        "REACT_APP_EVM_WITHDRAWER_CONTRACT_ADDRESS",
-      );
-    } catch (error) {
-      console.error(
-        "REACT_APP_EVM_WITHDRAWER_CONTRACT_ADDRESS not set:",
-        error,
-      );
-      throw error;
-    }
+    this.contractAddress = contractAddress;
   }
 
   /**
    * Get the singleton instance of the AstriaWithdrawerService.
    * If a provider is supplied, it will be used to create a new instance.
    * @param provider
+   * @param contractAddress
    */
   public static getInstance(
     provider?: ethers.Eip1193Provider,
+    contractAddress?: string,
   ): AstriaWithdrawerService {
     if (!AstriaWithdrawerService.instance) {
       if (!provider) {
@@ -46,7 +40,15 @@ export class AstriaWithdrawerService {
           "Provider must be supplied when creating the service instance",
         );
       }
-      AstriaWithdrawerService.instance = new AstriaWithdrawerService(provider);
+      if (!contractAddress) {
+        throw new Error(
+          "Contract address must be supplied when creating the service instance",
+        );
+      }
+      AstriaWithdrawerService.instance = new AstriaWithdrawerService(
+        provider,
+        contractAddress,
+      );
     } else if (provider) {
       // update the provider if one is supplied
       AstriaWithdrawerService.instance.updateProvider(provider);
@@ -120,9 +122,11 @@ export class AstriaWithdrawerService {
 /**
  * Get the singleton instance of the AstriaWithdrawerService.
  * @param provider
+ * @param contractAddress
  */
 export const getAstriaWithdrawerService = (
   provider?: ethers.Eip1193Provider,
+  contractAddress?: string,
 ): AstriaWithdrawerService => {
-  return AstriaWithdrawerService.getInstance(provider);
+  return AstriaWithdrawerService.getInstance(provider, contractAddress);
 };
