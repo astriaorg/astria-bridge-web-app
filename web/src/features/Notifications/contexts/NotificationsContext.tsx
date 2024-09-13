@@ -1,17 +1,31 @@
-import type React from "react";
+import React from "react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import type {
   AddNotificationOpts,
   Notification,
-} from "components/Notification/types";
-import { NotificationsContext } from "contexts/NotificationsContext";
+} from "features/Notifications/components/Notification/types";
+
+interface NotificationsContextProps {
+  notifications: Notification[];
+  addNotification: (opts: AddNotificationOpts) => void;
+  removeNotification: (id: string) => void;
+}
+
+export const NotificationsContext =
+  React.createContext<NotificationsContextProps>(
+    {} as NotificationsContextProps,
+  );
 
 type NotificationsProviderProps = {
   children: React.ReactNode;
 };
 
+/**
+ * NotificationsProvider component to provide notifications context to children.
+ * @param children
+ */
 export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({
   children,
 }) => {

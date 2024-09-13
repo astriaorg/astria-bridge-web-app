@@ -1,10 +1,10 @@
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
-import { NotificationType } from "components/Notification/types";
+import { NotificationType } from "features/Notifications/components/Notification/types";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
-import { NotificationsContext } from "contexts/NotificationsContext";
+import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { getBalance, sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
