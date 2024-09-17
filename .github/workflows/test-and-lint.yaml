@@ -26,8 +26,6 @@ jobs:
       - name: Install Dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
-      - name: Copy env file
-        run: cp .env.example .env
       - name: Lint
         run: npm run lint
       - name: Test
