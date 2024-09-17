@@ -33,6 +33,7 @@ function Dropdown<T>({
   const [selectedOption, setSelectedOption] =
     useState<DropdownOption<T> | null>(defaultOption || null);
 
+  // set the default option when defaultOption or onSelect change
   useEffect(() => {
     if (defaultOption) {
       setSelectedOption(defaultOption);
