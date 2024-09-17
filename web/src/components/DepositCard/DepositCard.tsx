@@ -266,27 +266,6 @@ export default function DepositCard(): React.ReactElement {
         </div>
       </div>
 
-      <div className="field">
-        <label className="field-label">Amount to deposit</label>
-        <div className="control has-icons-right mt-1">
-          <input
-            className="input"
-            type="text"
-            placeholder="0.00"
-            onChange={updateAmount}
-            value={amount}
-          />
-          <span className="icon is-right mt-1">
-            <p>{selectedIbcCurrency?.coinDenom}</p>
-          </span>
-        </div>
-        {!isAmountValid && hasTouchedForm && (
-          <p className="help is-danger mt-2">
-            Amount must be a number greater than 0
-          </p>
-        )}
-      </div>
-
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
@@ -321,6 +300,27 @@ export default function DepositCard(): React.ReactElement {
         </div>
       </div>
 
+      <div className="field">
+        <label className="field-label">Amount to deposit</label>
+        <div className="control has-icons-right mt-1">
+          <input
+            className="input"
+            type="text"
+            placeholder="0.00"
+            onChange={updateAmount}
+            value={amount}
+          />
+          <span className="icon is-right mt-1">
+            <p>{selectedIbcCurrency?.coinDenom}</p>
+          </span>
+        </div>
+        {!isAmountValid && hasTouchedForm && (
+          <p className="help is-danger mt-2">
+            Amount must be a number greater than 0
+          </p>
+        )}
+      </div>
+
       <div className="card-footer px-4 my-5">
         <button
           type="button"
@@ -336,6 +336,7 @@ export default function DepositCard(): React.ReactElement {
           {isLoading ? "Processing..." : "Deposit"}
         </button>
       </div>
+
     </div>
   );
 }
