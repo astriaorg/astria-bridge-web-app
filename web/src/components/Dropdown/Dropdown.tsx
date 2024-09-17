@@ -11,6 +11,7 @@ interface DropdownProps<T> {
   onSelect: (value: T) => void;
   placeholder?: string;
   defaultOption?: DropdownOption<T>;
+  disabled?: boolean;
 }
 
 function Dropdown<T>({
@@ -18,11 +19,13 @@ function Dropdown<T>({
   onSelect,
   placeholder = "Select an option",
   defaultOption,
+  disabled,
 }: DropdownProps<T>) {
   const [isActive, setIsActive] = useState(false);
   const [selectedOption, setSelectedOption] =
     useState<DropdownOption<T> | null>(defaultOption || null);
 
+  // set the default option when defaultOption or onSelect change
   useEffect(() => {
     if (defaultOption) {
       setSelectedOption(defaultOption);
@@ -37,7 +40,11 @@ function Dropdown<T>({
   };
 
   return (
-    <div className={`dropdown ${isActive ? "is-active" : ""}`}>
+    <div
+      className={`dropdown ${isActive ? "is-active" : ""} ${
+        disabled ? "is-disabled" : ""
+      }`}
+    >
       <div className="dropdown-trigger">
         <button
           type="button"

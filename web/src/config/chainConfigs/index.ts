@@ -23,6 +23,15 @@ export type IbcChains = {
 };
 
 /**
+ * Represents information about a currency used in an IBC chain.
+ */
+export type IbcCurrency = {
+  coinDenom: string;
+  coinMinimalDenom: string;
+  coinDecimals: number;
+};
+
+/**
  * Retrieves the IBC chains from the environment variable override or the default chain configurations,
  * depending on the environment.
  *

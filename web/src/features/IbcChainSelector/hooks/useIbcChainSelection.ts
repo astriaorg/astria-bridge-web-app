@@ -1,18 +1,13 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
-import type { IbcChainInfo, IbcChains } from "config/chainConfigs";
+import type { IbcChainInfo, IbcChains, IbcCurrency } from "config/chainConfigs";
 
-/**
- * Custom hook for selecting an IBC chain from a list of available IBC chains.
- *
- * @param ibcChains - An object containing the available IBC chains.
- *
- * @return An object containing the selected IBC chain, a function to select an IBC chain, and the options for the IBC chain dropdown.
- */
 export function useIbcChainSelection(ibcChains: IbcChains) {
   const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
     null,
   );
+  const [selectedIbcCurrency, setSelectedIbcCurrency] =
+    useState<IbcCurrency | null>(null);
 
   const ibcChainsOptions = useMemo(() => {
     return Object.entries(ibcChains).map(
@@ -23,13 +18,32 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     );
   }, [ibcChains]);
 
-  const selectIbcChain = (chain: IbcChainInfo) => {
+  const selectIbcChain = useCallback((chain: IbcChainInfo) => {
     setSelectedIbcChain(chain);
-  };
+  }, []);
+
+  const ibcCurrencyOptions = useMemo(() => {
+    if (!selectedIbcChain) {
+      return [];
+    }
+    return selectedIbcChain.currencies?.map(
+      (currency): DropdownOption<IbcCurrency> => ({
+        label: currency.coinDenom,
+        value: currency,
+      }),
+    );
+  }, [selectedIbcChain]);
+
+  const selectIbcCurrency = useCallback((currency: IbcCurrency) => {
+    setSelectedIbcCurrency(currency);
+  }, []);
 
   return {
     selectedIbcChain,
     selectIbcChain,
     ibcChainsOptions,
+    selectIbcCurrency,
+    selectedIbcCurrency,
+    ibcCurrencyOptions,
   };
 }
