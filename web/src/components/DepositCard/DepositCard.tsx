@@ -210,18 +210,28 @@ export default function DepositCard(): React.ReactElement {
     setRecipientAddress(event.target.value);
   };
 
-  const additionalOptions = useMemo(
+  const additionalIbcOptions = useMemo(
     () => [
       {
         label: "Connect Keplr Wallet",
-        selectedLabel: userAccount?.address,
         action: connectKeplrWallet,
         className: "has-text-primary",
         icon: "fas fa-star",
       },
     ],
-    [connectKeplrWallet, userAccount],
+    [connectKeplrWallet],
   );
+
+  const additionalEvmOptions = useMemo(() => {
+    return [
+      {
+        label: "Connect EVM Wallet",
+        action: connectEVMWallet,
+        className: "has-text-primary",
+        icon: "fas fa-star",
+      },
+    ];
+  }, [connectEVMWallet]);
 
   return (
     <div>
@@ -235,7 +245,7 @@ export default function DepositCard(): React.ReactElement {
                 options={ibcChainsOptions}
                 defaultOption={defaultIbcChainOption}
                 onSelect={selectIbcChain}
-                additionalOptions={additionalOptions}
+                additionalOptions={additionalIbcOptions}
                 additionalOptionSelectedLabel={fromAddress}
               />
             </div>
@@ -271,52 +281,44 @@ export default function DepositCard(): React.ReactElement {
       )}
 
       <div className="field">
-        <label className="field-label">To</label>
-        <div className="is-flex is-flex-direction-column">
-          <div className="control mt-1 is-flex-grow-1">
-            <input
-              className="input"
-              type="text"
-              placeholder="0x..."
-              onChange={updateRecipientAddress}
-              value={recipientAddress}
-            />
-          </div>
+        <div className="is-flex is-flex-direction-row is-justify-content-start">
+          <div className="mr-3">To</div>
           <div className="mt-3">
-            <button
-              type="button"
-              className="button is-ghost is-outlined-light is-tall"
+            <Dropdown
+              placeholder="Connect EVM Wallet"
+              options={[]}
+              onSelect={connectEVMWallet}
               disabled={recipientAddress !== ""}
-              onClick={() => connectEVMWallet()}
-            >
-              {userAccount ? "Connected to EVM Wallet" : "Connect EVM Wallet"}
-            </button>
-            {!isRecipientAddressValid && hasTouchedForm && (
-              <p className="help is-danger mt-2">Must be a valid EVM address</p>
-            )}
+              additionalOptions={additionalEvmOptions}
+              additionalOptionSelectedLabel={userAccount?.address}
+            />
           </div>
         </div>
       </div>
 
+      <div className="card-spacer" />
+
       <div className="field">
-        <label className="field-label">Amount to deposit</label>
-        <div className="control has-icons-right mt-1">
-          <input
-            className="input"
-            type="text"
-            placeholder="0.00"
-            onChange={updateAmount}
-            value={amount}
-          />
-          <span className="icon is-right mt-1">
-            <p>{selectedIbcCurrency?.coinDenom}</p>
-          </span>
+        <div className="is-flex is-flex-direction-row is-justify-content-start">
+          <div className="mr-3">Amount</div>
+          <div className="control has-icons-right mt-1 is-flex-grow-1">
+            <input
+              className="input"
+              type="text"
+              placeholder="0.00"
+              onChange={updateAmount}
+              value={amount}
+            />
+            <span className="icon is-right mt-1">
+              <p>{selectedIbcCurrency?.coinDenom}</p>
+            </span>
+          </div>
+          {!isAmountValid && hasTouchedForm && (
+            <p className="help is-danger mt-2">
+              Amount must be a number greater than 0
+            </p>
+          )}
         </div>
-        {!isAmountValid && hasTouchedForm && (
-          <p className="help is-danger mt-2">
-            Amount must be a number greater than 0
-          </p>
-        )}
       </div>
 
       <div className="card-footer px-4 my-5">
