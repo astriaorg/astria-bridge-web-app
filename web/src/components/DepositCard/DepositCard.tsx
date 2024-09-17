@@ -210,37 +210,35 @@ export default function DepositCard(): React.ReactElement {
     setRecipientAddress(event.target.value);
   };
 
-  const additionalOptions = useMemo(() => [
-  {
-    label: "Connect Keplr Wallet",
-    action: connectKeplrWallet,
-    className: "has-text-primary",
-    icon: "fas fa-star"
-  },
-], [connectKeplrWallet]);
+  const additionalOptions = useMemo(
+    () => [
+      {
+        label: "Connect Keplr Wallet",
+        selectedLabel: userAccount?.address,
+        action: connectKeplrWallet,
+        className: "has-text-primary",
+        icon: "fas fa-star",
+      },
+    ],
+    [connectKeplrWallet, userAccount],
+  );
 
   return (
     <div>
       <div className="field">
-        <label className="field-label">From</label>
         <div className="is-flex is-flex-direction-column">
-          <div className="control mt-1 is-flex-grow-1">
-            <input
-              className="input"
-              type="text"
-              placeholder="celestia..."
-              value={fromAddress}
-              readOnly
-            />
-          </div>
-          <div className="mt-3 is-flex is-flex-direction-row is-justify-content-space-evenly">
-            <Dropdown
-              placeholder="Select a chain"
-              options={ibcChainsOptions}
-              defaultOption={defaultIbcChainOption}
-              onSelect={selectIbcChain}
-              additionalOptions={additionalOptions}
-            />
+          <div className="is-flex is-flex-direction-row is-justify-content-start">
+            <div className="mr-3">From</div>
+            <div className="">
+              <Dropdown
+                placeholder="Select a chain"
+                options={ibcChainsOptions}
+                defaultOption={defaultIbcChainOption}
+                onSelect={selectIbcChain}
+                additionalOptions={additionalOptions}
+                additionalOptionSelectedLabel={fromAddress}
+              />
+            </div>
             {selectedIbcChain && ibcCurrencyOptions && (
               <div>
                 <Dropdown
@@ -336,7 +334,6 @@ export default function DepositCard(): React.ReactElement {
           {isLoading ? "Processing..." : "Deposit"}
         </button>
       </div>
-
     </div>
   );
 }

@@ -19,6 +19,7 @@ interface DropdownProps<T> {
   defaultOption?: DropdownOption<T>;
   disabled?: boolean;
   additionalOptions?: DropdownAdditionalOption[];
+  additionalOptionSelectedLabel?: string;
 }
 
 function Dropdown<T>({
@@ -28,6 +29,7 @@ function Dropdown<T>({
   defaultOption,
   disabled = false,
   additionalOptions = [],
+  additionalOptionSelectedLabel,
 }: DropdownProps<T>) {
   const [isActive, setIsActive] = useState(false);
   const [selectedOption, setSelectedOption] =
@@ -54,7 +56,7 @@ function Dropdown<T>({
     if (!disabled) {
       setIsActive(!isActive);
     }
-  }, [disabled]);
+  }, [disabled, isActive]);
 
   return (
     <div
@@ -71,16 +73,22 @@ function Dropdown<T>({
           onClick={toggleDropdown}
           disabled={disabled}
         >
-          <span>{selectedOption ? selectedOption.label : placeholder}</span>
+          {additionalOptionSelectedLabel && (
+            <span>{additionalOptionSelectedLabel}</span>
+          )}
+          {!additionalOptionSelectedLabel && (
+            <span>{selectedOption ? selectedOption.label : placeholder}</span>
+          )}
           <span className="icon is-small">
-            <i className="fas fa-angle-down" aria-hidden="true" />
+            <i className="fas fa-angle-down" />
           </span>
         </button>
       </div>
       <div className="dropdown-menu" id="dropdown-menu" role="menu">
         <div className="dropdown-content">
           {options?.map((option) => (
-            <a
+            <button
+              type="button"
               key={option.label}
               className={`dropdown-item ${
                 selectedOption?.value === option.value ? "is-active" : ""
@@ -88,12 +96,13 @@ function Dropdown<T>({
               onClick={() => handleSelect(option)}
             >
               {option.label}
-            </a>
+            </button>
           ))}
           {additionalOptions.length > 0 && <hr className="dropdown-divider" />}
-          {additionalOptions.map((option, index) => (
-            <a
-              key={`additional-${index}`}
+          {additionalOptions.map((option) => (
+            <button
+              type="button"
+              key={`additional-${option.label}`}
               className={`dropdown-item ${option.className || ""}`}
               onClick={() => {
                 option.action();
@@ -106,7 +115,7 @@ function Dropdown<T>({
                 </span>
               )}
               <span>{option.label}</span>
-            </a>
+            </button>
           ))}
         </div>
       </div>
