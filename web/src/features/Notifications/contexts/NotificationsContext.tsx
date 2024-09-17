@@ -26,9 +26,9 @@ type NotificationsProviderProps = {
  * NotificationsProvider component to provide notifications context to children.
  * @param children
  */
-export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({
-  children,
-}) => {
+export const NotificationsContextProvider: React.FC<
+  NotificationsProviderProps
+> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const addNotification = ({ modalOpts, toastOpts }: AddNotificationOpts) => {

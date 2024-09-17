@@ -1,8 +1,8 @@
 import Long from "long";
 import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
-import type { IbcChainInfo } from "config/chains";
-import { getEnvVariable } from "utils";
+import type { IbcChainInfo, IbcCurrency } from "config/chainConfigs";
+import { getEnvVariable } from "config/env";
 
 /**
  * Send an IBC transfer from the selected chain to the recipient address.
@@ -11,12 +11,14 @@ import { getEnvVariable } from "utils";
  * @param sender
  * @param recipient
  * @param amount
+ * @param currency
  */
 export const sendIbcTransfer = async (
   selectedIbcChain: IbcChainInfo,
   sender: string,
   recipient: string,
   amount: string,
+  currency: IbcCurrency,
 ) => {
   const keplr = window.keplr;
   if (!keplr) {
@@ -57,8 +59,7 @@ export const sendIbcTransfer = async (
       sourcePort: "transfer",
       sourceChannel: selectedIbcChain.ibcChannel,
       token: {
-        // TODO - should be configurable/selectable in the ui
-        denom: selectedIbcChain.currencies[0].coinMinimalDenom,
+        denom: currency.coinMinimalDenom,
         amount: amount,
       },
       sender: sender,
@@ -82,7 +83,10 @@ export const sendIbcTransfer = async (
 
 export const getBalance = async (
   selectedIbcChain: IbcChainInfo,
+  selectedCurrency: IbcCurrency,
 ): Promise<string> => {
+  // TODO - add ability to get balance for other currencies
+
   const keplr = window.keplr;
   if (!keplr) {
     throw new Error("Keplr extension not installed");

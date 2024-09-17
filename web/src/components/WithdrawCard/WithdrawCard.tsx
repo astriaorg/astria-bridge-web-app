@@ -11,13 +11,15 @@ import {
 } from "features/EthWallet";
 import { useIbcChainSelection } from "features/IbcChainSelector";
 import Dropdown from "components/Dropdown/Dropdown";
+import { useConfig } from "config/hooks/useConfig";
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount, selectedWallet } = useEthWallet();
+  const { ibcChains, sequencerBridgeAccount } = useConfig();
 
   const { selectedIbcChain, selectIbcChain, ibcChainsOptions } =
-    useIbcChainSelection();
+    useIbcChainSelection(ibcChains);
 
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
@@ -58,7 +60,6 @@ export default function WithdrawCard(): React.ReactElement {
   };
 
   const connectKeplrWallet = async () => {
-    console.log({ selectedIbcChain });
     if (!selectedIbcChain) {
       addNotification({
         toastOpts: {
@@ -146,7 +147,10 @@ export default function WithdrawCard(): React.ReactElement {
     setIsLoading(true);
     setIsAnimating(true);
     try {
-      const withdrawerSvc = getAstriaWithdrawerService(selectedWallet.provider);
+      const withdrawerSvc = getAstriaWithdrawerService(
+        selectedWallet.provider,
+        sequencerBridgeAccount,
+      );
       await withdrawerSvc.withdrawToIbcChain(
         fromAddress,
         toAddress,

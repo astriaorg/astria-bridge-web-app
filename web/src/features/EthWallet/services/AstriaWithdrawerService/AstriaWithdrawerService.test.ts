@@ -1,11 +1,7 @@
 import { ethers } from "ethers";
 import { getAstriaWithdrawerService } from "./AstriaWithdrawerService";
-import { getEnvVariable } from "utils";
 
 jest.mock("ethers");
-jest.mock("utils", () => ({
-  getEnvVariable: jest.fn(),
-}));
 
 describe("AstriaWithdrawerService", () => {
   const mockContractAddress = "0x1234567890123456789012345678901234567890";
@@ -21,9 +17,6 @@ describe("AstriaWithdrawerService", () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
-
-    // mock getEnvVariable
-    (getEnvVariable as jest.Mock).mockReturnValue(mockContractAddress);
 
     // mock ethers.BrowserProvider
     mockProvider = {
@@ -52,8 +45,19 @@ describe("AstriaWithdrawerService", () => {
     );
   });
 
+  it("should throw an error if contract address is not supplied on first instantiation", () => {
+    expect(() =>
+      getAstriaWithdrawerService({} as ethers.Eip1193Provider),
+    ).toThrow(
+      "Contract address must be supplied when creating the service instance",
+    );
+  });
+
   it("should create a singleton instance", () => {
-    const service1 = getAstriaWithdrawerService({} as ethers.Eip1193Provider);
+    const service1 = getAstriaWithdrawerService(
+      {} as ethers.Eip1193Provider,
+      mockContractAddress,
+    );
     const service2 = getAstriaWithdrawerService();
 
     expect(service1).toBe(service2);

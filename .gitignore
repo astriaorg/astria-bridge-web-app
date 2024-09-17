@@ -23,6 +23,7 @@ web/build
 
 # envs
 .env
+.env.local
 
 # local secrets
 .secret.local

@@ -1,4 +1,5 @@
 import type React from "react";
+import { useMemo } from "react";
 import { useContext, useEffect, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { NotificationType } from "features/Notifications/components/Notification/types";
@@ -10,13 +11,27 @@ import { getBalance, sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
 import Dropdown from "components/Dropdown/Dropdown";
+import { useConfig } from "config/hooks/useConfig";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount } = useEthWallet();
+  const { ibcChains } = useConfig();
 
-  const { selectedIbcChain, selectIbcChain, ibcChainsOptions } =
-    useIbcChainSelection();
+  const {
+    selectIbcChain,
+    ibcChainsOptions,
+    selectedIbcChain,
+    selectIbcCurrency,
+    ibcCurrencyOptions,
+    selectedIbcCurrency,
+  } = useIbcChainSelection(ibcChains);
+  const defaultIbcChainOption = useMemo(() => {
+    return ibcChainsOptions[0] || null;
+  }, [ibcChainsOptions]);
+  const defaultIbcCurrencyOption = useMemo(() => {
+    return ibcCurrencyOptions[0] || null;
+  }, [ibcCurrencyOptions]);
 
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
@@ -48,12 +63,13 @@ export default function DepositCard(): React.ReactElement {
   }, [recipientAddress, amount]);
 
   const getAndSetBalance = async () => {
-    if (!selectedIbcChain) {
+    if (!selectedIbcChain || !selectedIbcCurrency) {
       return;
     }
     try {
       setIsLoadingBalance(true);
-      const balance = await getBalance(selectedIbcChain);
+      // TODO - should update balance if user selects different token
+      const balance = await getBalance(selectedIbcChain, selectedIbcCurrency);
       setBalance(balance);
     } catch (e) {
       console.error(e);
@@ -64,11 +80,11 @@ export default function DepositCard(): React.ReactElement {
   };
 
   const sendBalance = async () => {
-    if (!selectedIbcChain) {
+    if (!selectedIbcChain || !selectedIbcCurrency) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
-          message: "Please select a chain first.",
+          message: "Please select a chain and token first.",
           onAcknowledge: () => {},
         },
       });
@@ -83,6 +99,7 @@ export default function DepositCard(): React.ReactElement {
         fromAddress,
         recipientAddress,
         DecUtils.getTenExponentN(6).mul(new Dec(amount)).truncate().toString(),
+        selectedIbcCurrency,
       );
     } catch (e) {
       if (e instanceof Error) {
@@ -211,8 +228,8 @@ export default function DepositCard(): React.ReactElement {
             <Dropdown
               placeholder="Select a chain"
               options={ibcChainsOptions}
-              defaultOption={ibcChainsOptions[0]}
-              onSelect={(selected) => selectIbcChain(selected)}
+              defaultOption={defaultIbcChainOption}
+              onSelect={selectIbcChain}
             />
             <button
               type="button"
@@ -224,6 +241,17 @@ export default function DepositCard(): React.ReactElement {
                 ? "Connected to Keplr Wallet"
                 : "Connect Keplr Wallet"}
             </button>
+            {selectedIbcChain && ibcCurrencyOptions && (
+              <div>
+                <Dropdown
+                  placeholder="Select a token"
+                  options={ibcCurrencyOptions}
+                  defaultOption={defaultIbcCurrencyOption}
+                  onSelect={selectIbcCurrency}
+                  disabled={!selectedIbcChain}
+                />
+              </div>
+            )}
           </div>
           <div>
             {fromAddress && !isLoadingBalance && (
@@ -249,7 +277,7 @@ export default function DepositCard(): React.ReactElement {
             value={amount}
           />
           <span className="icon is-right mt-1">
-            <p>TIA</p>
+            <p>{selectedIbcCurrency?.coinDenom}</p>
           </span>
         </div>
         {!isAmountValid && hasTouchedForm && (

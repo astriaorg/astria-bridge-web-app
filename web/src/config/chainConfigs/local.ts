@@ -1,4 +1,4 @@
-import type { IbcChainInfo, IbcChains } from "../chains";
+import type { IbcChainInfo, IbcChains } from ".";
 
 const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.
@@ -51,6 +51,15 @@ const CelestiaChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
+    },
+    {
+      // Not a real currency, just using for developing the ui
+      // Coin denomination to be displayed to the user.
+      coinDenom: "STEEZE",
+      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
+      coinMinimalDenom: "usteeze",
+      // # of decimal points to convert minimal denomination to user-facing denomination.
+      coinDecimals: 6,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.

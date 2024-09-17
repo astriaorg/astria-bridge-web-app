@@ -3,21 +3,24 @@ import { Route, Routes } from "react-router-dom";
 import { EthWalletContextProvider } from "features/EthWallet/contexts/EthWalletContext";
 import BridgePage from "pages/BridgePage/BridgePage";
 import Layout from "pages/Layout";
-import { NotificationsProvider } from "features/Notifications/contexts/NotificationsContext";
+import { NotificationsContextProvider } from "features/Notifications/contexts/NotificationsContext";
+import { ConfigContextProvider } from "config/contexts/ConfigContext";
 
 /**
  * App component with routes.
  */
 export default function App(): React.ReactElement {
   return (
-    <NotificationsProvider>
-      <EthWalletContextProvider>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route index element={<BridgePage />} />
-          </Route>
-        </Routes>
-      </EthWalletContextProvider>
-    </NotificationsProvider>
+    <ConfigContextProvider>
+      <NotificationsContextProvider>
+        <EthWalletContextProvider>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route index element={<BridgePage />} />
+            </Route>
+          </Routes>
+        </EthWalletContextProvider>
+      </NotificationsContextProvider>
+    </ConfigContextProvider>
   );
 }
