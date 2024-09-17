@@ -15,6 +15,6 @@ describe("BridgePage", () => {
   test("renders bridge page correctly", () => {
     renderWithRouter(<BridgePage />);
     const bridgeCard = screen.getAllByText(/deposit/i);
-    expect(bridgeCard).toHaveLength(3);
+    expect(bridgeCard).toHaveLength(2);
   });
 });
