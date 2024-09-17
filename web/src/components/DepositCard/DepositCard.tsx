@@ -210,6 +210,15 @@ export default function DepositCard(): React.ReactElement {
     setRecipientAddress(event.target.value);
   };
 
+  const additionalOptions = useMemo(() => [
+  {
+    label: "Connect Keplr Wallet",
+    action: connectKeplrWallet,
+    className: "has-text-primary",
+    icon: "fas fa-star"
+  },
+], [connectKeplrWallet]);
+
   return (
     <div>
       <div className="field">
@@ -230,17 +239,8 @@ export default function DepositCard(): React.ReactElement {
               options={ibcChainsOptions}
               defaultOption={defaultIbcChainOption}
               onSelect={selectIbcChain}
+              additionalOptions={additionalOptions}
             />
-            <button
-              type="button"
-              className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectKeplrWallet()}
-              disabled={fromAddress !== ""}
-            >
-              {fromAddress
-                ? "Connected to Keplr Wallet"
-                : "Connect Keplr Wallet"}
-            </button>
             {selectedIbcChain && ibcCurrencyOptions && (
               <div>
                 <Dropdown
