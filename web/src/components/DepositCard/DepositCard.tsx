@@ -1,6 +1,5 @@
 import type React from "react";
-import { useMemo } from "react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
@@ -237,7 +236,7 @@ export default function DepositCard(): React.ReactElement {
     <div>
       <div className="field">
         <div className="is-flex is-flex-direction-column">
-          <div className="is-flex is-flex-direction-row is-justify-content-start">
+          <div className="is-flex is-flex-direction-row is-align-items-center">
             <div className="pl-4 mr-5">From</div>
             <div className="">
               <Dropdown
@@ -277,11 +276,18 @@ export default function DepositCard(): React.ReactElement {
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
-        <div className="card-spacer" />
+        <div className="is-flex is-flex-direction-row">
+          <div className="pl-4">
+            <span className="icon is-medium">
+              <i className="i-arrow-up-arrow-down" />
+            </span>
+          </div>
+          <div className="card-spacer" />
+        </div>
       )}
 
       <div className="field">
-        <div className="is-flex is-flex-direction-row is-justify-content-start">
+        <div className="is-flex is-flex-direction-row is-align-items-center">
           <div className="pl-4 mr-5">To</div>
           <div className="mt-3">
             <Dropdown
@@ -296,7 +302,9 @@ export default function DepositCard(): React.ReactElement {
         </div>
       </div>
 
-      <div className="card-spacer" />
+      <div className="is-flex is-flex-direction-row is-align-items-center">
+        <div className="card-spacer" />
+      </div>
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">

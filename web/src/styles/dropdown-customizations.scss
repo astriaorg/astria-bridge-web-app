@@ -1,4 +1,23 @@
+@import './dropdown-overrides.scss';
+
+.dropdown-content {
+  background-color: $dropdown-content-background-color;
+  .dropdown-item {
+    background-color: transparent;
+    span {
+      color: $dropdown-item-color;
+    }
+  }
+}
+
+.dropdown-trigger {
+  .button {
+    background-color: $dropdown-content-background-color;
+    color: $dropdown-item-color;
+  }
+}
+
 .dropdown.is-disabled {
-    background-color: $astria-grey-dark;
-    color: $astria-text-light;
+  background-color: $astria-grey-dark;
+  color: $astria-text-light;
 }

@@ -71,7 +71,7 @@ function Dropdown<T>({
       <div className="dropdown-trigger">
         <button
           type="button"
-          className="button"
+          className="button is-ghost is-outlined-light"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
           onClick={toggleDropdown}
@@ -113,12 +113,12 @@ function Dropdown<T>({
                 setIsActive(false);
               }}
             >
+              <span>{option.label}</span>
               {option.icon && (
                 <span className="icon">
                   <i className={option.icon} />
                 </span>
               )}
-              <span>{option.label}</span>
             </button>
           ))}
         </div>

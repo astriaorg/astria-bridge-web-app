@@ -44,8 +44,9 @@
   }
 
   & .card-spacer {
-    border-top: 1px $astria-grey-light solid;
+    border-top: 1px $astria-grey-dark solid;
     margin: 1rem 1rem;
+    width: 100%;
   }
 
   .card-footer {
