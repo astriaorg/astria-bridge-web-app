@@ -238,7 +238,7 @@ export default function DepositCard(): React.ReactElement {
       <div className="field">
         <div className="is-flex is-flex-direction-column">
           <div className="is-flex is-flex-direction-row is-justify-content-start">
-            <div className="mr-3">From</div>
+            <div className="pl-4 mr-5">From</div>
             <div className="">
               <Dropdown
                 placeholder="Select a chain"
@@ -282,7 +282,7 @@ export default function DepositCard(): React.ReactElement {
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-justify-content-start">
-          <div className="mr-3">To</div>
+          <div className="pl-4 mr-5">To</div>
           <div className="mt-3">
             <Dropdown
               placeholder="Connect EVM Wallet"
@@ -299,9 +299,9 @@ export default function DepositCard(): React.ReactElement {
       <div className="card-spacer" />
 
       <div className="field">
-        <div className="is-flex is-flex-direction-row is-justify-content-start">
-          <div className="mr-3">Amount</div>
-          <div className="control has-icons-right mt-1 is-flex-grow-1">
+        <div className="is-flex is-flex-direction-row is-align-items-center">
+          <div className="pl-4 mr-5">Amount</div>
+          <div className="control has-icons-right mt-1 is-flex-grow-1 mr-3">
             <input
               className="input"
               type="text"
@@ -309,9 +309,6 @@ export default function DepositCard(): React.ReactElement {
               onChange={updateAmount}
               value={amount}
             />
-            <span className="icon is-right mt-1">
-              <p>{selectedIbcCurrency?.coinDenom}</p>
-            </span>
           </div>
           {!isAmountValid && hasTouchedForm && (
             <p className="help is-danger mt-2">
@@ -321,10 +318,10 @@ export default function DepositCard(): React.ReactElement {
         </div>
       </div>
 
-      <div className="card-footer px-4 my-5">
+      <div className="card-footer pl-4 my-3">
         <button
           type="button"
-          className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
+          className="button has-gradient-to-right-orange has-text-weight-bold has-text-white"
           onClick={() => sendBalance()}
           disabled={
             !isAmountValid ||

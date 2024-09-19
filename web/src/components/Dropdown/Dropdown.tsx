@@ -18,7 +18,11 @@ interface DropdownProps<T> {
   placeholder?: string;
   defaultOption?: DropdownOption<T>;
   disabled?: boolean;
+  // additionalOptions allows for additional options with actions to be added to the dropdown
   additionalOptions?: DropdownAdditionalOption[];
+  // additionalOptionSelectedLabel allows for a label to be displayed when an additional option is selected.
+  //  This value is set by the parent component because the additional options generally have side effects
+  //  outside of this component.
   additionalOptionSelectedLabel?: string;
 }
 

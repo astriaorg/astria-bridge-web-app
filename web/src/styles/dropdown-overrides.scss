@@ -1,5 +1,10 @@
 @import './astria-colors';
 
-$dropdown-item-color: $astria-text-light;
-$dropdown-content-background-color: $astria-grey-dark;
+$dropdown-content-background-color: $astria-black;
 
+$dropdown-item-color: $astria-text-dark;
+$dropdown-item-hover-color: $astria-text-light;
+$dropdown-item-hover-background-color: $astria-black;
+$dropdown-item-active-color: $astria-text-light;
+$dropdown-item-active-background-color: $astria-black;
+$dropdown-divider-background-color: $astria-grey-light;

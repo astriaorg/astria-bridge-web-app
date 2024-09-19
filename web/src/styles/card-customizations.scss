@@ -44,9 +44,8 @@
   }
 
   & .card-spacer {
-    border-top: 1px $astria-white solid;
-    margin: 1rem 0;
-    width: 100%;
+    border-top: 1px $astria-grey-light solid;
+    margin: 1rem 1rem;
   }
 
   .card-footer {
@@ -57,7 +56,6 @@
   .tabs.is-fullwidth.is-large {
     ul {
       li {
-        // Default tab styles
         a {
           color: $astria-grey-dark;
           border-bottom: 2px solid transparent;
@@ -66,7 +64,7 @@
 
         &.is-active {
           a {
-            color: $astria-white; // Assuming you have a primary color defined
+            color: $astria-white;
             border-bottom-color: $astria-white;
             font-weight: bold;
             position: relative;
