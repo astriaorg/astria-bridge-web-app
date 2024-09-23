@@ -236,8 +236,8 @@ export default function DepositCard(): React.ReactElement {
     <div>
       <div className="field">
         <div className="is-flex is-flex-direction-column">
-          <div className="is-flex is-flex-direction-row is-align-items-center">
-            <div className="pl-4 mr-5">From</div>
+          <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
+            <div className="pl-4 mr-5 w-70">From</div>
             <div className="">
               <Dropdown
                 placeholder="Select a chain"
@@ -276,7 +276,7 @@ export default function DepositCard(): React.ReactElement {
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
-        <div className="is-flex is-flex-direction-row">
+        <div className="is-flex is-flex-direction-row mb-3">
           <div className="pl-4">
             <span className="icon is-medium">
               <i className="i-arrow-up-arrow-down" />
@@ -288,8 +288,8 @@ export default function DepositCard(): React.ReactElement {
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">
-          <div className="pl-4 mr-5">To</div>
-          <div className="mt-3">
+          <div className="pl-4 mr-5 w-70">To</div>
+          <div className="mt-3 flex-grow-1">
             <Dropdown
               placeholder="Connect EVM Wallet"
               options={[]}
@@ -308,8 +308,8 @@ export default function DepositCard(): React.ReactElement {
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">
-          <div className="pl-4 mr-5">Amount</div>
-          <div className="control has-icons-right mt-1 is-flex-grow-1 mr-3">
+          <div className="pl-4 mr-5 w-70">Amount</div>
+          <div className="control mt-1 mr-3 is-flex-grow-1 ">
             <input
               className="input"
               type="text"
@@ -329,7 +329,7 @@ export default function DepositCard(): React.ReactElement {
       <div className="card-footer pl-4 my-3">
         <button
           type="button"
-          className="button has-gradient-to-right-orange has-text-weight-bold has-text-white"
+          className="button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white"
           onClick={() => sendBalance()}
           disabled={
             !isAmountValid ||
