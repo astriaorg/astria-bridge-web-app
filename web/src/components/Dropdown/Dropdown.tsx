@@ -80,7 +80,7 @@ function Dropdown<T>({
           disabled={disabled}
         >
           {leftIcon && (
-            <span className="icon is-small mr-2">
+            <span className="icon is-small mr-2 dropdown-icon-left">
               <i className={leftIcon} />
             </span>
           )}
@@ -90,7 +90,7 @@ function Dropdown<T>({
           {!additionalOptionSelectedLabel && (
             <span>{selectedOption ? selectedOption.label : placeholder}</span>
           )}
-          <span className="icon is-small">
+          <span className="icon is-small dropdown-icon-right">
             <i className="fas fa-angle-down" />
           </span>
         </button>

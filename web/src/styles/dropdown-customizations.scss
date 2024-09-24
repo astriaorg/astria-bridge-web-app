@@ -1,40 +1,53 @@
 @import './dropdown-overrides.scss';
 
-.dropdown-content {
-  background-color: $dropdown-content-background-color;
+.dropdown {
+  width: 100%;
 
-  .dropdown-item {
-    background-color: transparent;
+  .dropdown-trigger {
+    width: 100%;
 
-    span {
+    .button {
+      width: 100%;
+      background-color: $dropdown-content-background-color;
       color: $dropdown-item-color;
+      justify-content: flex-start;
+
+      span {
+        > i {
+          color: $dropdown-item-color;
+        }
+
+        // only affecting the dropdown's left icon
+        &.dropdown-icon-left {
+          height: 90%;
+        }
+
+        // only affecting the dropdown's right span
+        &.dropdown-icon-right {
+          margin-left: auto;
+        }
+      }
     }
   }
-}
 
-.dropdown-trigger {
-  .button {
+  &.is-disabled {
+    .dropdown-trigger {
+      .button {
+        background-color: $dropdown-content-background-color;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  .dropdown-content {
     background-color: $dropdown-content-background-color;
-    color: $dropdown-item-color;
 
-    span {
-      > i {
+    .dropdown-item {
+      background-color: transparent;
+
+      span {
         color: $dropdown-item-color;
       }
-
-      // only affecting the dropdown's left icon
-      &:first-child > i {
-        height: 100%;
-      }
-    }
-  }
-}
-
-.dropdown.is-disabled {
-  .dropdown-trigger {
-    .button {
-      background-color: $dropdown-content-background-color;
-      opacity: 0.5;
     }
   }
 }

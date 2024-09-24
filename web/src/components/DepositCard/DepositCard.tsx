@@ -240,7 +240,7 @@ export default function DepositCard(): React.ReactElement {
         <div className="is-flex is-flex-direction-column">
           <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
             <div className="pl-4 mr-5 w-70">From</div>
-            <div className="">
+            <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Select..."
                 options={ibcChainsOptions}
@@ -291,7 +291,7 @@ export default function DepositCard(): React.ReactElement {
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">
           <div className="pl-4 mr-5 w-70">To</div>
-          <div className="mt-3 flex-grow-1">
+          <div className="mt-3 is-flex-grow-1">
             <Dropdown
               placeholder="Connect EVM Wallet"
               options={[]}
