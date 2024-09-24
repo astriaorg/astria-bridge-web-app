@@ -18,6 +18,7 @@ interface DropdownProps<T> {
   placeholder?: string;
   defaultOption?: DropdownOption<T>;
   disabled?: boolean;
+  leftIcon?: string;
   // additionalOptions allows for additional options with actions to be added to the dropdown
   additionalOptions?: DropdownAdditionalOption[];
   // additionalOptionSelectedLabel allows for a label to be displayed when an additional option is selected.
@@ -32,6 +33,7 @@ function Dropdown<T>({
   placeholder = "Select an option",
   defaultOption,
   disabled = false,
+  leftIcon,
   additionalOptions = [],
   additionalOptionSelectedLabel,
 }: DropdownProps<T>) {
@@ -77,6 +79,11 @@ function Dropdown<T>({
           onClick={toggleDropdown}
           disabled={disabled}
         >
+          {leftIcon && (
+            <span className="icon is-small mr-2">
+              <i className={leftIcon} />
+            </span>
+          )}
           {additionalOptionSelectedLabel && (
             <span>{additionalOptionSelectedLabel}</span>
           )}

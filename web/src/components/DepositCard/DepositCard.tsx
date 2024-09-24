@@ -25,9 +25,6 @@ export default function DepositCard(): React.ReactElement {
     ibcCurrencyOptions,
     selectedIbcCurrency,
   } = useIbcChainSelection(ibcChains);
-  const defaultIbcChainOption = useMemo(() => {
-    return ibcChainsOptions[0] || null;
-  }, [ibcChainsOptions]);
   const defaultIbcCurrencyOption = useMemo(() => {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
@@ -61,14 +58,21 @@ export default function DepositCard(): React.ReactElement {
     checkIsFormValid(recipientAddress, amount);
   }, [recipientAddress, amount]);
 
+  // useEffect(() => {
+  //   getAndSetBalance().then(_ => {});
+  // }, [selectedIbcChain, selectedIbcCurrency]);
+
   const getAndSetBalance = async () => {
+    console.log("getAndSetBalance");
     if (!selectedIbcChain || !selectedIbcCurrency) {
+      console.log("no chain or currency selected");
       return;
     }
     try {
       setIsLoadingBalance(true);
       // TODO - should update balance if user selects different token
       const balance = await getBalance(selectedIbcChain, selectedIbcCurrency);
+      console.log("balance", balance);
       setBalance(balance);
     } catch (e) {
       console.error(e);
@@ -240,10 +244,10 @@ export default function DepositCard(): React.ReactElement {
             <div className="pl-4 mr-5 w-70">From</div>
             <div className="">
               <Dropdown
-                placeholder="Select a chain"
+                placeholder="Select..."
                 options={ibcChainsOptions}
-                defaultOption={defaultIbcChainOption}
                 onSelect={selectIbcChain}
+                leftIcon={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
                 additionalOptionSelectedLabel={fromAddress}
               />
@@ -295,6 +299,7 @@ export default function DepositCard(): React.ReactElement {
               options={[]}
               onSelect={connectEVMWallet}
               disabled={recipientAddress !== ""}
+              leftIcon={"i-wallet"}
               additionalOptions={additionalEvmOptions}
               additionalOptionSelectedLabel={userAccount?.address}
             />

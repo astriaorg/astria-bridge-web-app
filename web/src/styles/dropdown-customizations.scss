@@ -2,8 +2,10 @@
 
 .dropdown-content {
   background-color: $dropdown-content-background-color;
+
   .dropdown-item {
     background-color: transparent;
+
     span {
       color: $dropdown-item-color;
     }
@@ -14,10 +16,25 @@
   .button {
     background-color: $dropdown-content-background-color;
     color: $dropdown-item-color;
+
+    span {
+      > i {
+        color: $dropdown-item-color;
+      }
+
+      // only affecting the dropdown's left icon
+      &:first-child > i {
+        height: 100%;
+      }
+    }
   }
 }
 
 .dropdown.is-disabled {
-  background-color: $astria-grey-dark;
-  color: $astria-text-light;
+  .dropdown-trigger {
+    .button {
+      background-color: $dropdown-content-background-color;
+      opacity: 0.5;
+    }
+  }
 }
