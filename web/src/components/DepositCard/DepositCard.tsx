@@ -66,7 +66,7 @@ export default function DepositCard(): React.ReactElement {
     if (!selectedIbcChain || !selectedIbcCurrency) {
       return;
     }
-    connectKeplrWallet().then(_ => {});
+    connectKeplrWallet().then((_) => {});
   }, [selectedIbcChain, selectedIbcCurrency]);
 
   const getAndSetBalance = async () => {

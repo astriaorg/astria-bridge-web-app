@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 
 export interface DropdownOption<T> {
   label: string;
@@ -41,6 +41,25 @@ function Dropdown<T>({
   const [selectedOption, setSelectedOption] =
     useState<DropdownOption<T> | null>(defaultOption || null);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsActive(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
   // set the default option when defaultOption or onSelect change
   useEffect(() => {
     if (defaultOption) {
@@ -66,6 +85,7 @@ function Dropdown<T>({
 
   return (
     <div
+      ref={dropdownRef}
       className={`dropdown ${isActive ? "is-active" : ""} ${
         disabled ? "is-disabled" : ""
       }`}
@@ -109,12 +129,16 @@ function Dropdown<T>({
               {option.label}
             </button>
           ))}
-          {!!(options?.length && additionalOptions?.length) && <hr className="dropdown-divider" />}
+          {!!(options?.length && additionalOptions?.length) && (
+            <hr className="dropdown-divider" />
+          )}
           {additionalOptions.map((option) => (
             <button
               type="button"
               key={`additional-${option.label}`}
-              className={`additional-dropdown-item dropdown-item ${option.className || ""}`}
+              className={`additional-dropdown-item dropdown-item ${
+                option.className || ""
+              }`}
               onClick={() => {
                 option.action();
                 setIsActive(false);
