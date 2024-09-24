@@ -13,6 +13,8 @@
       justify-content: flex-start;
 
       span {
+        color: $dropdown-placeholder-color;
+
         > i {
           color: $dropdown-item-color;
         }
@@ -39,14 +41,36 @@
     }
   }
 
-  .dropdown-content {
-    background-color: $dropdown-content-background-color;
+  .dropdown-menu {
+    width: 100%;
+    background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+    border: #3B7D4F;
 
-    .dropdown-item {
+    .dropdown-content {
       background-color: transparent;
 
-      span {
-        color: $dropdown-item-color;
+      .dropdown-item {
+        display: inline-flex;
+        padding-right: 0.5rem;
+        background-color: transparent;
+        border: 1px $dropdown-divider-background-color;
+        cursor: pointer;
+
+        span {
+          color: $dropdown-item-color;
+        }
+
+        &:hover {
+          span {
+            color: $dropdown-item-hover-color
+          }
+        }
+
+        &.additional-dropdown-item {
+          span.icon {
+            margin-left: auto;
+          }
+        }
       }
     }
   }

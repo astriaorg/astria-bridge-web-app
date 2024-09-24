@@ -217,7 +217,7 @@ export default function DepositCard(): React.ReactElement {
         label: "Connect Keplr Wallet",
         action: connectKeplrWallet,
         className: "has-text-primary",
-        icon: "fas fa-star",
+        icon: "fas fa-plus",
       },
     ],
     [connectKeplrWallet],
@@ -229,7 +229,7 @@ export default function DepositCard(): React.ReactElement {
         label: "Connect EVM Wallet",
         action: connectEVMWallet,
         className: "has-text-primary",
-        icon: "fas fa-star",
+        icon: "fas fa-plus",
       },
     ];
   }, [connectEVMWallet]);

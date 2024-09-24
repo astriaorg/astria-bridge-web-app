@@ -109,12 +109,12 @@ function Dropdown<T>({
               {option.label}
             </button>
           ))}
-          {additionalOptions.length > 0 && <hr className="dropdown-divider" />}
+          {!!(options?.length && additionalOptions?.length) && <hr className="dropdown-divider" />}
           {additionalOptions.map((option) => (
             <button
               type="button"
               key={`additional-${option.label}`}
-              className={`dropdown-item ${option.className || ""}`}
+              className={`additional-dropdown-item dropdown-item ${option.className || ""}`}
               onClick={() => {
                 option.action();
                 setIsActive(false);
