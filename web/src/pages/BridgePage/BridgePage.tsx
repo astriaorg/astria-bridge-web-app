@@ -39,22 +39,14 @@ export default function BridgePage(): React.ReactElement {
   const tabs: TabType[] = ["Deposit", "Withdraw"];
 
   return (
-    <section className="section">
-      <div className="container is-fluid">
+    <section className="">
+      <div className="container px-2">
         <div className="columns is-centered is-vcentered is-fullheight-with-navbar">
           <div className="column is-12-mobile is-8-tablet">
             <div className="card p-5">
               <div className="tabs is-fullwidth is-large">
-                <ul>
-                  {tabs.map((tab) => (
-                    <Tab
-                      key={tab}
-                      label={tab}
-                      isActive={activeTab === tab}
-                      onClick={setActiveTab}
-                    />
-                  ))}
-                </ul>
+                {/* NOTE - just a single Deposit tab for now. Can easily add tab switcher back. */}
+                Deposit
               </div>
               <TabContent activeTab={activeTab} />
             </div>

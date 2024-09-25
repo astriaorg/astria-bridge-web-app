@@ -1,6 +1,5 @@
 import type React from "react";
-import { useMemo } from "react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
@@ -62,13 +61,20 @@ export default function DepositCard(): React.ReactElement {
     checkIsFormValid(recipientAddress, amount);
   }, [recipientAddress, amount]);
 
+  // connect to keplr wallet when chain and currency are selected
+  useEffect(() => {
+    if (!selectedIbcChain || !selectedIbcCurrency) {
+      return;
+    }
+    connectKeplrWallet().then((_) => {});
+  }, [selectedIbcChain, selectedIbcCurrency]);
+
   const getAndSetBalance = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
       return;
     }
     try {
       setIsLoadingBalance(true);
-      // TODO - should update balance if user selects different token
       const balance = await getBalance(selectedIbcChain, selectedIbcCurrency);
       setBalance(balance);
     } catch (e) {
@@ -120,13 +126,8 @@ export default function DepositCard(): React.ReactElement {
 
   const connectKeplrWallet = async () => {
     if (!selectedIbcChain) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          message: "Please select a chain first.",
-          onAcknowledge: () => {},
-        },
-      });
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectIbcChain(defaultIbcChainOption.value);
       return;
     }
     const keplr = await getKeplrFromWindow();
@@ -210,37 +211,45 @@ export default function DepositCard(): React.ReactElement {
     setRecipientAddress(event.target.value);
   };
 
+  const additionalIbcOptions = useMemo(
+    () => [
+      {
+        label: "Connect Keplr Wallet",
+        action: connectKeplrWallet,
+        className: "has-text-primary",
+        icon: "fas fa-plus",
+      },
+    ],
+    [connectKeplrWallet],
+  );
+
+  const additionalEvmOptions = useMemo(() => {
+    return [
+      {
+        label: "Connect EVM Wallet",
+        action: connectEVMWallet,
+        className: "has-text-primary",
+        icon: "fas fa-plus",
+      },
+    ];
+  }, [connectEVMWallet]);
+
   return (
     <div>
       <div className="field">
-        <label className="field-label">From</label>
         <div className="is-flex is-flex-direction-column">
-          <div className="control mt-1 is-flex-grow-1">
-            <input
-              className="input"
-              type="text"
-              placeholder="celestia..."
-              value={fromAddress}
-              readOnly
-            />
-          </div>
-          <div className="mt-3 is-flex is-flex-direction-row is-justify-content-space-evenly">
-            <Dropdown
-              placeholder="Select a chain"
-              options={ibcChainsOptions}
-              defaultOption={defaultIbcChainOption}
-              onSelect={selectIbcChain}
-            />
-            <button
-              type="button"
-              className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectKeplrWallet()}
-              disabled={fromAddress !== ""}
-            >
-              {fromAddress
-                ? "Connected to Keplr Wallet"
-                : "Connect Keplr Wallet"}
-            </button>
+          <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
+            <div className="pl-4 mr-5 w-70">From</div>
+            <div className="is-flex-grow-1">
+              <Dropdown
+                placeholder="Select..."
+                options={ibcChainsOptions}
+                onSelect={selectIbcChain}
+                leftIcon={"i-wallet"}
+                additionalOptions={additionalIbcOptions}
+                additionalOptionSelectedLabel={fromAddress}
+              />
+            </div>
             {selectedIbcChain && ibcCurrencyOptions && (
               <div>
                 <Dropdown
@@ -266,65 +275,64 @@ export default function DepositCard(): React.ReactElement {
         </div>
       </div>
 
-      <div className="field">
-        <label className="field-label">Amount to deposit</label>
-        <div className="control has-icons-right mt-1">
-          <input
-            className="input"
-            type="text"
-            placeholder="0.00"
-            onChange={updateAmount}
-            value={amount}
-          />
-          <span className="icon is-right mt-1">
-            <p>{selectedIbcCurrency?.coinDenom}</p>
-          </span>
-        </div>
-        {!isAmountValid && hasTouchedForm && (
-          <p className="help is-danger mt-2">
-            Amount must be a number greater than 0
-          </p>
-        )}
-      </div>
-
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
-        <div className="card-spacer" />
+        <div className="is-flex is-flex-direction-row mb-3">
+          <div className="pl-4">
+            <span className="icon is-medium">
+              <i className="i-arrow-up-arrow-down" />
+            </span>
+          </div>
+          <div className="card-spacer" />
+        </div>
       )}
 
       <div className="field">
-        <label className="field-label">To</label>
-        <div className="is-flex is-flex-direction-column">
-          <div className="control mt-1 is-flex-grow-1">
-            <input
-              className="input"
-              type="text"
-              placeholder="0x..."
-              onChange={updateRecipientAddress}
-              value={recipientAddress}
-            />
-          </div>
-          <div className="mt-3">
-            <button
-              type="button"
-              className="button is-ghost is-outlined-light is-tall"
+        <div className="is-flex is-flex-direction-row is-align-items-center">
+          <div className="pl-4 mr-5 w-70">To</div>
+          <div className="mt-3 is-flex-grow-1">
+            <Dropdown
+              placeholder="Connect EVM Wallet"
+              options={[]}
+              onSelect={connectEVMWallet}
               disabled={recipientAddress !== ""}
-              onClick={() => connectEVMWallet()}
-            >
-              {userAccount ? "Connected to EVM Wallet" : "Connect EVM Wallet"}
-            </button>
-            {!isRecipientAddressValid && hasTouchedForm && (
-              <p className="help is-danger mt-2">Must be a valid EVM address</p>
-            )}
+              leftIcon={"i-wallet"}
+              additionalOptions={additionalEvmOptions}
+              additionalOptionSelectedLabel={userAccount?.address}
+            />
           </div>
         </div>
       </div>
 
-      <div className="card-footer px-4 my-5">
+      <div className="is-flex is-flex-direction-row is-align-items-center">
+        <div className="card-spacer" />
+      </div>
+
+      <div className="field">
+        <div className="is-flex is-flex-direction-row is-align-items-center">
+          <div className="pl-4 mr-5 w-70">Amount</div>
+          <div className="control mt-1 mr-3 is-flex-grow-1 ">
+            <input
+              className="input"
+              type="text"
+              placeholder="0.00"
+              onChange={updateAmount}
+              value={amount}
+            />
+          </div>
+          {!isAmountValid && hasTouchedForm && (
+            <p className="help is-danger mt-2">
+              Amount must be a number greater than 0
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="card-footer pl-4 my-3">
         <button
           type="button"
-          className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
+          className="button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white"
           onClick={() => sendBalance()}
           disabled={
             !isAmountValid ||

@@ -1,4 +1,77 @@
-.dropdown.is-disabled {
-    background-color: $astria-grey-dark;
-    color: $astria-text-light;
+@import './dropdown-overrides.scss';
+
+.dropdown {
+  width: 100%;
+
+  .dropdown-trigger {
+    width: 100%;
+
+    .button {
+      width: 100%;
+      background-color: $dropdown-content-background-color;
+      color: $dropdown-item-color;
+      justify-content: flex-start;
+
+      span {
+        color: $dropdown-placeholder-color;
+
+        > i {
+          color: $dropdown-item-color;
+        }
+
+        // only affecting the dropdown's left icon
+        &.dropdown-icon-left {
+          height: 90%;
+        }
+
+        // only affecting the dropdown's right span
+        &.dropdown-icon-right {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+
+  &.is-disabled {
+    .dropdown-trigger {
+      .button {
+        background-color: $dropdown-content-background-color;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  .dropdown-menu {
+    width: 100%;
+    background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+    border: #3B7D4F;
+
+    .dropdown-content {
+      background-color: transparent;
+
+      .dropdown-item {
+        display: inline-flex;
+        padding-right: 0.5rem;
+        background-color: transparent;
+        border: 1px $dropdown-divider-background-color;
+        cursor: pointer;
+
+        span {
+          color: $dropdown-item-color;
+        }
+
+        &:hover {
+          span {
+            color: $dropdown-item-hover-color
+          }
+        }
+
+        &.additional-dropdown-item {
+          span.icon {
+            margin-left: auto;
+          }
+        }
+      }
+    }
+  }
 }

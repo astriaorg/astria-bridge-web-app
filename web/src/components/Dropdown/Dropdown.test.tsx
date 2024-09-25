@@ -23,7 +23,8 @@ describe("Dropdown Component", () => {
 
   test("opens dropdown when clicked", () => {
     render(<Dropdown options={mockOptions} onSelect={() => {}} />);
-    const dropdownButton = screen.getByRole("button");
+    const dropdownButtons = screen.getAllByRole("button");
+    const dropdownButton = dropdownButtons[0];
     fireEvent.click(dropdownButton);
     expect(screen.getByRole("menu")).toBeInTheDocument();
   });
@@ -32,7 +33,8 @@ describe("Dropdown Component", () => {
     const onSelect = jest.fn();
     render(<Dropdown options={mockOptions} onSelect={onSelect} />);
 
-    const dropdownButton = screen.getByRole("button");
+    const dropdownButtons = screen.getAllByRole("button");
+    const dropdownButton = dropdownButtons[0];
     fireEvent.click(dropdownButton);
 
     const option = screen.getByText("Option 1");
@@ -49,7 +51,8 @@ describe("Dropdown Component", () => {
 
   test("highlights selected option in dropdown", () => {
     render(<Dropdown options={mockOptions} onSelect={() => {}} />);
-    const dropdownButton = screen.getByRole("button");
+    const dropdownButtons = screen.getAllByRole("button");
+    const dropdownButton = dropdownButtons[0];
     fireEvent.click(dropdownButton);
 
     const selectedOption = screen.getByText("Option 3");
@@ -62,7 +65,8 @@ describe("Dropdown Component", () => {
     const onSelect = jest.fn();
     render(<Dropdown options={mockOptions} onSelect={onSelect} />);
 
-    const dropdownButton = screen.getByRole("button");
+    const dropdownButtons = screen.getAllByRole("button");
+    const dropdownButton = dropdownButtons[0];
     fireEvent.click(dropdownButton);
 
     const option = screen.getByText("Option 3");

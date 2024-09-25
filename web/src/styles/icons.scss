@@ -1,0 +1,19 @@
+@import 'astria-colors.scss';
+
+// custom astria icons
+
+i.i-arrow-up-arrow-down {
+  // this was downloaded from figma
+  background-image: url('../../public/assets/icons/arrow-up-arrow-down.png');
+  height: 100%;
+  width: 100%;
+}
+
+i.i-wallet {
+  // this was downloaded from figma
+  background-image: url('../../public/assets/icons/wallet.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 100%;
+  width: 100%;
+}
