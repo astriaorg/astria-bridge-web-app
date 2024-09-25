@@ -3,7 +3,7 @@ import { useState } from "react";
 import DepositCard from "components/DepositCard/DepositCard";
 import WithdrawCard from "components/WithdrawCard/WithdrawCard";
 
-type TabType = "Deposit" | "Withdraw";
+type TabType = "DEPOSIT" | "WITHDRAW";
 
 interface TabProps {
   label: TabType;
@@ -24,9 +24,9 @@ const Tab: React.FC<TabProps> = ({ label, isActive, onClick }) => (
 
 const TabContent: React.FC<{ activeTab: TabType }> = ({ activeTab }) => {
   switch (activeTab) {
-    case "Deposit":
+    case "DEPOSIT":
       return <DepositCard />;
-    case "Withdraw":
+    case "WITHDRAW":
       return <WithdrawCard />;
     default:
       return null;
@@ -34,9 +34,9 @@ const TabContent: React.FC<{ activeTab: TabType }> = ({ activeTab }) => {
 };
 
 export default function BridgePage(): React.ReactElement {
-  const [activeTab, setActiveTab] = useState<TabType>("Deposit");
+  const [activeTab, setActiveTab] = useState<TabType>("DEPOSIT");
 
-  const tabs: TabType[] = ["Deposit", "Withdraw"];
+  const tabs: TabType[] = ["DEPOSIT", "WITHDRAW"];
 
   return (
     <section className="">
@@ -44,9 +44,17 @@ export default function BridgePage(): React.ReactElement {
         <div className="columns is-centered is-vcentered is-fullheight-with-navbar">
           <div className="column is-12-mobile is-8-tablet">
             <div className="card p-5">
-              <div className="tabs is-fullwidth is-large">
-                {/* NOTE - just a single Deposit tab for now. Can easily add tab switcher back. */}
-                Deposit
+              <div className="tabs is-fullwidth is-medium">
+                <ul>
+                  {tabs.map((tab) => (
+                    <Tab
+                      key={tab}
+                      label={tab}
+                      isActive={activeTab === tab}
+                      onClick={setActiveTab}
+                    />
+                  ))}
+                </ul>
               </div>
               <TabContent activeTab={activeTab} />
             </div>

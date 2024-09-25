@@ -8,7 +8,7 @@
 
     .button {
       width: 100%;
-      background-color: $dropdown-content-background-color;
+      background-color: transparent;
       color: $dropdown-item-color;
       justify-content: flex-start;
 
@@ -35,7 +35,7 @@
   &.is-disabled {
     .dropdown-trigger {
       .button {
-        background-color: $dropdown-content-background-color;
+        background-color: transparent;
         opacity: 0.5;
       }
     }
