@@ -205,12 +205,6 @@ export default function DepositCard(): React.ReactElement {
     setAmount(event.target.value);
   };
 
-  const updateRecipientAddress = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRecipientAddress(event.target.value);
-  };
-
   const additionalIbcOptions = useMemo(
     () => [
       {
@@ -239,7 +233,7 @@ export default function DepositCard(): React.ReactElement {
       <div className="field">
         <div className="is-flex is-flex-direction-column">
           <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
-            <div className="pl-4 mr-5 w-70">From</div>
+            <div className="mr-5 w-70">From</div>
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Select..."
@@ -278,20 +272,20 @@ export default function DepositCard(): React.ReactElement {
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
-        <div className="is-flex is-flex-direction-row mb-3">
-          <div className="pl-4">
+        <div className="is-flex is-flex-direction-row">
+          <div>
             <span className="icon is-medium">
               <i className="i-arrow-up-arrow-down" />
             </span>
           </div>
-          <div className="card-spacer" />
+          <div className="ml-3 card-spacer" />
         </div>
       )}
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">
-          <div className="pl-4 mr-5 w-70">To</div>
-          <div className="mt-3 is-flex-grow-1">
+          <div className="mr-5 w-70">To</div>
+          <div className="is-flex-grow-1">
             <Dropdown
               placeholder="Connect EVM Wallet"
               options={[]}
@@ -311,8 +305,8 @@ export default function DepositCard(): React.ReactElement {
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">
-          <div className="pl-4 mr-5 w-70">Amount</div>
-          <div className="control mt-1 mr-3 is-flex-grow-1 ">
+          <div className="mr-5 w-70">Amount</div>
+          <div className="control mt-1 is-flex-grow-1">
             <input
               className="input"
               type="text"
@@ -321,15 +315,15 @@ export default function DepositCard(): React.ReactElement {
               value={amount}
             />
           </div>
-          {!isAmountValid && hasTouchedForm && (
-            <p className="help is-danger mt-2">
-              Amount must be a number greater than 0
-            </p>
-          )}
         </div>
+        {!isAmountValid && hasTouchedForm && (
+          <div className="help is-danger mt-2">
+            Amount must be a number greater than 0
+          </div>
+        )}
       </div>
 
-      <div className="card-footer pl-4 my-3">
+      <div className="card-footer mt-4">
         <button
           type="button"
           className="button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white"

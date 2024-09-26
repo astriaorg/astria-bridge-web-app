@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 export interface DropdownOption<T> {
   label: string;
@@ -105,10 +105,14 @@ function Dropdown<T>({
             </span>
           )}
           {additionalOptionSelectedLabel && (
-            <span>{additionalOptionSelectedLabel}</span>
+            <span className="dropdown-label is-text-overflow">
+              {additionalOptionSelectedLabel}
+            </span>
           )}
           {!additionalOptionSelectedLabel && (
-            <span>{selectedOption ? selectedOption.label : placeholder}</span>
+            <span className="dropdown-label is-text-overflow">
+              {selectedOption ? selectedOption.label : placeholder}
+            </span>
           )}
           <span className="icon is-small dropdown-icon-right">
             <i className="fas fa-angle-down" />

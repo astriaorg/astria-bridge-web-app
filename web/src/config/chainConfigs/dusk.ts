@@ -76,7 +76,7 @@ const CelestiaChainInfo: IbcChainInfo = {
       },
     },
   ],
-  ibcChannel: "channel-110",
+  ibcChannel: "channel-2",
   iconSourceUrl: "https://placehold.co/60x60/EEE/31343C",
 };
 

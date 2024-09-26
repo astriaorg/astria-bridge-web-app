@@ -1,4 +1,4 @@
-import type React from "react";
+import React, { useMemo } from "react";
 import { useContext, useEffect, useState } from "react";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
@@ -18,8 +18,20 @@ export default function WithdrawCard(): React.ReactElement {
   const { userAccount, selectedWallet } = useEthWallet();
   const { ibcChains, sequencerBridgeAccount } = useConfig();
 
-  const { selectedIbcChain, selectIbcChain, ibcChainsOptions } =
-    useIbcChainSelection(ibcChains);
+  const {
+    selectIbcChain,
+    ibcChainsOptions,
+    selectedIbcChain,
+    selectIbcCurrency,
+    ibcCurrencyOptions,
+    selectedIbcCurrency,
+  } = useIbcChainSelection(ibcChains);
+  const defaultIbcChainOption = useMemo(() => {
+    return ibcChainsOptions[0] || null;
+  }, [ibcChainsOptions]);
+  const defaultIbcCurrencyOption = useMemo(() => {
+    return ibcCurrencyOptions[0] || null;
+  }, [ibcCurrencyOptions]);
 
   const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
@@ -29,6 +41,7 @@ export default function WithdrawCard(): React.ReactElement {
   const [isToAddressValid, setIsToAddressValid] = useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   useEffect(() => {
@@ -61,13 +74,8 @@ export default function WithdrawCard(): React.ReactElement {
 
   const connectKeplrWallet = async () => {
     if (!selectedIbcChain) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          message: "Please select a chain first.",
-          onAcknowledge: () => {},
-        },
-      });
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectIbcChain(defaultIbcChainOption.value);
       return;
     }
 
@@ -179,105 +187,137 @@ export default function WithdrawCard(): React.ReactElement {
     }
   };
 
+  const additionalIbcOptions = useMemo(
+    () => [
+      {
+        label: "Connect Keplr Wallet",
+        action: connectKeplrWallet,
+        className: "has-text-primary",
+        icon: "fas fa-plus",
+      },
+    ],
+    [connectKeplrWallet],
+  );
+
+  const additionalEvmOptions = useMemo(() => {
+    return [
+      {
+        label: "Connect EVM Wallet",
+        action: connectEVMWallet,
+        className: "has-text-primary",
+        icon: "fas fa-plus",
+      },
+    ];
+  }, [connectEVMWallet]);
+
+  useEffect(() => {
+    if (!selectedIbcChain || !selectedIbcCurrency) {
+      return;
+    }
+    connectKeplrWallet().then((_) => {});
+  }, [selectedIbcChain, selectedIbcCurrency]);
+
   return (
     <div>
       <div className="field">
-        <label className="field-label">From</label>
         <div className="is-flex is-flex-direction-column">
-          <div className="control mt-1 is-flex-grow-1">
-            <input
-              className="input"
-              type="text"
-              placeholder="0x..."
-              value={fromAddress}
-              readOnly
-            />
+          <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
+            <div className="mr-5 w-70">From</div>
+            <div className="is-flex-grow-1">
+              <Dropdown
+                placeholder="Connect EVM Wallet"
+                options={[]}
+                onSelect={connectEVMWallet}
+                disabled={fromAddress !== ""}
+                leftIcon={"i-wallet"}
+                additionalOptions={additionalEvmOptions}
+                additionalOptionSelectedLabel={userAccount?.address}
+              />
+            </div>
           </div>
-          <div className="mt-3">
-            <button
-              type="button"
-              className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectEVMWallet()}
-              disabled={fromAddress !== ""}
-            >
-              {fromAddress ? "Connected to EVM Wallet" : "Connect EVM Wallet"}
-            </button>
-            {fromAddress && (
+          <div>
+            {fromAddress && !isLoadingBalance && (
               <p className="mt-2 has-text-light">Balance: {balance}</p>
+            )}
+            {fromAddress && isLoadingBalance && (
+              <p className="mt-2 has-text-light">
+                Balance: <i className="fas fa-spinner fa-pulse" />
+              </p>
             )}
           </div>
         </div>
-      </div>
-
-      <div className="field">
-        <label className="field-label">Amount</label>
-        <div className="control has-icons-right mt-1">
-          <input
-            className="input"
-            type="text"
-            placeholder="0.00"
-            onChange={updateAmount}
-            value={amount}
-          />
-          <span className="icon is-right mt-1">
-            <p>TIA</p>
-          </span>
-        </div>
-        {!isAmountValid && hasTouchedForm && (
-          <p className="help is-danger mt-2">
-            Amount must be a number greater than 0
-          </p>
-        )}
       </div>
 
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
-        <div className="card-spacer" />
+        <div className="is-flex is-flex-direction-row">
+          <div className="">
+            <span className="icon is-medium">
+              <i className="i-arrow-up-arrow-down" />
+            </span>
+          </div>
+          <div className="ml-3 card-spacer" />
+        </div>
       )}
 
       <div className="field">
-        <label className="field-label">To</label>
         <div className="is-flex is-flex-direction-column">
-          <div className="control mt-1 is-flex-grow-1">
-            <input
-              className="input"
-              type="text"
-              placeholder="celestia..."
-              value={toAddress}
-              readOnly
-            />
-          </div>
-          <div>
-            {!isToAddressValid && hasTouchedForm && (
-              <p className="help is-danger mt-2">
-                Must be a valid Celestia address
-              </p>
+          <div className="is-flex is-flex-direction-row is-align-items-center">
+            <div className="mr-5 w-70">To</div>
+            <div className="is-flex-grow-1">
+              <Dropdown
+                placeholder="Select..."
+                options={ibcChainsOptions}
+                onSelect={selectIbcChain}
+                leftIcon={"i-wallet"}
+                additionalOptions={additionalIbcOptions}
+                additionalOptionSelectedLabel={fromAddress}
+              />
+            </div>
+            {selectedIbcChain && ibcCurrencyOptions && (
+              <div>
+                <Dropdown
+                  placeholder="Select a token"
+                  options={ibcCurrencyOptions}
+                  defaultOption={defaultIbcCurrencyOption}
+                  onSelect={selectIbcCurrency}
+                  disabled={!selectedIbcChain}
+                />
+              </div>
             )}
-          </div>
-          <div className="mt-3 is-flex is-flex-direction-row is-justify-content-space-evenly">
-            <Dropdown
-              placeholder="Select a chain"
-              options={ibcChainsOptions}
-              onSelect={(selected) => selectIbcChain(selected)}
-              defaultOption={ibcChainsOptions[0]}
-            />
-            <button
-              type="button"
-              className="button is-ghost is-outlined-light is-tall"
-              onClick={() => connectKeplrWallet()}
-              disabled={toAddress !== ""}
-            >
-              {toAddress ? "Connected to Keplr Wallet" : "Connect Keplr Wallet"}
-            </button>
           </div>
         </div>
       </div>
 
-      <div className="card-footer px-4 my-5">
+      <div className="is-flex is-flex-direction-row is-align-items-center">
+        <div className="card-spacer" />
+      </div>
+
+      <div className="field">
+        <div className="is-flex is-flex-direction-row is-align-items-center">
+          <div className="mr-5 w-70">Amount</div>
+          <div className="control mt-1 is-flex-grow-1">
+            <input
+              className="input"
+              type="text"
+              placeholder="0.00"
+              onChange={updateAmount}
+              value={amount}
+            />
+          </div>
+        </div>
+        {!isAmountValid && hasTouchedForm && (
+          <div className="help is-danger mt-2">
+            Amount must be a number greater than 0
+          </div>
+        )}
+      </div>
+
+      <div className="card-footer mt-4">
         <button
           type="button"
-          className="button card-footer-item is-ghost is-outlined-light has-text-weight-bold"
+          className="button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white"
           onClick={handleWithdraw}
           disabled={
             !isAmountValid ||

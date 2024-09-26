@@ -43,7 +43,7 @@ export default function BridgePage(): React.ReactElement {
       <div className="container px-2">
         <div className="columns is-centered is-vcentered is-fullheight-with-navbar">
           <div className="column is-12-mobile is-8-tablet">
-            <div className="card p-5">
+            <div className="card p-6">
               <div className="tabs is-fullwidth is-medium">
                 <ul>
                   {tabs.map((tab) => (
