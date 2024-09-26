@@ -93,14 +93,14 @@ function Dropdown<T>({
       <div className="dropdown-trigger">
         <button
           type="button"
-          className="button is-ghost is-outlined-light"
+          className="button is-ghost is-outlined-light is-tall"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
           onClick={toggleDropdown}
           disabled={disabled}
         >
           {leftIcon && (
-            <span className="icon is-small mr-2 dropdown-icon-left">
+            <span className="icon is-small ml-1 mr-3 dropdown-icon-left">
               <i className={leftIcon} />
             </span>
           )}

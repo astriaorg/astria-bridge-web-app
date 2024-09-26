@@ -258,7 +258,7 @@ export default function WithdrawCard(): React.ReactElement {
               <i className="i-arrow-up-arrow-down" />
             </span>
           </div>
-          <div className="ml-3 card-spacer" />
+          <div className="ml-4 card-spacer" />
         </div>
       )}
 
@@ -300,7 +300,7 @@ export default function WithdrawCard(): React.ReactElement {
           <div className="mr-5 w-70">Amount</div>
           <div className="control mt-1 is-flex-grow-1">
             <input
-              className="input"
+              className="input is-medium"
               type="text"
               placeholder="0.00"
               onChange={updateAmount}

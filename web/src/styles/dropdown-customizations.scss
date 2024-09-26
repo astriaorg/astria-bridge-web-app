@@ -3,6 +3,10 @@
 .dropdown {
   width: 100%;
 
+  &.is-active > .dropdown-trigger>button {
+    border-color: $dropdown-divider-background-color;
+  }
+
   .dropdown-trigger {
     width: 100%;
 
@@ -21,7 +25,7 @@
 
         // only affecting the dropdown's left icon
         &.dropdown-icon-left {
-          height: 90%;
+          height: 20px;
         }
 
         // only affecting the dropdown's right span
