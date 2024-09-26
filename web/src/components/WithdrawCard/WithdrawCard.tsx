@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { useContext, useEffect, useState } from "react";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
@@ -59,6 +60,13 @@ export default function WithdrawCard(): React.ReactElement {
     }
     checkIsFormValid(amount, toAddress);
   }, [amount, toAddress]);
+
+  useEffect(() => {
+    if (!selectedIbcChain || !selectedIbcCurrency) {
+      return;
+    }
+    connectKeplrWallet().then((_) => {});
+  }, [selectedIbcChain, selectedIbcCurrency]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
@@ -209,13 +217,6 @@ export default function WithdrawCard(): React.ReactElement {
       },
     ];
   }, [connectEVMWallet]);
-
-  useEffect(() => {
-    if (!selectedIbcChain || !selectedIbcCurrency) {
-      return;
-    }
-    connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain, selectedIbcCurrency]);
 
   return (
     <div>
