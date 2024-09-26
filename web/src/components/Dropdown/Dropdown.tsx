@@ -155,7 +155,7 @@ function Dropdown<T>({
             >
               {option.leftIconClass && (
                 <span className="icon mr-3">
-                  <i className={option.leftIconClass}></i>
+                  <i className={option.leftIconClass} />
                 </span>
               )}
               {option.label}
@@ -188,7 +188,6 @@ function Dropdown<T>({
               )}
             </button>
           ))}
-
         </div>
       </div>
     </div>
