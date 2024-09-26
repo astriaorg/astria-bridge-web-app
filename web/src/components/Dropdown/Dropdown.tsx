@@ -1,15 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
+// DropdownOption is an interface for the options that can be selected in the dropdown.
 export interface DropdownOption<T> {
   label: string;
   value: T;
+  // leftIconClass allows for an icon to be displayed to the left of the option label in the dropdown content
+  leftIconClass?: string;
 }
 
+// DropdownAdditionalOption is an interface for additional options that can be added to the dropdown.
+// This is useful for adding extra options that have side effects outside the dropdown component.
 export interface DropdownAdditionalOption {
   label: string;
+  // action is the function that is called when the additional option is selected
   action: () => void;
+  // className allows for additional classes to be added to the additional option
   className?: string;
-  icon?: string;
+  // leftIconClass allows for an icon to be displayed to the left of the label in the dropdown content
+  leftIconClass?: string;
+  // rightIconClass allows for an icon to be displayed to the right of the label in the dropdown content
+  rightIconClass?: string;
 }
 
 interface DropdownProps<T> {
@@ -18,7 +28,8 @@ interface DropdownProps<T> {
   placeholder?: string;
   defaultOption?: DropdownOption<T>;
   disabled?: boolean;
-  leftIcon?: string;
+  // leftIconClass allows for an icon to be displayed to the left of input for the dropdown label
+  leftIconClass?: string;
   // additionalOptions allows for additional options with actions to be added to the dropdown
   additionalOptions?: DropdownAdditionalOption[];
   // additionalOptionSelectedLabel allows for a label to be displayed when an additional option is selected.
@@ -33,7 +44,7 @@ function Dropdown<T>({
   placeholder = "Select an option",
   defaultOption,
   disabled = false,
-  leftIcon,
+  leftIconClass,
   additionalOptions = [],
   additionalOptionSelectedLabel,
 }: DropdownProps<T>) {
@@ -99,9 +110,9 @@ function Dropdown<T>({
           onClick={toggleDropdown}
           disabled={disabled}
         >
-          {leftIcon && (
+          {leftIconClass && (
             <span className="icon is-small ml-1 mr-3 dropdown-icon-left">
-              <i className={leftIcon} />
+              <i className={leftIconClass} />
             </span>
           )}
           {additionalOptionSelectedLabel && (
@@ -111,7 +122,18 @@ function Dropdown<T>({
           )}
           {!additionalOptionSelectedLabel && (
             <span className="dropdown-label is-text-overflow">
-              {selectedOption ? selectedOption.label : placeholder}
+              {selectedOption ? (
+                <>
+                  {selectedOption.leftIconClass && (
+                    <span className="icon mr-2">
+                      <i className={selectedOption.leftIconClass} />
+                    </span>
+                  )}
+                  {selectedOption.label}
+                </>
+              ) : (
+                placeholder
+              )}
             </span>
           )}
           <span className="icon is-small dropdown-icon-right">
@@ -121,21 +143,26 @@ function Dropdown<T>({
       </div>
       <div className="dropdown-menu" id="dropdown-menu" role="menu">
         <div className="dropdown-content">
+          {/* first list the options from props */}
           {options?.map((option) => (
             <button
               type="button"
               key={option.label}
-              className={`dropdown-item ${
+              className={`dropdown-item is-tall ${
                 selectedOption?.value === option.value ? "is-active" : ""
               }`}
               onClick={() => handleSelect(option)}
             >
+              {option.leftIconClass && (
+                <span className="icon mr-3">
+                  <i className={option.leftIconClass}></i>
+                </span>
+              )}
               {option.label}
             </button>
           ))}
-          {!!(options?.length && additionalOptions?.length) && (
-            <hr className="dropdown-divider" />
-          )}
+
+          {/* list additional options  */}
           {additionalOptions.map((option) => (
             <button
               type="button"
@@ -148,14 +175,20 @@ function Dropdown<T>({
                 setIsActive(false);
               }}
             >
+              {option.leftIconClass && (
+                <span className="icon mr-3">
+                  <i className={option.leftIconClass} />
+                </span>
+              )}
               <span>{option.label}</span>
-              {option.icon && (
-                <span className="icon">
-                  <i className={option.icon} />
+              {option.rightIconClass && (
+                <span className="icon icon-right">
+                  <i className={option.rightIconClass} />
                 </span>
               )}
             </button>
           ))}
+
         </div>
       </div>
     </div>

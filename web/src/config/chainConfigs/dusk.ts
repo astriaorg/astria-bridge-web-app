@@ -77,7 +77,7 @@ const CelestiaChainInfo: IbcChainInfo = {
     },
   ],
   ibcChannel: "channel-2",
-  iconSourceUrl: "https://placehold.co/60x60/EEE/31343C",
+  iconClass: "i-celestia",
 };
 
 export const ibcChains: IbcChains = {

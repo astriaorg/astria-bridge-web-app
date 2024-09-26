@@ -51,11 +51,15 @@
     border: #3B7D4F;
 
     .dropdown-content {
-      background-color: transparent;
+      background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, #1E1D1D;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 1px 1px 1px -1px rgba(255, 255, 255, 0.5);
+      border-radius: 16px;
+
 
       .dropdown-item {
         display: inline-flex;
-        padding-right: 0.5rem;
+        padding: 1rem 1rem 1rem 1rem;
         background-color: transparent;
         border: 1px $dropdown-divider-background-color;
         cursor: pointer;
@@ -65,13 +69,16 @@
         }
 
         &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 12px;
+          color: $dropdown-item-color;
           span {
-            color: $dropdown-item-hover-color
+            color: $dropdown-item-color;
           }
         }
 
         &.additional-dropdown-item {
-          span.icon {
+          span.icon.icon-right {
             margin-left: auto;
           }
         }

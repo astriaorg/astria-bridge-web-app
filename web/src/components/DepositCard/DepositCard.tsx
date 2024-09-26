@@ -211,7 +211,8 @@ export default function DepositCard(): React.ReactElement {
         label: "Connect Keplr Wallet",
         action: connectKeplrWallet,
         className: "has-text-primary",
-        icon: "fas fa-plus",
+        leftIconClass: "i-keplr",
+        rightIconClass: "fas fa-plus",
       },
     ],
     [connectKeplrWallet],
@@ -223,7 +224,7 @@ export default function DepositCard(): React.ReactElement {
         label: "Connect EVM Wallet",
         action: connectEVMWallet,
         className: "has-text-primary",
-        icon: "fas fa-plus",
+        rightIconClass: "fas fa-plus",
       },
     ];
   }, [connectEVMWallet]);
@@ -239,7 +240,7 @@ export default function DepositCard(): React.ReactElement {
                 placeholder="Select..."
                 options={ibcChainsOptions}
                 onSelect={selectIbcChain}
-                leftIcon={"i-wallet"}
+                leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
                 additionalOptionSelectedLabel={fromAddress}
               />
@@ -291,7 +292,7 @@ export default function DepositCard(): React.ReactElement {
               options={[]}
               onSelect={connectEVMWallet}
               disabled={recipientAddress !== ""}
-              leftIcon={"i-wallet"}
+              leftIconClass={"i-wallet"}
               additionalOptions={additionalEvmOptions}
               additionalOptionSelectedLabel={userAccount?.address}
             />

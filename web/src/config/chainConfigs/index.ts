@@ -9,12 +9,12 @@ import { ibcChains as duskIbcChains } from "./dusk";
  *
  * @typedef {object} IbcChainInfo
  * @property {string} ibcChannel - The name of the IBC channel for this chain.
- * @property {string} iconSourceUrl - The URL to the source of the chain's icon.
+ * @property {string} iconClass - The classname to use for the chain's icon.
  * @extends {ChainInfo}
  */
 export type IbcChainInfo = {
   ibcChannel: string;
-  iconSourceUrl: string;
+  iconClass?: string;
 } & ChainInfo;
 
 // IbcChains type maps labels to IbcChainInfo objects

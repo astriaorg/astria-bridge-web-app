@@ -14,6 +14,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
       ([chainLabel, chain]): DropdownOption<IbcChainInfo> => ({
         label: chainLabel,
         value: chain,
+        leftIconClass: chain.iconClass,
       }),
     );
   }, [ibcChains]);
