@@ -3,7 +3,7 @@
 .dropdown {
   width: 100%;
 
-  &.is-active > .dropdown-trigger>button {
+  &.is-active > .dropdown-trigger > button {
     border-color: $dropdown-divider-background-color;
   }
 
@@ -23,13 +23,11 @@
           color: $dropdown-item-color;
         }
 
-        // only affecting the dropdown's left icon
-        &.dropdown-icon-left {
+        &.icon-left {
           height: 20px;
         }
 
-        // only affecting the dropdown's right span
-        &.dropdown-icon-right {
+        &.icon-right {
           margin-left: auto;
         }
       }
@@ -51,36 +49,49 @@
     border: #3B7D4F;
 
     .dropdown-content {
-      background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, #1E1D1D;
+      background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%), #1E1D1D;
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: inset 1px 1px 1px -1px rgba(255, 255, 255, 0.5);
       border-radius: 16px;
-
+      padding: 0.5rem;
 
       .dropdown-item {
-        display: inline-flex;
-        padding: 1rem 1rem 1rem 1rem;
+        display: flex;
+        padding: 0;
         background-color: transparent;
         border: 1px $dropdown-divider-background-color;
         cursor: pointer;
+        width: 100%;
 
-        span {
-          color: $dropdown-item-color;
-        }
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.05);
+        .dropdown-item-inner {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding: 1rem 0.5rem;
           border-radius: 12px;
-          color: $dropdown-item-color;
-          span {
-            color: $dropdown-item-color;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.05);
           }
         }
 
         &.additional-dropdown-item {
-          span.icon.icon-right {
-            margin-left: auto;
+          .dropdown-item-inner {
+            justify-content: space-between;
+
+            .dropdown-item-label {
+              flex-grow: 1;
+            }
+
+            .icon-right {
+              //margin-left: auto;
+            }
           }
+        }
+
+        span {
+          color: $dropdown-item-color;
         }
       }
     }

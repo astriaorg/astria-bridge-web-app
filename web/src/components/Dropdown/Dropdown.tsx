@@ -111,7 +111,7 @@ function Dropdown<T>({
           disabled={disabled}
         >
           {leftIconClass && (
-            <span className="icon is-small ml-1 mr-3 dropdown-icon-left">
+            <span className="icon icon-left is-small ml-1 mr-3">
               <i className={leftIconClass} />
             </span>
           )}
@@ -122,47 +122,38 @@ function Dropdown<T>({
           )}
           {!additionalOptionSelectedLabel && (
             <span className="dropdown-label is-text-overflow">
-              {selectedOption ? (
-                <>
-                  {selectedOption.leftIconClass && (
-                    <span className="icon mr-2">
-                      <i className={selectedOption.leftIconClass} />
-                    </span>
-                  )}
-                  {selectedOption.label}
-                </>
-              ) : (
-                placeholder
-              )}
+              { selectedOption ? selectedOption.label : placeholder }
             </span>
           )}
-          <span className="icon is-small dropdown-icon-right">
-            <i className="fas fa-angle-down" />
+          <span className="icon icon-right is-small">
+            {isActive ?
+              <i className="fas fa-angle-up" />:
+              <i className="fas fa-angle-down" />}
           </span>
         </button>
       </div>
       <div className="dropdown-menu" id="dropdown-menu" role="menu">
         <div className="dropdown-content">
-          {/* first list the options from props */}
           {options?.map((option) => (
             <button
               type="button"
               key={option.label}
-              className={`dropdown-item is-tall ${
+              className={`dropdown-item ${
                 selectedOption?.value === option.value ? "is-active" : ""
               }`}
               onClick={() => handleSelect(option)}
             >
-              {option.leftIconClass && (
-                <span className="icon mr-3">
-                  <i className={option.leftIconClass} />
-                </span>
-              )}
-              {option.label}
+              <span className="dropdown-item-inner is-size-6">
+                {option.leftIconClass && (
+                  <span className="icon ml-1 mr-3">
+                    <i className={option.leftIconClass} />
+                  </span>
+                )}
+                {option.label}
+              </span>
             </button>
           ))}
 
-          {/* list additional options  */}
           {additionalOptions.map((option) => (
             <button
               type="button"
@@ -175,17 +166,19 @@ function Dropdown<T>({
                 setIsActive(false);
               }}
             >
-              {option.leftIconClass && (
-                <span className="icon mr-3">
-                  <i className={option.leftIconClass} />
-                </span>
-              )}
-              <span>{option.label}</span>
-              {option.rightIconClass && (
-                <span className="icon icon-right">
-                  <i className={option.rightIconClass} />
-                </span>
-              )}
+              <span className="dropdown-item-inner is-size-6">
+                {option.leftIconClass && (
+                  <span className="icon ml-1 mr-3">
+                    <i className={option.leftIconClass} />
+                  </span>
+                )}
+                <span className="dropdown-item-label">{option.label}</span>
+                {option.rightIconClass && (
+                  <span className="icon icon-right">
+                    <i className={option.rightIconClass} />
+                  </span>
+                )}
+              </span>
             </button>
           ))}
         </div>
