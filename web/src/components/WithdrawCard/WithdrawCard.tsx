@@ -224,7 +224,7 @@ export default function WithdrawCard(): React.ReactElement {
       <div className="field">
         <div className="is-flex is-flex-direction-column">
           <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
-            <div className="mr-5 w-70">From</div>
+            <div className="label-left">From</div>
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Connect EVM Wallet"
@@ -266,7 +266,7 @@ export default function WithdrawCard(): React.ReactElement {
       <div className="field">
         <div className="is-flex is-flex-direction-column">
           <div className="is-flex is-flex-direction-row is-align-items-center">
-            <div className="mr-5 w-70">To</div>
+            <div className="label-left">To</div>
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Select..."
@@ -298,7 +298,7 @@ export default function WithdrawCard(): React.ReactElement {
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">
-          <div className="mr-5 w-70">Amount</div>
+          <div className="label-left">Amount</div>
           <div className="control mt-1 is-flex-grow-1">
             <input
               className="input is-medium"

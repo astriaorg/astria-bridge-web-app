@@ -1,6 +1,15 @@
 @import './astria-colors';
 
 div.control > input {
-    color: $astria-text-light;
+  color: $astria-text-light;
 }
 
+.field {
+  .label-left {
+    margin-right: 1rem;
+    min-width: 70px;
+    @include mobile {
+      min-width: 60px;
+    }
+  }
+}
