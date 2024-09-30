@@ -274,7 +274,7 @@ export default function WithdrawCard(): React.ReactElement {
                 onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
-                additionalOptionSelectedLabel={fromAddress}
+                additionalOptionSelectedLabel={toAddress}
               />
             </div>
             {selectedIbcChain && ibcCurrencyOptions && (
