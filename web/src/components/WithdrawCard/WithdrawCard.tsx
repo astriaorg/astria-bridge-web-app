@@ -17,7 +17,7 @@ import { useConfig } from "config/hooks/useConfig";
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount, selectedWallet } = useEthWallet();
-  const { ibcChains, sequencerBridgeAccount } = useConfig();
+  const { ibcChains, sequencerBridgeAccount, evmWithdrawerContractAddress } = useConfig();
 
   const {
     selectIbcChain,
@@ -46,6 +46,7 @@ export default function WithdrawCard(): React.ReactElement {
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log(userAccount);
     if (userAccount?.address) {
       setFromAddress(userAccount.address);
     }
@@ -165,7 +166,7 @@ export default function WithdrawCard(): React.ReactElement {
     try {
       const withdrawerSvc = getAstriaWithdrawerService(
         selectedWallet.provider,
-        sequencerBridgeAccount,
+        evmWithdrawerContractAddress,
       );
       await withdrawerSvc.withdrawToIbcChain(
         fromAddress,

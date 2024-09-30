@@ -15,7 +15,7 @@ import { useConfig } from "config/hooks/useConfig";
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount } = useEthWallet();
-  const { ibcChains } = useConfig();
+  const { ibcChains, sequencerBridgeAccount } = useConfig();
 
   const {
     selectIbcChain,
@@ -106,6 +106,7 @@ export default function DepositCard(): React.ReactElement {
         recipientAddress,
         DecUtils.getTenExponentN(6).mul(new Dec(amount)).truncate().toString(),
         selectedIbcCurrency,
+        sequencerBridgeAccount,
       );
     } catch (e) {
       if (e instanceof Error) {

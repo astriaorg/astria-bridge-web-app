@@ -9,4 +9,5 @@ import type { IbcChains } from "./chainConfigs";
 export type AppConfig = {
   ibcChains: IbcChains;
   sequencerBridgeAccount: string;
+  evmWithdrawerContractAddress: string;
 };

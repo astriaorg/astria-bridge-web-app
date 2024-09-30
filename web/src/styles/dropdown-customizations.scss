@@ -9,14 +9,17 @@
 
   .dropdown-trigger {
     width: 100%;
-
     .button {
       width: 100%;
-      min-width: 0;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       background-color: transparent;
       color: $dropdown-item-color;
+
+      .dropdown-label {
+        //
+      }
 
       span {
         color: $dropdown-placeholder-color;
@@ -27,12 +30,10 @@
 
         &.icon-left {
           height: 20px;
-          flex-shrink: 0;
         }
 
         &.icon-right {
           margin-left: auto;
-          flex-shrink: 0;
         }
       }
     }

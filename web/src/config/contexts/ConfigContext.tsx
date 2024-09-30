@@ -24,9 +24,12 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const sequencerBridgeAccount = getEnvVariable(
     "REACT_APP_SEQUENCER_BRIDGE_ACCOUNT",
   );
+  const evmWithdrawerContractAddress = getEnvVariable(
+    "REACT_APP_EVM_WITHDRAWER_CONTRACT_ADDRESS",
+  );
 
   return (
-    <ConfigContext.Provider value={{ ibcChains, sequencerBridgeAccount }}>
+    <ConfigContext.Provider value={{ evmWithdrawerContractAddress, ibcChains, sequencerBridgeAccount }}>
       {children}
     </ConfigContext.Provider>
   );
