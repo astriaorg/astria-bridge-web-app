@@ -5,7 +5,10 @@ import { NotificationsContext } from "features/Notifications/contexts/Notificati
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import { getKeplrFromWindow } from "services/keplr";
-import { EthWalletConnector, getAstriaWithdrawerService } from "features/EthWallet";
+import {
+  EthWalletConnector,
+  getAstriaWithdrawerService,
+} from "features/EthWallet";
 import { useIbcChainSelection } from "features/IbcChainSelector";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config/hooks/useConfig";
@@ -64,7 +67,7 @@ export default function WithdrawCard(): React.ReactElement {
     if (evmUserAccount?.balance) {
       setBalance(`${evmUserAccount.balance} ${selectedEvmCurrency?.coinDenom}`);
     }
-  }, [evmUserAccount]);
+  }, [evmUserAccount, selectedEvmCurrency]);
 
   useEffect(() => {
     if (amount || toAddress) {
@@ -124,8 +127,7 @@ export default function WithdrawCard(): React.ReactElement {
               .
             </p>
           ),
-          onAcknowledge: () => {
-          },
+          onAcknowledge: () => {},
         },
       });
       return;
@@ -142,8 +144,7 @@ export default function WithdrawCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.DANGER,
           message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {
-          },
+          onAcknowledge: () => {},
         },
       });
     }
@@ -169,14 +170,18 @@ export default function WithdrawCard(): React.ReactElement {
         onCancel: () => {
           setFromAddress("");
         },
-        onConfirm: () => {
-        },
+        onConfirm: () => {},
       },
     });
   };
 
   const handleWithdraw = async () => {
-    if (!selectedWallet || !selectedEvmCurrency || !isAmountValid || !toAddress) {
+    if (
+      !selectedWallet ||
+      !selectedEvmCurrency ||
+      !isAmountValid ||
+      !toAddress
+    ) {
       console.warn(
         "Withdrawal cannot proceed: missing required fields or fields are invalid",
         {
@@ -205,8 +210,7 @@ export default function WithdrawCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.SUCCESS,
           message: "Withdrawal successful!",
-          onAcknowledge: () => {
-          },
+          onAcknowledge: () => {},
         },
       });
     } catch (error) {
@@ -215,8 +219,7 @@ export default function WithdrawCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.DANGER,
           message: "Withdrawal failed. Please try again.",
-          onAcknowledge: () => {
-          },
+          onAcknowledge: () => {},
         },
       });
     } finally {

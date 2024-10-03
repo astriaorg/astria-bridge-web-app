@@ -1,6 +1,9 @@
 import type { ChainInfo } from "@keplr-wallet/types";
 import { getEnvVariable } from "config/env";
-import { ibcChains as localIbcChains, evmChains as localEvmChains } from "./local";
+import {
+  ibcChains as localIbcChains,
+  evmChains as localEvmChains,
+} from "./local";
 import { ibcChains as duskIbcChains, evmChains as duskEvmChains } from "./dusk";
 
 /**
@@ -113,7 +116,7 @@ export type EvmChains = {
  * @param chainIdHex - The chain ID as a hexadecimal string.
  */
 export function getEvmChainById(chainIdHex: string): EvmChainInfo {
-  const chainId = parseInt(chainIdHex as string, 16);
+  const chainId = Number.parseInt(chainIdHex as string, 16);
   const chains = getEvmChains();
   for (const chain of Object.values(chains)) {
     if (chain.chainId === chainId) {

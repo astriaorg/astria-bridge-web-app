@@ -1,4 +1,4 @@
-import { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from ".";
+import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from ".";
 
 const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.
@@ -109,7 +109,8 @@ const FlameChainInfo: EvmChainInfo = {
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 6,
-      evmWithdrawerContractAddress: "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+      evmWithdrawerContractAddress:
+        "0xA58639fB5458e65E4fA917FF951C390292C24A15",
       iconClass: "i-celestia",
     },
   ],
@@ -118,5 +119,5 @@ const FlameChainInfo: EvmChainInfo = {
 };
 
 export const evmChains: EvmChains = {
-  "Flame": FlameChainInfo,
+  Flame: FlameChainInfo,
 };

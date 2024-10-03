@@ -4,7 +4,7 @@ import { useSyncWalletProviders } from "../hooks/useSyncWalletProviders";
 import type { UserAccount } from "../types";
 import { formatBalance } from "utils";
 import { ethers } from "ethers";
-import { EvmChainInfo, getEvmChainById } from "config/chainConfigs";
+import { type EvmChainInfo, getEvmChainById } from "config/chainConfigs";
 
 export interface EthWalletContextProps {
   providers: EIP6963ProviderDetail[];
@@ -13,7 +13,10 @@ export interface EthWalletContextProps {
   selectedChain: EvmChainInfo | undefined;
   provider: ethers.BrowserProvider | undefined;
   signer: ethers.Signer | undefined;
-  handleConnect: (providerWithInfo: EIP6963ProviderDetail, defaultChain: EvmChainInfo) => Promise<void>;
+  handleConnect: (
+    providerWithInfo: EIP6963ProviderDetail,
+    defaultChain: EvmChainInfo,
+  ) => Promise<void>;
 }
 
 export const EthWalletContext = createContext<
@@ -21,19 +24,22 @@ export const EthWalletContext = createContext<
 >(undefined);
 
 export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
-                                                                              children,
-                                                                            }) => {
+  children,
+}) => {
   const [selectedWallet, setSelectedWallet] = useState<EIP6963ProviderDetail>();
   const [selectedProvider, setSelectedProvider] =
     useState<ethers.BrowserProvider>();
   const [userAccount, setUserAccount] = useState<UserAccount>();
   const [signer, setSigner] = useState<ethers.Signer>();
   const providers = useSyncWalletProviders();
-  const [selectedChain, setSelectedChain] = useState<EvmChainInfo | undefined>();
-
+  const [selectedChain, setSelectedChain] = useState<
+    EvmChainInfo | undefined
+  >();
 
   // get chain id from provider
-  const getChainId = async (providerWithInfo: EIP6963ProviderDetail): Promise<string | undefined> => {
+  const getChainId = async (
+    providerWithInfo: EIP6963ProviderDetail,
+  ): Promise<string | undefined> => {
     try {
       const chainIdHex: unknown = await providerWithInfo.provider.request({
         method: "eth_chainId",
@@ -46,7 +52,10 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // switch to a different chain
-  const switchToChain = async (providerWithInfo: EIP6963ProviderDetail, chainId: string): Promise<boolean> => {
+  const switchToChain = async (
+    providerWithInfo: EIP6963ProviderDetail,
+    chainId: string,
+  ): Promise<boolean> => {
     try {
       await providerWithInfo.provider.request({
         method: "wallet_switchEthereumChain",
@@ -60,27 +69,35 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // add a chain to wallet
-  const addChain = async (providerWithInfo: EIP6963ProviderDetail, defaultChain: EvmChainInfo): Promise<void> => {
+  const addChain = async (
+    providerWithInfo: EIP6963ProviderDetail,
+    defaultChain: EvmChainInfo,
+  ): Promise<void> => {
     try {
       await providerWithInfo.provider.request({
         method: "wallet_addEthereumChain",
-        params: [{
-          chainId: `0x${defaultChain.chainId.toString(16)}`,
-          chainName: defaultChain.chainName,
-          nativeCurrency: {
-            name: defaultChain.currencies[0].coinDenom,
-            symbol: defaultChain.currencies[0].coinDenom,
-            decimals: defaultChain.currencies[0].coinDecimals,
+        params: [
+          {
+            chainId: `0x${defaultChain.chainId.toString(16)}`,
+            chainName: defaultChain.chainName,
+            nativeCurrency: {
+              name: defaultChain.currencies[0].coinDenom,
+              symbol: defaultChain.currencies[0].coinDenom,
+              decimals: defaultChain.currencies[0].coinDecimals,
+            },
+            rpcUrls: defaultChain.rpcUrls,
           },
-          rpcUrls: defaultChain.rpcUrls,
-        }],
+        ],
       });
     } catch (error) {
       console.warn("Failed to add chain", error);
     }
   };
 
-  const handleConnect = async (providerWithInfo: EIP6963ProviderDetail, defaultChain: EvmChainInfo) => {
+  const handleConnect = async (
+    providerWithInfo: EIP6963ProviderDetail,
+    defaultChain: EvmChainInfo,
+  ) => {
     const chainIdHex = await getChainId(providerWithInfo);
 
     if (chainIdHex) {

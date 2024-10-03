@@ -1,4 +1,4 @@
-import { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from ".";
+import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from ".";
 
 const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.
@@ -89,7 +89,7 @@ export const ibcChains: IbcChains = {
 const FlameChainInfo: EvmChainInfo = {
   chainId: 912559,
   chainName: "Flame Dusk-10",
-  rpcUrls: ["https://rpc.evm.dusk-10.devnet.astria.org",],
+  rpcUrls: ["https://rpc.evm.dusk-10.devnet.astria.org"],
   currencies: [
     {
       coinDenom: "RIA",
@@ -101,13 +101,14 @@ const FlameChainInfo: EvmChainInfo = {
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 6,
-      evmWithdrawerContractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
+      evmWithdrawerContractAddress:
+        "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
       iconClass: "i-celestia",
     },
   ],
   // TODO - import icon
   iconClass: "i-flame",
-}
+};
 
 export const evmChains: EvmChains = {
   "Flame Dusk-10": FlameChainInfo,

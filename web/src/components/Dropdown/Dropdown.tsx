@@ -122,13 +122,15 @@ function Dropdown<T>({
           )}
           {!additionalOptionSelectedLabel && (
             <span className="dropdown-label is-text-overflow">
-              { selectedOption ? selectedOption.label : placeholder }
+              {selectedOption ? selectedOption.label : placeholder}
             </span>
           )}
           <span className="icon icon-right is-small">
-            {isActive ?
-              <i className="fas fa-angle-up" />:
-              <i className="fas fa-angle-down" />}
+            {isActive ? (
+              <i className="fas fa-angle-up" />
+            ) : (
+              <i className="fas fa-angle-down" />
+            )}
           </span>
         </button>
       </div>
@@ -168,15 +170,17 @@ function Dropdown<T>({
             >
               <span className="dropdown-item-inner is-size-6">
                 {option.leftIconClass && (
-                <span className="icon ml-1 mr-3">
-                  <i className={option.leftIconClass} />
-                </span>
+                  <span className="icon ml-1 mr-3">
+                    <i className={option.leftIconClass} />
+                  </span>
                 )}
-                <span className="dropdown-item-label is-text-overflow">{option.label}</span>
-                {option.rightIconClass && (
-                <span className="icon icon-right">
-                  <i className={option.rightIconClass} />
+                <span className="dropdown-item-label is-text-overflow">
+                  {option.label}
                 </span>
+                {option.rightIconClass && (
+                  <span className="icon icon-right">
+                    <i className={option.rightIconClass} />
+                  </span>
                 )}
               </span>
             </button>

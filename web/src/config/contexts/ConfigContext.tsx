@@ -1,7 +1,12 @@
 import React from "react";
 
 import type { AppConfig } from "..";
-import { EvmChains, getEvmChains, getIbcChains, IbcChains } from "../chainConfigs";
+import {
+  type EvmChains,
+  getEvmChains,
+  getIbcChains,
+  type IbcChains,
+} from "../chainConfigs";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,
