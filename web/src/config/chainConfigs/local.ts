@@ -1,4 +1,4 @@
-import type { IbcChainInfo, IbcChains } from ".";
+import { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from ".";
 
 const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.
@@ -51,6 +51,9 @@ const CelestiaChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
+      ibcChannel: "channel-0",
+      sequencerBridgeAccount: "astria1d7zjjljc0dsmxa545xkpwxym86g8uvvwhtezcr",
+      iconClass: "i-celestia",
     },
     {
       // Not a real currency, just using for developing the ui
@@ -85,10 +88,35 @@ const CelestiaChainInfo: IbcChainInfo = {
       },
     },
   ],
-  ibcChannel: "channel-0",
   iconClass: "i-celestia",
 };
 
 export const ibcChains: IbcChains = {
   "Celestia Local": CelestiaChainInfo,
+};
+
+const FlameChainInfo: EvmChainInfo = {
+  chainId: 912559,
+  chainName: "Flame (local)",
+  currencies: [
+    {
+      coinDenom: "RIA",
+      coinMinimalDenom: "uria",
+      coinDecimals: 18,
+      iconClass: "i-celestia",
+    },
+    {
+      coinDenom: "TIA",
+      coinMinimalDenom: "utia",
+      coinDecimals: 6,
+      evmWithdrawerContractAddress: "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+      iconClass: "i-celestia",
+    },
+  ],
+  // TODO - import icon
+  iconClass: "i-flame",
+};
+
+export const evmChains: EvmChains = {
+  "Flame": FlameChainInfo,
 };

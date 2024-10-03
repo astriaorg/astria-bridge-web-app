@@ -1,9 +1,18 @@
 import React from "react";
-import { useEthWallet } from "../../hooks/useEthWallet";
 
+import { useEthWallet } from "../../hooks/useEthWallet";
+import { getEvmChains } from "config/chainConfigs";
+
+/**
+ * A card component for connecting to an ethereum wallet
+ */
 export default function EthWalletConnector() {
   const { providers, selectedWallet, userAccount, handleConnect } =
     useEthWallet();
+
+  const evmChains = getEvmChains();
+  const firstKey = Object.keys(evmChains)[0];
+  const defaultChain = evmChains[firstKey];
 
   return (
     <div className="card p-5 wallet-provider-card">
@@ -22,7 +31,7 @@ export default function EthWalletConnector() {
                   type="button"
                   className="button is-tall"
                   key={provider.info.uuid}
-                  onClick={() => handleConnect(provider)}
+                  onClick={() => handleConnect(provider, defaultChain)}
                 >
                   <img src={provider.info.icon} alt={provider.info.name} />
                   <p>{provider.info.name}</p>

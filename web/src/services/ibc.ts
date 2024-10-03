@@ -2,7 +2,6 @@ import Long from "long";
 import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
 import type { IbcChainInfo, IbcCurrency } from "config/chainConfigs";
-import { getEnvVariable } from "config/env";
 
 /**
  * Send an IBC transfer from the selected chain to the recipient address.
@@ -12,7 +11,6 @@ import { getEnvVariable } from "config/env";
  * @param recipient
  * @param amount
  * @param currency
- * @param sequencerBridgeAccount
  */
 export const sendIbcTransfer = async (
   selectedIbcChain: IbcChainInfo,
@@ -20,7 +18,6 @@ export const sendIbcTransfer = async (
   recipient: string,
   amount: string,
   currency: IbcCurrency,
-  sequencerBridgeAccount: string,
 ) => {
   const keplr = window.keplr;
   if (!keplr) {
@@ -57,14 +54,14 @@ export const sendIbcTransfer = async (
     typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
     value: {
       sourcePort: "transfer",
-      sourceChannel: selectedIbcChain.ibcChannel,
+      sourceChannel: currency.ibcChannel,
       token: {
         denom: currency.coinMinimalDenom,
         amount: amount,
       },
       sender: sender,
       memo: memo,
-      receiver: sequencerBridgeAccount,
+      receiver: currency.sequencerBridgeAccount,
       // Timeout is in nanoseconds. Use Long.UZERO for default timeout
       timeoutTimestamp: Long.fromNumber(Date.now() + 600_000).multiply(
         1_000_000,

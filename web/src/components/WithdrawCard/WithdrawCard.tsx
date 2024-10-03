@@ -1,23 +1,35 @@
 import type React from "react";
-import { useMemo } from "react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import { getKeplrFromWindow } from "services/keplr";
-import {
-  EthWalletConnector,
-  getAstriaWithdrawerService,
-} from "features/EthWallet";
+import { EthWalletConnector, getAstriaWithdrawerService } from "features/EthWallet";
 import { useIbcChainSelection } from "features/IbcChainSelector";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config/hooks/useConfig";
+import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount, selectedWallet } = useEthWallet();
-  const { ibcChains, sequencerBridgeAccount, evmWithdrawerContractAddress } = useConfig();
+  const { userAccount: evmUserAccount, selectedWallet } = useEthWallet();
+  const { ibcChains, evmChains } = useConfig();
+
+  const {
+    selectEvmChain,
+    evmChainsOptions,
+    selectedEvmChain,
+    selectEvmCurrency,
+    evmCurrencyOptions,
+    selectedEvmCurrency,
+  } = useEvmChainSelection(evmChains);
+  const defaultEvmChainOption = useMemo(() => {
+    return evmChainsOptions[0] || null;
+  }, [evmChainsOptions]);
+  const defaultEvmCurrencyOption = useMemo(() => {
+    return evmCurrencyOptions[0] || null;
+  }, [evmCurrencyOptions]);
 
   const {
     selectIbcChain,
@@ -46,14 +58,13 @@ export default function WithdrawCard(): React.ReactElement {
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(userAccount);
-    if (userAccount?.address) {
-      setFromAddress(userAccount.address);
+    if (evmUserAccount?.address) {
+      setFromAddress(evmUserAccount.address);
     }
-    if (userAccount?.balance) {
-      setBalance(`${userAccount.balance} TIA`);
+    if (evmUserAccount?.balance) {
+      setBalance(`${evmUserAccount.balance} ${selectedEvmCurrency?.coinDenom}`);
     }
-  }, [userAccount]);
+  }, [evmUserAccount]);
 
   useEffect(() => {
     if (amount || toAddress) {
@@ -68,6 +79,13 @@ export default function WithdrawCard(): React.ReactElement {
     }
     connectKeplrWallet().then((_) => {});
   }, [selectedIbcChain, selectedIbcCurrency]);
+
+  useEffect(() => {
+    if (!selectedEvmChain || !selectedEvmCurrency) {
+      return;
+    }
+    connectEVMWallet().then((_) => {});
+  }, [selectedEvmChain, selectedEvmCurrency]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
@@ -106,7 +124,8 @@ export default function WithdrawCard(): React.ReactElement {
               .
             </p>
           ),
-          onAcknowledge: () => {},
+          onAcknowledge: () => {
+          },
         },
       });
       return;
@@ -123,15 +142,22 @@ export default function WithdrawCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.DANGER,
           message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {},
+          onAcknowledge: () => {
+          },
         },
       });
     }
   };
 
   const connectEVMWallet = async () => {
-    if (userAccount) {
-      setFromAddress(userAccount.address);
+    // if (userAccount) {
+    //   setFromAddress(userAccount.address);
+    //   return;
+    // }
+
+    if (!selectedEvmChain) {
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectEvmChain(defaultEvmChainOption.value);
       return;
     }
 
@@ -143,13 +169,14 @@ export default function WithdrawCard(): React.ReactElement {
         onCancel: () => {
           setFromAddress("");
         },
-        onConfirm: () => {},
+        onConfirm: () => {
+        },
       },
     });
   };
 
   const handleWithdraw = async () => {
-    if (!selectedWallet || !isAmountValid || !toAddress) {
+    if (!selectedWallet || !selectedEvmCurrency || !isAmountValid || !toAddress) {
       console.warn(
         "Withdrawal cannot proceed: missing required fields or fields are invalid",
         {
@@ -166,7 +193,7 @@ export default function WithdrawCard(): React.ReactElement {
     try {
       const withdrawerSvc = getAstriaWithdrawerService(
         selectedWallet.provider,
-        evmWithdrawerContractAddress,
+        selectedEvmCurrency.evmWithdrawerContractAddress,
       );
       await withdrawerSvc.withdrawToIbcChain(
         fromAddress,
@@ -178,7 +205,8 @@ export default function WithdrawCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.SUCCESS,
           message: "Withdrawal successful!",
-          onAcknowledge: () => {},
+          onAcknowledge: () => {
+          },
         },
       });
     } catch (error) {
@@ -187,7 +215,8 @@ export default function WithdrawCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.DANGER,
           message: "Withdrawal failed. Please try again.",
-          onAcknowledge: () => {},
+          onAcknowledge: () => {
+          },
         },
       });
     } finally {
@@ -229,25 +258,36 @@ export default function WithdrawCard(): React.ReactElement {
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Connect EVM Wallet"
-                options={[]}
-                onSelect={connectEVMWallet}
+                options={evmChainsOptions}
+                onSelect={selectEvmChain}
                 disabled={fromAddress !== ""}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalEvmOptions}
-                additionalOptionSelectedLabel={userAccount?.address}
+                additionalOptionSelectedLabel={evmUserAccount?.address}
               />
             </div>
-          </div>
-          <div>
-            {fromAddress && !isLoadingBalance && (
-              <p className="mt-2 has-text-light">Balance: {balance}</p>
+            {selectedEvmChain && evmCurrencyOptions && (
+              <div>
+                <Dropdown
+                  placeholder="Select a token"
+                  options={evmCurrencyOptions}
+                  defaultOption={defaultEvmCurrencyOption}
+                  onSelect={selectEvmCurrency}
+                  disabled={!selectedEvmChain}
+                />
+              </div>
             )}
-            {fromAddress && isLoadingBalance && (
-              <p className="mt-2 has-text-light">
-                Balance: <i className="fas fa-spinner fa-pulse" />
-              </p>
-            )}
           </div>
+          {/*<div>*/}
+          {/*  {fromAddress && !isLoadingBalance && (*/}
+          {/*    <p className="mt-2 has-text-light">Balance: {balance}</p>*/}
+          {/*  )}*/}
+          {/*  {fromAddress && isLoadingBalance && (*/}
+          {/*    <p className="mt-2 has-text-light">*/}
+          {/*      Balance: <i className="fas fa-spinner fa-pulse" />*/}
+          {/*    </p>*/}
+          {/*  )}*/}
+          {/*</div>*/}
         </div>
       </div>
 

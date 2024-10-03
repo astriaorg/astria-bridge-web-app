@@ -14,8 +14,8 @@ import { useConfig } from "config/hooks/useConfig";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount } = useEthWallet();
-  const { ibcChains, sequencerBridgeAccount } = useConfig();
+  const { userAccount: evmUserAccount } = useEthWallet();
+  const { ibcChains } = useConfig();
 
   const {
     selectIbcChain,
@@ -47,10 +47,10 @@ export default function DepositCard(): React.ReactElement {
   // set recipient address if userAccount available,
   // which means we got it from the eth wallet
   useEffect(() => {
-    if (userAccount) {
-      setRecipientAddress(userAccount.address);
+    if (evmUserAccount) {
+      setRecipientAddress(evmUserAccount.address);
     }
-  }, [userAccount]);
+  }, [evmUserAccount]);
 
   // check if form is valid whenever values change
   useEffect(() => {
@@ -106,7 +106,6 @@ export default function DepositCard(): React.ReactElement {
         recipientAddress,
         DecUtils.getTenExponentN(6).mul(new Dec(amount)).truncate().toString(),
         selectedIbcCurrency,
-        sequencerBridgeAccount,
       );
     } catch (e) {
       if (e instanceof Error) {
@@ -174,9 +173,9 @@ export default function DepositCard(): React.ReactElement {
   };
 
   const connectEVMWallet = async () => {
-    // use existing userAccount if we've already got it
-    if (userAccount) {
-      setRecipientAddress(userAccount.address);
+    // use existing evmUserAccount if we've already got it
+    if (evmUserAccount) {
+      setRecipientAddress(evmUserAccount.address);
       return;
     }
 
@@ -295,7 +294,7 @@ export default function DepositCard(): React.ReactElement {
               disabled={recipientAddress !== ""}
               leftIconClass={"i-wallet"}
               additionalOptions={additionalEvmOptions}
-              additionalOptionSelectedLabel={userAccount?.address}
+              additionalOptionSelectedLabel={evmUserAccount?.address}
             />
           </div>
         </div>
