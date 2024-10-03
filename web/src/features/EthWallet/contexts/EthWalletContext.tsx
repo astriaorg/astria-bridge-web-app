@@ -98,8 +98,9 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
     providerWithInfo: EIP6963ProviderDetail,
     defaultChain: EvmChainInfo,
   ) => {
+    // get chain id from wallet and use it as selectedChain if we have matching config for it,
+    // otherwise switch to or add the default chain
     const chainIdHex = await getChainId(providerWithInfo);
-
     if (chainIdHex) {
       try {
         const chain = getEvmChainById(chainIdHex);
@@ -124,6 +125,7 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
       }
     }
 
+    // get account info from wallet
     try {
       setSelectedWallet(providerWithInfo);
       const accounts: unknown = await providerWithInfo.provider.request({

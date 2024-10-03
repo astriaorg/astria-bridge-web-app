@@ -49,15 +49,15 @@ export default function WithdrawCard(): React.ReactElement {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
 
-  const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
+  const [balance, setBalance] = useState<string>("0");
+  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [toAddress, setToAddress] = useState<string>("");
   const [isToAddressValid, setIsToAddressValid] = useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   useEffect(() => {
@@ -151,11 +151,6 @@ export default function WithdrawCard(): React.ReactElement {
   };
 
   const connectEVMWallet = async () => {
-    // if (userAccount) {
-    //   setFromAddress(userAccount.address);
-    //   return;
-    // }
-
     if (!selectedEvmChain) {
       // select default chain if none selected, then return. effect handles retriggering.
       selectEvmChain(defaultEvmChainOption.value);
