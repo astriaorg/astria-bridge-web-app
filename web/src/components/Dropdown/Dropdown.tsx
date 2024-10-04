@@ -32,10 +32,10 @@ interface DropdownProps<T> {
   leftIconClass?: string;
   // additionalOptions allows for additional options with actions to be added to the dropdown
   additionalOptions?: DropdownAdditionalOption[];
-  // additionalOptionSelectedLabel allows for a label to be displayed when an additional option is selected.
+  // overrideSelectedLabel allows for a label to be displayed when an additional option is selected.
   //  This value is set by the parent component because the additional options generally have side effects
   //  outside of this component.
-  additionalOptionSelectedLabel?: string;
+  overrideSelectedLabel?: string;
 }
 
 function Dropdown<T>({
@@ -46,7 +46,7 @@ function Dropdown<T>({
   disabled = false,
   leftIconClass,
   additionalOptions = [],
-  additionalOptionSelectedLabel,
+  overrideSelectedLabel,
 }: DropdownProps<T>) {
   const [isActive, setIsActive] = useState(false);
   const [selectedOption, setSelectedOption] =
@@ -110,17 +110,24 @@ function Dropdown<T>({
           onClick={toggleDropdown}
           disabled={disabled}
         >
-          {leftIconClass && (
+          {/* only show left icon class if there isn't a selected option left icon class */}
+          {leftIconClass && !selectedOption?.leftIconClass && (
             <span className="icon icon-left is-small ml-1 mr-3">
               <i className={leftIconClass} />
             </span>
           )}
-          {additionalOptionSelectedLabel && (
-            <span className="dropdown-label is-text-overflow">
-              {additionalOptionSelectedLabel}
+          {selectedOption?.leftIconClass && (
+            <span className="icon icon-left is-small ml-1 mr-3">
+              <i className={selectedOption.leftIconClass} />
             </span>
           )}
-          {!additionalOptionSelectedLabel && (
+
+          {overrideSelectedLabel && (
+            <span className="dropdown-label is-text-overflow">
+              {overrideSelectedLabel}
+            </span>
+          )}
+          {!overrideSelectedLabel && (
             <span className="dropdown-label is-text-overflow">
               {selectedOption ? selectedOption.label : placeholder}
             </span>

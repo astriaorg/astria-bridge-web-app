@@ -31,6 +31,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
       (currency): DropdownOption<IbcCurrency> => ({
         label: currency.coinDenom,
         value: currency,
+        leftIconClass: currency.iconClass,
       }),
     );
   }, [selectedIbcChain]);

@@ -12,4 +12,9 @@ div.control > input {
       min-width: 60px;
     }
   }
+
+  .field-info-box {
+    background: $astria-grey-dark;
+    border-radius: 12px;
+  }
 }

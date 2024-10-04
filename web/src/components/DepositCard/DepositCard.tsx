@@ -175,6 +175,8 @@ export default function DepositCard(): React.ReactElement {
   };
 
   const getAndSetBalance = async () => {
+    // TODO - also set evm balance
+    // TODO - get balance for currently selected currency
     if (!selectedIbcChain || !selectedIbcCurrency) {
       return;
     }
@@ -266,31 +268,38 @@ export default function DepositCard(): React.ReactElement {
                 onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
-                additionalOptionSelectedLabel={fromAddress}
               />
             </div>
             {selectedIbcChain && ibcCurrencyOptions && (
-              <div>
+              <div className="ml-3">
                 <Dropdown
                   placeholder="Select a token"
                   options={ibcCurrencyOptions}
                   defaultOption={defaultIbcCurrencyOption}
                   onSelect={selectIbcCurrency}
-                  disabled={!selectedIbcChain}
                 />
               </div>
             )}
           </div>
-          <div>
-            {fromAddress && !isLoadingBalance && (
-              <p className="mt-2 has-text-light">Balance: {balance}</p>
-            )}
-            {fromAddress && isLoadingBalance && (
-              <p className="mt-2 has-text-light">
-                Balance: <i className="fas fa-spinner fa-pulse" />
-              </p>
-            )}
-          </div>
+          {fromAddress && (
+            <div className="field-info-box py-2 px-3">
+              {fromAddress && (
+                <p className="has-text-grey-light has-text-weight-semibold">
+                  Address: {fromAddress}
+                </p>
+              )}
+              {fromAddress && !isLoadingBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: {balance}
+                </p>
+              )}
+              {fromAddress && isLoadingBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: <i className="fas fa-spinner fa-pulse" />
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -315,24 +324,30 @@ export default function DepositCard(): React.ReactElement {
               placeholder="Connect EVM Wallet"
               options={evmChainsOptions}
               onSelect={selectEvmChain}
-              disabled={fromAddress !== ""}
               leftIconClass={"i-wallet"}
               additionalOptions={additionalEvmOptions}
-              additionalOptionSelectedLabel={evmUserAccount?.address}
             />
           </div>
           {selectedEvmChain && evmCurrencyOptions && (
-            <div>
+            <div className="ml-3">
               <Dropdown
                 placeholder="Select a token"
                 options={evmCurrencyOptions}
                 defaultOption={defaultEvmCurrencyOption}
                 onSelect={selectEvmCurrency}
-                disabled={!selectedEvmChain}
               />
             </div>
           )}
         </div>
+        {recipientAddress && (
+          <div className="field-info-box mt-3 py-2 px-3">
+            {recipientAddress && (
+              <p className="has-text-grey-light has-text-weight-semibold">
+                Address: {recipientAddress}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="is-flex is-flex-direction-row is-align-items-center">
