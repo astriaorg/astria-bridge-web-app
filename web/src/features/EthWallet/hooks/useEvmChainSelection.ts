@@ -37,6 +37,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       (currency): DropdownOption<EvmCurrency> => ({
         label: currency.coinDenom,
         value: currency,
+        leftIconClass: currency.iconClass,
       }),
     );
   }, [selectedEvmChain]);
