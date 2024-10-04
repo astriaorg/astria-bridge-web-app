@@ -1,79 +1,59 @@
 import { ethers } from "ethers";
 
-const ABI = [
-  "function withdrawToSequencer(string destinationChainAddress) payable",
-  "function withdrawToIbcChain(string destinationChainAddress, string memo) payable",
-];
+export class GenericContractService {
+  protected static instances: Map<string, GenericContractService> = new Map();
+  protected static ABI: ethers.InterfaceAbi;
+  protected walletProvider: ethers.BrowserProvider;
+  protected readonly contractAddress: string;
+  protected readonly abi: ethers.InterfaceAbi;
+  protected contractPromise: Promise<ethers.Contract> | null = null;
 
-/**
- * Service for interacting with the Astria withdrawer contract.
- *
- * This service is used to withdraw funds from the Astria EVM to the Sequencer or to an IBC chain.
- */
-export class AstriaWithdrawerService {
-  private static instance: AstriaWithdrawerService | null = null;
-  private walletProvider: ethers.BrowserProvider;
-  private readonly contractAddress: string;
-  private contractPromise: Promise<ethers.Contract> | null = null;
-
-  private constructor(
+  protected constructor(
     walletProvider: ethers.Eip1193Provider,
     contractAddress: string,
   ) {
     this.walletProvider = new ethers.BrowserProvider(walletProvider);
     this.contractAddress = contractAddress;
+    this.abi = (this.constructor as typeof GenericContractService).ABI;
   }
 
-  /**
-   * Get the singleton instance of the AstriaWithdrawerService.
-   * If a provider is supplied, it will be used to create a new instance.
-   * @param provider
-   * @param contractAddress
-   */
+  protected static getInstanceKey(contractAddress: string): string {
+    /* biome-ignore lint/complexity/noThisInStatic: */
+    return `${this.name}-${contractAddress}`;
+  }
+
   public static getInstance(
-    provider?: ethers.Eip1193Provider,
-    contractAddress?: string,
-  ): AstriaWithdrawerService {
-    if (!AstriaWithdrawerService.instance) {
-      if (!provider) {
-        throw new Error(
-          "Provider must be supplied when creating the service instance",
-        );
-      }
-      if (!contractAddress) {
-        throw new Error(
-          "Contract address must be supplied when creating the service instance",
-        );
-      }
-      AstriaWithdrawerService.instance = new AstriaWithdrawerService(
-        provider,
-        contractAddress,
-      );
-    } else if (provider) {
-      // update the provider if one is supplied
-      AstriaWithdrawerService.instance.updateProvider(provider);
+    provider: ethers.Eip1193Provider,
+    contractAddress: string,
+  ): GenericContractService {
+    /* biome-ignore lint/complexity/noThisInStatic: */
+    const key = this.getInstanceKey(contractAddress);
+    /* biome-ignore lint/complexity/noThisInStatic: */
+    let instance = this.instances.get(key);
+
+    if (!instance) {
+      /* biome-ignore lint/complexity/noThisInStatic: */
+      instance = new this(provider, contractAddress);
+      /* biome-ignore lint/complexity/noThisInStatic: */
+      this.instances.set(key, instance);
+    } else {
+      instance.updateProvider(provider);
     }
-    return AstriaWithdrawerService.instance;
+
+    return instance;
   }
 
-  private updateProvider(provider: ethers.Eip1193Provider): void {
+  protected updateProvider(provider: ethers.Eip1193Provider): void {
     this.walletProvider = new ethers.BrowserProvider(provider);
-    // reset the contract promise to force a new contract creation
     this.contractPromise = null;
   }
 
-  /**
-   * Get the withdrawer contract instance.
-   * Caches the contract instance to avoid unnecessary contract creation.
-   * @param address
-   * @private
-   */
-  private async getContract(address: string): Promise<ethers.Contract> {
+  protected async getContract(address: string): Promise<ethers.Contract> {
     if (!this.contractPromise) {
       this.contractPromise = (async () => {
         try {
           const signer = await this.walletProvider.getSigner(address);
-          return new ethers.Contract(this.contractAddress, ABI, signer);
+          return new ethers.Contract(this.contractAddress, this.abi, signer);
         } catch (error) {
           this.contractPromise = null;
           throw error;
@@ -83,21 +63,55 @@ export class AstriaWithdrawerService {
     return this.contractPromise;
   }
 
+  protected async callContractMethod(
+    methodName: string,
+    fromAddress: string,
+    args: unknown[],
+    value?: ethers.BigNumberish,
+  ): Promise<ethers.ContractTransactionResponse> {
+    try {
+      const contract = await this.getContract(fromAddress);
+      const method = contract[methodName];
+      if (!method) {
+        throw new Error(`Method ${methodName} not found in contract`);
+      }
+      return method(...args, { value });
+    } catch (error) {
+      console.error(`Error in ${methodName}:`, error);
+      throw error;
+    }
+  }
+}
+
+export class AstriaWithdrawerService extends GenericContractService {
+  protected static override ABI: ethers.InterfaceAbi = [
+    "function withdrawToSequencer(string destinationChainAddress) payable",
+    "function withdrawToIbcChain(string destinationChainAddress, string memo) payable",
+  ];
+
+  public static override getInstance(
+    provider: ethers.Eip1193Provider,
+    contractAddress: string,
+  ): AstriaWithdrawerService {
+    /* biome-ignore lint/complexity/noThisInStatic: */
+    return super.getInstance(
+      provider,
+      contractAddress,
+    ) as AstriaWithdrawerService;
+  }
+
   async withdrawToSequencer(
     fromAddress: string,
     destinationChainAddress: string,
     amount: string,
   ): Promise<ethers.ContractTransactionResponse> {
-    try {
-      const amountWei = ethers.parseEther(amount);
-      const contract = await this.getContract(fromAddress);
-      return contract.withdrawToSequencer(destinationChainAddress, {
-        value: amountWei,
-      });
-    } catch (error) {
-      console.error("Error in withdrawToSequencer:", error);
-      throw error;
-    }
+    const amountWei = ethers.parseEther(amount);
+    return this.callContractMethod(
+      "withdrawToSequencer",
+      fromAddress,
+      [destinationChainAddress],
+      amountWei,
+    );
   }
 
   async withdrawToIbcChain(
@@ -106,27 +120,73 @@ export class AstriaWithdrawerService {
     amount: string,
     memo: string,
   ): Promise<ethers.ContractTransactionResponse> {
-    try {
-      const amountWei = ethers.parseEther(amount);
-      const contract = await this.getContract(fromAddress);
-      return contract.withdrawToIbcChain(destinationChainAddress, memo, {
-        value: amountWei,
-      });
-    } catch (error) {
-      console.error("Error in withdrawToIbcChain:", error);
-      throw error;
-    }
+    const amountWei = ethers.parseEther(amount);
+    return this.callContractMethod(
+      "withdrawToIbcChain",
+      fromAddress,
+      [destinationChainAddress, memo],
+      amountWei,
+    );
   }
 }
 
-/**
- * Get the singleton instance of the AstriaWithdrawerService.
- * @param provider
- * @param contractAddress
- */
+export class AstriaErc20WithdrawerService extends GenericContractService {
+  protected static override ABI: ethers.InterfaceAbi = [
+    "function withdrawToSequencer(uint256 amount, string destinationChainAddress) payable",
+    "function withdrawToIbcChain(uint256 amount, string destinationChainAddress, string memo) payable",
+  ];
+
+  public static override getInstance(
+    provider: ethers.Eip1193Provider,
+    contractAddress: string,
+  ): AstriaErc20WithdrawerService {
+    /* biome-ignore lint/complexity/noThisInStatic: */
+    return super.getInstance(
+      provider,
+      contractAddress,
+    ) as AstriaErc20WithdrawerService;
+  }
+  async withdrawToSequencer(
+    fromAddress: string,
+    destinationChainAddress: string,
+    amount: string,
+  ): Promise<ethers.ContractTransactionResponse> {
+    const amountWei = ethers.parseEther(amount);
+    return this.callContractMethod("withdrawToSequencer", fromAddress, [
+      amountWei,
+      destinationChainAddress,
+    ]);
+  }
+
+  async withdrawToIbcChain(
+    fromAddress: string,
+    destinationChainAddress: string,
+    amount: string,
+    memo: string,
+  ): Promise<ethers.ContractTransactionResponse> {
+    const amountWei = ethers.parseEther(amount);
+    return this.callContractMethod("withdrawToIbcChain", fromAddress, [
+      amountWei,
+      destinationChainAddress,
+      memo,
+    ]);
+  }
+}
+
+// Helper function to get AstriaWithdrawerService instance
 export const getAstriaWithdrawerService = (
-  provider?: ethers.Eip1193Provider,
-  contractAddress?: string,
-): AstriaWithdrawerService => {
-  return AstriaWithdrawerService.getInstance(provider, contractAddress);
+  provider: ethers.Eip1193Provider,
+  contractAddress: string,
+  isErc20 = false,
+): AstriaWithdrawerService | AstriaErc20WithdrawerService => {
+  if (isErc20) {
+    return AstriaErc20WithdrawerService.getInstance(
+      provider,
+      contractAddress,
+    ) as AstriaErc20WithdrawerService;
+  }
+  return AstriaWithdrawerService.getInstance(
+    provider,
+    contractAddress,
+  ) as AstriaWithdrawerService;
 };

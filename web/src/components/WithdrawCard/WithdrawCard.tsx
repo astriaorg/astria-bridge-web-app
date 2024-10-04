@@ -175,7 +175,8 @@ export default function WithdrawCard(): React.ReactElement {
       !selectedWallet ||
       !selectedEvmCurrency ||
       !isAmountValid ||
-      !toAddress
+      !toAddress ||
+      !selectedEvmCurrency?.evmWithdrawerContractAddress
     ) {
       console.warn(
         "Withdrawal cannot proceed: missing required fields or fields are invalid",
@@ -194,6 +195,7 @@ export default function WithdrawCard(): React.ReactElement {
       const withdrawerSvc = getAstriaWithdrawerService(
         selectedWallet.provider,
         selectedEvmCurrency.evmWithdrawerContractAddress,
+        true, // FIXME - how to determine when erc20? just add flag to config?
       );
       await withdrawerSvc.withdrawToIbcChain(
         fromAddress,
