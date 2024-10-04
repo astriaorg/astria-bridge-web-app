@@ -1,18 +1,19 @@
 import type React from "react";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
-import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
+
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import { NotificationType } from "features/Notifications/components/Notification/types";
-import { getKeplrFromWindow } from "services/keplr";
+import Dropdown from "components/Dropdown/Dropdown";
+import { useConfig } from "config/hooks/useConfig";
+import { useIbcChainSelection } from "features/IbcChainSelector";
 import {
   EthWalletConnector,
   getAstriaWithdrawerService,
 } from "features/EthWallet";
-import { useIbcChainSelection } from "features/IbcChainSelector";
-import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig } from "config/hooks/useConfig";
+import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
+import { NotificationType } from "features/Notifications/components/Notification/types";
+import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
+import { getKeplrFromWindow } from "services/keplr";
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);

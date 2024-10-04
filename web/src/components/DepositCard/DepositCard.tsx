@@ -1,17 +1,18 @@
 import type React from "react";
 import { useContext, useEffect, useMemo, useState } from "react";
+
 import { Dec, DecUtils } from "@keplr-wallet/unit";
-import { NotificationType } from "features/Notifications/components/Notification/types";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
-import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
-import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
-import { getBalance, sendIbcTransfer } from "services/ibc";
-import { getKeplrFromWindow } from "services/keplr";
-import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config/hooks/useConfig";
-import { useEvmChainSelection } from "../../features/EthWallet/hooks/useEvmChainSelection";
+import { NotificationType } from "features/Notifications/components/Notification/types";
+import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
+import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
+import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
+import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
+import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
+import { getBalance, sendIbcTransfer } from "services/ibc";
+import { getKeplrFromWindow } from "services/keplr";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
