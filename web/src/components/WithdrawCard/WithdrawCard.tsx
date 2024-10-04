@@ -2,7 +2,8 @@ import type React from "react";
 import { useContext, useEffect, useMemo, useState } from "react";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import Dropdown from "components/Dropdown/Dropdown";
+import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
+import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { useIbcChainSelection } from "features/IbcChainSelector";
 import {
@@ -49,6 +50,29 @@ export default function WithdrawCard(): React.ReactElement {
   const defaultIbcCurrencyOption = useMemo(() => {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
+
+  // selectedIbcChainOption allows us to ensure the label is set properly
+  // in the dropdown when connecting via additional action
+  const selectedIbcChainOption = useMemo(() => {
+    if (!selectedIbcChain) {
+      return null;
+    }
+    return {
+      label: selectedIbcChain?.chainName || "",
+      value: selectedIbcChain,
+      leftIconClass: selectedIbcChain?.iconClass || "",
+    } as DropdownOption<IbcChainInfo>;
+  }, [selectedIbcChain]);
+  const selectedEvmChainOption = useMemo(() => {
+    if (!selectedEvmChain) {
+      return null;
+    }
+    return {
+      label: selectedEvmChain?.chainName || "",
+      value: selectedEvmChain,
+      leftIconClass: selectedEvmChain?.iconClass || "",
+    } as DropdownOption<EvmChainInfo>;
+  }, [selectedEvmChain]);
 
   const [fromAddress, setFromAddress] = useState<string>("");
   const [balance, setBalance] = useState<string>("0");
@@ -267,6 +291,7 @@ export default function WithdrawCard(): React.ReactElement {
                 onSelect={selectEvmChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalEvmOptions}
+                valueOverride={selectedEvmChainOption}
               />
             </div>
             {selectedEvmChain && evmCurrencyOptions && (
@@ -327,6 +352,7 @@ export default function WithdrawCard(): React.ReactElement {
                 onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
+                valueOverride={selectedIbcChainOption}
               />
             </div>
             {selectedIbcChain && ibcCurrencyOptions && (

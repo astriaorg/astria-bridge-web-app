@@ -3,7 +3,8 @@ import { useContext, useEffect, useMemo, useState } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import Dropdown from "components/Dropdown/Dropdown";
+import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
+import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
@@ -48,6 +49,29 @@ export default function DepositCard(): React.ReactElement {
   const defaultIbcCurrencyOption = useMemo(() => {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
+
+  // selectedIbcChainOption allows us to ensure the label is set properly
+  // in the dropdown when connecting via additional action
+  const selectedIbcChainOption = useMemo(() => {
+    if (!selectedIbcChain) {
+      return null;
+    }
+    return {
+      label: selectedIbcChain?.chainName || "",
+      value: selectedIbcChain,
+      leftIconClass: selectedIbcChain?.iconClass || "",
+    } as DropdownOption<IbcChainInfo>;
+  }, [selectedIbcChain]);
+  const selectedEvmChainOption = useMemo(() => {
+    if (!selectedEvmChain) {
+      return null;
+    }
+    return {
+      label: selectedEvmChain?.chainName || "",
+      value: selectedEvmChain,
+      leftIconClass: selectedEvmChain?.iconClass || "",
+    } as DropdownOption<EvmChainInfo>;
+  }, [selectedEvmChain]);
 
   const [fromAddress, setFromAddress] = useState<string>("");
   const [balance, setBalance] = useState<string>("0 TIA");
@@ -268,6 +292,7 @@ export default function DepositCard(): React.ReactElement {
                 onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
+                valueOverride={selectedIbcChainOption}
               />
             </div>
             {selectedIbcChain && ibcCurrencyOptions && (
@@ -326,6 +351,7 @@ export default function DepositCard(): React.ReactElement {
               onSelect={selectEvmChain}
               leftIconClass={"i-wallet"}
               additionalOptions={additionalEvmOptions}
+              valueOverride={selectedEvmChainOption}
             />
           </div>
           {selectedEvmChain && evmCurrencyOptions && (

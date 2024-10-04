@@ -32,10 +32,10 @@ interface DropdownProps<T> {
   leftIconClass?: string;
   // additionalOptions allows for additional options with actions to be added to the dropdown
   additionalOptions?: DropdownAdditionalOption[];
-  // overrideSelectedLabel allows for a label to be displayed when an additional option is selected.
-  //  This value is set by the parent component because the additional options generally have side effects
-  //  outside of this component.
-  overrideSelectedLabel?: string;
+  // valueOverride will trigger a call of onSelect in the component so the labels update correctly.
+  //  This was needed to set the label correctly when the value is set via side effects from an
+  //  additionalOption action
+  valueOverride?: DropdownOption<T> | null;
 }
 
 function Dropdown<T>({
@@ -46,7 +46,7 @@ function Dropdown<T>({
   disabled = false,
   leftIconClass,
   additionalOptions = [],
-  overrideSelectedLabel,
+  valueOverride,
 }: DropdownProps<T>) {
   const [isActive, setIsActive] = useState(false);
   const [selectedOption, setSelectedOption] =
@@ -78,6 +78,14 @@ function Dropdown<T>({
       onSelect(defaultOption.value);
     }
   }, [defaultOption, onSelect]);
+
+  useEffect(() => {
+    if (valueOverride) {
+      console.log("valueOverride", valueOverride);
+      setSelectedOption(valueOverride);
+      onSelect(valueOverride.value);
+    }
+  }, [valueOverride, onSelect]);
 
   const handleSelect = useCallback(
     (option: DropdownOption<T>) => {
@@ -121,17 +129,9 @@ function Dropdown<T>({
               <i className={selectedOption.leftIconClass} />
             </span>
           )}
-
-          {overrideSelectedLabel && (
-            <span className="dropdown-label is-text-overflow">
-              {overrideSelectedLabel}
-            </span>
-          )}
-          {!overrideSelectedLabel && (
-            <span className="dropdown-label is-text-overflow">
-              {selectedOption ? selectedOption.label : placeholder}
-            </span>
-          )}
+          <span className="dropdown-label is-text-overflow">
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
           <span className="icon icon-right is-small">
             {isActive ? (
               <i className="fas fa-angle-up" />
