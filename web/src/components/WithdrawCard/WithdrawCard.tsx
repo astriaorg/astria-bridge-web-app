@@ -17,7 +17,7 @@ import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelect
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount: evmUserAccount, selectedWallet } = useEthWallet();
-  const { ibcChains, evmChains } = useConfig();
+  const { evmChains, ibcChains } = useConfig();
 
   const {
     selectEvmChain,
@@ -54,8 +54,9 @@ export default function WithdrawCard(): React.ReactElement {
   const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
-  const [toAddress, setToAddress] = useState<string>("");
-  const [isToAddressValid, setIsToAddressValid] = useState<boolean>(false);
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
+  const [isRecipientAddressValid, setIsRecipientAddressValid] =
+    useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
@@ -70,11 +71,11 @@ export default function WithdrawCard(): React.ReactElement {
   }, [evmUserAccount, selectedEvmCurrency]);
 
   useEffect(() => {
-    if (amount || toAddress) {
+    if (amount || recipientAddress) {
       setHasTouchedForm(true);
     }
-    checkIsFormValid(amount, toAddress);
-  }, [amount, toAddress]);
+    checkIsFormValid(amount, recipientAddress);
+  }, [amount, recipientAddress]);
 
   useEffect(() => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
@@ -94,12 +95,15 @@ export default function WithdrawCard(): React.ReactElement {
     setAmount(event.target.value);
   };
 
-  const checkIsFormValid = (amountInput: string, toAddressInput: string) => {
+  const checkIsFormValid = (
+    amountInput: string,
+    recipientAddressInput: string,
+  ) => {
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
     setIsAmountValid(amountValid);
-    const isToAddressValid = toAddressInput.length > 0;
-    setIsToAddressValid(isToAddressValid);
+    const isRecipientAddressValid = recipientAddressInput.length > 0;
+    setIsRecipientAddressValid(isRecipientAddressValid);
   };
 
   const connectKeplrWallet = async () => {
@@ -135,7 +139,7 @@ export default function WithdrawCard(): React.ReactElement {
 
     try {
       const key = await keplr.getKey(selectedIbcChain.chainId);
-      setToAddress(key.bech32Address);
+      setRecipientAddress(key.bech32Address);
     } catch (e) {
       if (e instanceof Error) {
         console.error(e.message);
@@ -175,7 +179,7 @@ export default function WithdrawCard(): React.ReactElement {
       !selectedWallet ||
       !selectedEvmCurrency ||
       !isAmountValid ||
-      !toAddress ||
+      !recipientAddress ||
       !selectedEvmCurrency?.evmWithdrawerContractAddress
     ) {
       console.warn(
@@ -183,7 +187,7 @@ export default function WithdrawCard(): React.ReactElement {
         {
           selectedWallet,
           isAmountValid,
-          toAddress,
+          recipientAddress,
         },
       );
       return;
@@ -199,7 +203,7 @@ export default function WithdrawCard(): React.ReactElement {
       );
       await withdrawerSvc.withdrawToIbcChain(
         fromAddress,
-        toAddress,
+        recipientAddress,
         amount,
         "",
       );
@@ -315,7 +319,7 @@ export default function WithdrawCard(): React.ReactElement {
                 onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
-                additionalOptionSelectedLabel={toAddress}
+                additionalOptionSelectedLabel={recipientAddress}
               />
             </div>
             {selectedIbcChain && ibcCurrencyOptions && (
@@ -364,10 +368,10 @@ export default function WithdrawCard(): React.ReactElement {
           onClick={handleWithdraw}
           disabled={
             !isAmountValid ||
-            !isToAddressValid ||
+            !isRecipientAddressValid ||
             isLoading ||
             !fromAddress ||
-            !toAddress
+            !recipientAddress
           }
         >
           {isLoading ? "Processing..." : "Withdraw"}

@@ -11,11 +11,27 @@ import { getKeplrFromWindow } from "services/keplr";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config/hooks/useConfig";
+import { useEvmChainSelection } from "../../features/EthWallet/hooks/useEvmChainSelection";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
   const { userAccount: evmUserAccount } = useEthWallet();
-  const { ibcChains } = useConfig();
+  const { evmChains, ibcChains } = useConfig();
+
+  const {
+    selectEvmChain,
+    evmChainsOptions,
+    selectedEvmChain,
+    selectEvmCurrency,
+    evmCurrencyOptions,
+    selectedEvmCurrency,
+  } = useEvmChainSelection(evmChains);
+  const defaultEvmChainOption = useMemo(() => {
+    return evmChainsOptions[0] || null;
+  }, [evmChainsOptions]);
+  const defaultEvmCurrencyOption = useMemo(() => {
+    return evmCurrencyOptions[0] || null;
+  }, [evmCurrencyOptions]);
 
   const {
     selectIbcChain,
@@ -32,8 +48,9 @@ export default function DepositCard(): React.ReactElement {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
 
-  const [balance, setBalance] = useState<string>("0 TIA");
   const [fromAddress, setFromAddress] = useState<string>("");
+  const [balance, setBalance] = useState<string>("0 TIA");
+  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
@@ -41,7 +58,6 @@ export default function DepositCard(): React.ReactElement {
     useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // set recipient address if userAccount available,
@@ -68,6 +84,94 @@ export default function DepositCard(): React.ReactElement {
     }
     connectKeplrWallet().then((_) => {});
   }, [selectedIbcChain, selectedIbcCurrency]);
+
+  useEffect(() => {
+    if (!selectedEvmChain || !selectedEvmCurrency) {
+      return;
+    }
+    connectEVMWallet().then((_) => {});
+  }, [selectedEvmChain, selectedEvmCurrency]);
+
+  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(event.target.value);
+  };
+
+  const checkIsFormValid = (addressInput: string, amountInput: string) => {
+    const amount = Number.parseFloat(amountInput);
+    const amountValid = amount > 0;
+    setIsAmountValid(amountValid);
+    // TODO - what validation should we do?
+    const addressValid = addressInput.length > 0;
+    setIsRecipientAddressValid(addressValid);
+  };
+
+  const connectKeplrWallet = async () => {
+    if (!selectedIbcChain) {
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectIbcChain(defaultIbcChainOption.value);
+      return;
+    }
+    const keplr = await getKeplrFromWindow();
+    if (!keplr) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.DANGER,
+          component: (
+            <p>
+              Keplr wallet extension must be installed! You can find it{" "}
+              <a
+                target="_blank"
+                href="https://www.keplr.app/download"
+                rel="noreferrer"
+              >
+                here
+              </a>
+              .
+            </p>
+          ),
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
+
+    try {
+      const key = await keplr.getKey(selectedIbcChain.chainId);
+      setFromAddress(key.bech32Address);
+      await getAndSetBalance();
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      }
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.DANGER,
+          message: "Failed to get key from Keplr wallet.",
+          onAcknowledge: () => {},
+        },
+      });
+    }
+  };
+
+  const connectEVMWallet = async () => {
+    if (!selectedEvmChain) {
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectEvmChain(defaultEvmChainOption.value);
+      return;
+    }
+
+    addNotification({
+      modalOpts: {
+        modalType: NotificationType.INFO,
+        title: "Connect EVM Wallet",
+        component: <EthWalletConnector />,
+        onCancel: () => {
+          setRecipientAddress("");
+        },
+        onConfirm: () => {},
+      },
+    });
+  };
 
   const getAndSetBalance = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
@@ -122,87 +226,6 @@ export default function DepositCard(): React.ReactElement {
       setIsLoading(false);
       setTimeout(() => setIsAnimating(false), 2000);
     }
-  };
-
-  const connectKeplrWallet = async () => {
-    if (!selectedIbcChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
-      selectIbcChain(defaultIbcChainOption.value);
-      return;
-    }
-    const keplr = await getKeplrFromWindow();
-    if (!keplr) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          component: (
-            <p>
-              Keplr wallet extension must be installed! You can find it{" "}
-              <a
-                target="_blank"
-                href="https://www.keplr.app/download"
-                rel="noreferrer"
-              >
-                here
-              </a>
-              .
-            </p>
-          ),
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    try {
-      const key = await keplr.getKey(selectedIbcChain.chainId);
-      setFromAddress(key.bech32Address);
-      await getAndSetBalance();
-    } catch (e) {
-      if (e instanceof Error) {
-        console.error(e.message);
-      }
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {},
-        },
-      });
-    }
-  };
-
-  const connectEVMWallet = async () => {
-    // use existing evmUserAccount if we've already got it
-    if (evmUserAccount) {
-      setRecipientAddress(evmUserAccount.address);
-      return;
-    }
-
-    addNotification({
-      modalOpts: {
-        modalType: NotificationType.INFO,
-        title: "Connect EVM Wallet",
-        component: <EthWalletConnector />,
-        onCancel: () => {
-          setRecipientAddress("");
-        },
-        onConfirm: () => {},
-      },
-    });
-  };
-
-  const checkIsFormValid = (addressInput: string, amountInput: string) => {
-    const amount = Number.parseFloat(amountInput);
-    const amountValid = amount > 0;
-    setIsAmountValid(amountValid);
-    // TODO - what validation should we do?
-    const addressValid = addressInput.length > 0;
-    setIsRecipientAddressValid(addressValid);
-  };
-
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
   };
 
   const additionalIbcOptions = useMemo(
@@ -289,14 +312,25 @@ export default function DepositCard(): React.ReactElement {
           <div className="is-flex-grow-1">
             <Dropdown
               placeholder="Connect EVM Wallet"
-              options={[]}
-              onSelect={connectEVMWallet}
-              disabled={recipientAddress !== ""}
+              options={evmChainsOptions}
+              onSelect={selectEvmChain}
+              disabled={fromAddress !== ""}
               leftIconClass={"i-wallet"}
               additionalOptions={additionalEvmOptions}
               additionalOptionSelectedLabel={evmUserAccount?.address}
             />
           </div>
+          {selectedEvmChain && evmCurrencyOptions && (
+            <div>
+              <Dropdown
+                placeholder="Select a token"
+                options={evmCurrencyOptions}
+                defaultOption={defaultEvmCurrencyOption}
+                onSelect={selectEvmCurrency}
+                disabled={!selectedEvmChain}
+              />
+            </div>
+          )}
         </div>
       </div>
 
