@@ -16,6 +16,7 @@ html, body {
 @import 'card-overrides';
 @import 'dropdown-overrides';
 @import 'form-overrides';
+@import 'modal-overrides';
 
 // bulma
 @import '../../node_modules/bulma/bulma';
@@ -33,6 +34,7 @@ html, body {
 @import 'card-customizations';
 @import 'dropdown-customizations';
 @import 'form-customizations';
+@import 'modal-customizations';
 
 
 // body reset
