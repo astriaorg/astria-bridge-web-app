@@ -19,6 +19,15 @@ export type IbcChainInfo = {
   currencies: IbcCurrency[];
 } & ChainInfo;
 
+/**
+ * Converts an IbcChainInfo object to a ChainInfo object.
+ * @param chain
+ */
+export function toChainInfo(chain: IbcChainInfo): ChainInfo {
+  const { iconClass, ...chainInfo } = chain;
+  return chainInfo as ChainInfo;
+}
+
 // IbcChains type maps labels to IbcChainInfo objects
 export type IbcChains = {
   [label: string]: IbcChainInfo;

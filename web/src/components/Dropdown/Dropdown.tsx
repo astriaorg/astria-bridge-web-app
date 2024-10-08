@@ -81,9 +81,11 @@ function Dropdown<T>({
 
   useEffect(() => {
     if (valueOverride) {
-      console.log("valueOverride", valueOverride);
       setSelectedOption(valueOverride);
       onSelect(valueOverride.value);
+    }
+    if (valueOverride === null) {
+      setSelectedOption(null);
     }
   }, [valueOverride, onSelect]);
 

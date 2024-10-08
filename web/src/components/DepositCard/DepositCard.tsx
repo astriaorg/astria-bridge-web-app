@@ -1,10 +1,16 @@
 import type React from "react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
+import { type EvmChainInfo, type IbcChainInfo, toChainInfo } from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
@@ -17,7 +23,7 @@ import { getKeplrFromWindow } from "services/keplr";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount: evmUserAccount } = useEthWallet();
+  const { userAccount: evmUserAccount, selectedWallet } = useEthWallet();
   const { evmChains, ibcChains } = useConfig();
 
   const {
@@ -88,10 +94,15 @@ export default function DepositCard(): React.ReactElement {
   // set recipient address if userAccount available,
   // which means we got it from the eth wallet
   useEffect(() => {
-    if (evmUserAccount) {
+    if (evmUserAccount && selectedWallet) {
       setRecipientAddress(evmUserAccount.address);
+    } else {
+      setRecipientAddress("");
     }
-  }, [evmUserAccount]);
+    if (!selectedWallet) {
+      selectEvmChain(null);
+    }
+  }, [selectedWallet, evmUserAccount, selectEvmChain]);
 
   // check if form is valid whenever values change
   useEffect(() => {
@@ -165,26 +176,30 @@ export default function DepositCard(): React.ReactElement {
       setFromAddress(key.bech32Address);
       await getAndSetBalance();
     } catch (e) {
-      if (e instanceof Error) {
-        console.error(e.message);
+      if (
+        e instanceof Error &&
+        e.message.startsWith("There is no chain info")
+      ) {
+        try {
+          await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
+        } catch (e) {
+          if (e instanceof Error) {
+            selectIbcChain(null);
+          }
+        }
+      } else {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            message: "Failed to get key from Keplr wallet.",
+            onAcknowledge: () => {},
+          },
+        });
       }
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {},
-        },
-      });
     }
   };
 
   const connectEVMWallet = async () => {
-    if (!selectedEvmChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
-      selectEvmChain(defaultEvmChainOption.value);
-      return;
-    }
-
     addNotification({
       modalOpts: {
         modalType: NotificationType.INFO,
@@ -192,6 +207,7 @@ export default function DepositCard(): React.ReactElement {
         component: <EthWalletConnector />,
         onCancel: () => {
           setRecipientAddress("");
+          selectEvmChain(null);
         },
         onConfirm: () => {},
       },

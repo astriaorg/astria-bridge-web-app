@@ -3,7 +3,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
+import { type EvmChainInfo, type IbcChainInfo, toChainInfo } from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { useIbcChainSelection } from "features/IbcChainSelector";
 import {
@@ -166,26 +166,30 @@ export default function WithdrawCard(): React.ReactElement {
       const key = await keplr.getKey(selectedIbcChain.chainId);
       setRecipientAddress(key.bech32Address);
     } catch (e) {
-      if (e instanceof Error) {
-        console.error(e.message);
+      if (
+        e instanceof Error &&
+        e.message.startsWith("There is no chain info")
+      ) {
+        try {
+          await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
+        } catch (e) {
+          if (e instanceof Error) {
+            selectIbcChain(null);
+          }
+        }
+      } else {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            message: "Failed to get key from Keplr wallet.",
+            onAcknowledge: () => {},
+          },
+        });
       }
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {},
-        },
-      });
     }
   };
 
   const connectEVMWallet = async () => {
-    if (!selectedEvmChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
-      selectEvmChain(defaultEvmChainOption.value);
-      return;
-    }
-
     addNotification({
       modalOpts: {
         modalType: NotificationType.INFO,
@@ -193,8 +197,14 @@ export default function WithdrawCard(): React.ReactElement {
         component: <EthWalletConnector />,
         onCancel: () => {
           setFromAddress("");
+          selectEvmChain(null);
         },
-        onConfirm: () => {},
+        onConfirm: () => {
+          if (!evmUserAccount) {
+            setRecipientAddress("");
+            selectEvmChain(null);
+          }
+        },
       },
     });
   };

@@ -19,7 +19,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     );
   }, [ibcChains]);
 
-  const selectIbcChain = useCallback((chain: IbcChainInfo) => {
+  const selectIbcChain = useCallback((chain: IbcChainInfo | null) => {
     setSelectedIbcChain(chain);
   }, []);
 

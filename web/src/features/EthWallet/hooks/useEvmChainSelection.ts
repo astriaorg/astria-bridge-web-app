@@ -19,7 +19,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     );
   }, [evmChains]);
 
-  const selectEvmChain = useCallback((chain: EvmChainInfo) => {
+  const selectEvmChain = useCallback((chain: EvmChainInfo | null) => {
     setSelectedEvmChain(chain);
   }, []);
 
