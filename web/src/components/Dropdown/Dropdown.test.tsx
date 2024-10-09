@@ -57,7 +57,8 @@ describe("Dropdown Component", () => {
 
     const selectedOption = screen.getByText("Option 3");
     expect(
-      selectedOption?.parentElement?.parentElement?.parentElement,
+      selectedOption?.parentElement?.parentElement?.parentElement
+        ?.parentElement,
     ).toHaveClass("is-active");
   });
 

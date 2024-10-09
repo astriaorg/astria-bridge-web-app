@@ -24,7 +24,8 @@ _lint-md:
   docker run --rm -v $PWD:/workdir davidanson/markdownlint-cli2:v0.8.1 \
     "**/*.md" \
     "#web/node_modules" \
-    "#functions/node_modules"
+    "#functions/node_modules" \
+    "#codebase.md"
 
 [no-exit-message]
 _lint-ts:

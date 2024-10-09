@@ -9,7 +9,7 @@ const domRoot: ReactDOM.Root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
 );
 
-console.log(`App Version: ${process.env.REACT_APP_VERSION}`);
+console.debug(`App Version: ${process.env.REACT_APP_VERSION}`);
 
 domRoot.render(
   <React.StrictMode>

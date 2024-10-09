@@ -5,6 +5,8 @@
 i.i-arrow-up-arrow-down {
   // this was downloaded from figma
   background-image: url('../../public/assets/icons/arrow-up-arrow-down.png');
+  background-repeat: no-repeat;
+  background-size: contain;
   height: 100%;
   width: 100%;
 }
@@ -16,4 +18,31 @@ i.i-wallet {
   background-size: contain;
   height: 100%;
   width: 100%;
+}
+
+i.i-celestia {
+    // this was downloaded from figma
+    background-image: url('../../public/assets/icons/logos/celestia-logo-color.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 100%;
+    width: 100%;
+}
+
+i.i-keplr {
+    // this was downloaded from figma
+    background-image: url('../../public/assets/icons/logos/keplr-logo-color.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 100%;
+    width: 100%;
+}
+
+i.i-flame {
+    // this was downloaded from figma
+    background-image: url('../../public/assets/icons/logos/flame-logo-color.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 100%;
+    width: 100%;
 }

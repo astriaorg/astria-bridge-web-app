@@ -14,11 +14,12 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
       ([chainLabel, chain]): DropdownOption<IbcChainInfo> => ({
         label: chainLabel,
         value: chain,
+        leftIconClass: chain.iconClass,
       }),
     );
   }, [ibcChains]);
 
-  const selectIbcChain = useCallback((chain: IbcChainInfo) => {
+  const selectIbcChain = useCallback((chain: IbcChainInfo | null) => {
     setSelectedIbcChain(chain);
   }, []);
 
@@ -30,6 +31,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
       (currency): DropdownOption<IbcCurrency> => ({
         label: currency.coinDenom,
         value: currency,
+        leftIconClass: currency.iconClass,
       }),
     );
   }, [selectedIbcChain]);

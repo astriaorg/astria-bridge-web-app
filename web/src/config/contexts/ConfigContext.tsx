@@ -1,9 +1,12 @@
 import React from "react";
 
 import type { AppConfig } from "..";
-import type { IbcChains } from "../chainConfigs";
-import { getIbcChains } from "../chainConfigs";
-import { getEnvVariable } from "../env";
+import {
+  type EvmChains,
+  getEvmChains,
+  getIbcChains,
+  type IbcChains,
+} from "../chainConfigs";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,
@@ -21,12 +24,10 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   children,
 }) => {
   const ibcChains: IbcChains = getIbcChains();
-  const sequencerBridgeAccount = getEnvVariable(
-    "REACT_APP_SEQUENCER_BRIDGE_ACCOUNT",
-  );
+  const evmChains: EvmChains = getEvmChains();
 
   return (
-    <ConfigContext.Provider value={{ ibcChains, sequencerBridgeAccount }}>
+    <ConfigContext.Provider value={{ ibcChains, evmChains }}>
       {children}
     </ConfigContext.Provider>
   );

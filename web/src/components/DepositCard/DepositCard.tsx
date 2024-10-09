@@ -1,21 +1,50 @@
 import type React from "react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from "react";
+
 import { Dec, DecUtils } from "@keplr-wallet/unit";
-import { NotificationType } from "features/Notifications/components/Notification/types";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
+import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
+import {
+  type EvmChainInfo,
+  type IbcChainInfo,
+  toChainInfo,
+} from "config/chainConfigs";
+import { useConfig } from "config/hooks/useConfig";
+import { NotificationType } from "features/Notifications/components/Notification/types";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
+import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
+import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
+import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
 import { getBalance, sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
-import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
-import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig } from "config/hooks/useConfig";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount } = useEthWallet();
-  const { ibcChains } = useConfig();
+  const { userAccount: evmUserAccount, selectedWallet } = useEthWallet();
+  const { evmChains, ibcChains } = useConfig();
+
+  const {
+    selectEvmChain,
+    evmChainsOptions,
+    selectedEvmChain,
+    selectEvmCurrency,
+    evmCurrencyOptions,
+    selectedEvmCurrency,
+  } = useEvmChainSelection(evmChains);
+  const defaultEvmChainOption = useMemo(() => {
+    return evmChainsOptions[0] || null;
+  }, [evmChainsOptions]);
+  const defaultEvmCurrencyOption = useMemo(() => {
+    return evmCurrencyOptions[0] || null;
+  }, [evmCurrencyOptions]);
 
   const {
     selectIbcChain,
@@ -32,8 +61,32 @@ export default function DepositCard(): React.ReactElement {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
 
-  const [balance, setBalance] = useState<string>("0 TIA");
+  // selectedIbcChainOption allows us to ensure the label is set properly
+  // in the dropdown when connecting via additional action
+  const selectedIbcChainOption = useMemo(() => {
+    if (!selectedIbcChain) {
+      return null;
+    }
+    return {
+      label: selectedIbcChain?.chainName || "",
+      value: selectedIbcChain,
+      leftIconClass: selectedIbcChain?.iconClass || "",
+    } as DropdownOption<IbcChainInfo>;
+  }, [selectedIbcChain]);
+  const selectedEvmChainOption = useMemo(() => {
+    if (!selectedEvmChain) {
+      return null;
+    }
+    return {
+      label: selectedEvmChain?.chainName || "",
+      value: selectedEvmChain,
+      leftIconClass: selectedEvmChain?.iconClass || "",
+    } as DropdownOption<EvmChainInfo>;
+  }, [selectedEvmChain]);
+
   const [fromAddress, setFromAddress] = useState<string>("");
+  const [balance, setBalance] = useState<string>("0 TIA");
+  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
@@ -41,16 +94,25 @@ export default function DepositCard(): React.ReactElement {
     useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  // set recipient address if userAccount available,
-  // which means we got it from the eth wallet
+  // create refs to hold the latest state values
+  const latestState = useRef({
+    evmUserAccount,
+    selectedWallet,
+    recipientAddress,
+    selectedEvmChain,
+  });
+
+  // update the ref whenever the state changes
   useEffect(() => {
-    if (userAccount) {
-      setRecipientAddress(userAccount.address);
-    }
-  }, [userAccount]);
+    latestState.current = {
+      evmUserAccount,
+      selectedWallet,
+      recipientAddress,
+      selectedEvmChain,
+    };
+  }, [evmUserAccount, selectedWallet, recipientAddress, selectedEvmChain]);
 
   // check if form is valid whenever values change
   useEffect(() => {
@@ -63,13 +125,126 @@ export default function DepositCard(): React.ReactElement {
 
   // connect to keplr wallet when chain and currency are selected
   useEffect(() => {
-    if (!selectedIbcChain || !selectedIbcCurrency) {
+    if (!selectedIbcChain) {
       return;
     }
     connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain, selectedIbcCurrency]);
+  }, [selectedIbcChain]);
+
+  useEffect(() => {
+    if (!selectedEvmChain) {
+      return;
+    }
+    connectEVMWallet().then((_) => {});
+  }, [selectedEvmChain]);
+
+  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(event.target.value);
+  };
+
+  const checkIsFormValid = (addressInput: string, amountInput: string) => {
+    const amount = Number.parseFloat(amountInput);
+    const amountValid = amount > 0;
+    setIsAmountValid(amountValid);
+    // TODO - what validation should we do?
+    const addressValid = addressInput.length > 0;
+    setIsRecipientAddressValid(addressValid);
+  };
+
+  const connectKeplrWallet = async () => {
+    if (!selectedIbcChain) {
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectIbcChain(defaultIbcChainOption.value);
+      return;
+    }
+    const keplr = await getKeplrFromWindow();
+    if (!keplr) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.DANGER,
+          component: (
+            <p>
+              Keplr wallet extension must be installed! You can find it{" "}
+              <a
+                target="_blank"
+                href="https://www.keplr.app/download"
+                rel="noreferrer"
+              >
+                here
+              </a>
+              .
+            </p>
+          ),
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
+
+    try {
+      const key = await keplr.getKey(selectedIbcChain.chainId);
+      setFromAddress(key.bech32Address);
+      await getAndSetBalance();
+    } catch (e) {
+      if (
+        e instanceof Error &&
+        e.message.startsWith("There is no chain info")
+      ) {
+        try {
+          await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
+        } catch (e) {
+          if (e instanceof Error) {
+            selectIbcChain(null);
+          }
+        }
+      } else {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            message: "Failed to get key from Keplr wallet.",
+            onAcknowledge: () => {},
+          },
+        });
+      }
+    }
+  };
+
+  const connectEVMWallet = async () => {
+    if (!selectedEvmChain) {
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectEvmChain(defaultEvmChainOption.value);
+      return;
+    }
+
+    addNotification({
+      modalOpts: {
+        modalType: NotificationType.INFO,
+        title: "Connect EVM Wallet",
+        component: <EthWalletConnector />,
+        onCancel: () => {
+          const currentState = latestState.current;
+          setRecipientAddress("");
+          selectEvmChain(null);
+          if (currentState.selectedWallet) {
+            currentState.selectedWallet = undefined;
+          }
+        },
+        onConfirm: () => {
+          const currentState = latestState.current;
+          if (!currentState.evmUserAccount) {
+            setRecipientAddress("");
+            selectEvmChain(null);
+          } else {
+            setRecipientAddress(currentState.evmUserAccount.address);
+          }
+        },
+      },
+    });
+  };
 
   const getAndSetBalance = async () => {
+    // TODO - also set evm balance
+    // TODO - get balance for currently selected currency
     if (!selectedIbcChain || !selectedIbcCurrency) {
       return;
     }
@@ -124,100 +299,14 @@ export default function DepositCard(): React.ReactElement {
     }
   };
 
-  const connectKeplrWallet = async () => {
-    if (!selectedIbcChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
-      selectIbcChain(defaultIbcChainOption.value);
-      return;
-    }
-    const keplr = await getKeplrFromWindow();
-    if (!keplr) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          component: (
-            <p>
-              Keplr wallet extension must be installed! You can find it{" "}
-              <a
-                target="_blank"
-                href="https://www.keplr.app/download"
-                rel="noreferrer"
-              >
-                here
-              </a>
-              .
-            </p>
-          ),
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    try {
-      const key = await keplr.getKey(selectedIbcChain.chainId);
-      setFromAddress(key.bech32Address);
-      await getAndSetBalance();
-    } catch (e) {
-      if (e instanceof Error) {
-        console.error(e.message);
-      }
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          message: "Failed to get key from Keplr wallet.",
-          onAcknowledge: () => {},
-        },
-      });
-    }
-  };
-
-  const connectEVMWallet = async () => {
-    // use existing userAccount if we've already got it
-    if (userAccount) {
-      setRecipientAddress(userAccount.address);
-      return;
-    }
-
-    addNotification({
-      modalOpts: {
-        modalType: NotificationType.INFO,
-        title: "Connect EVM Wallet",
-        component: <EthWalletConnector />,
-        onCancel: () => {
-          setRecipientAddress("");
-        },
-        onConfirm: () => {},
-      },
-    });
-  };
-
-  const checkIsFormValid = (addressInput: string, amountInput: string) => {
-    const amount = Number.parseFloat(amountInput);
-    const amountValid = amount > 0;
-    setIsAmountValid(amountValid);
-    // TODO - what validation should we do?
-    const addressValid = addressInput.length > 0;
-    setIsRecipientAddressValid(addressValid);
-  };
-
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
-  };
-
-  const updateRecipientAddress = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRecipientAddress(event.target.value);
-  };
-
   const additionalIbcOptions = useMemo(
     () => [
       {
         label: "Connect Keplr Wallet",
         action: connectKeplrWallet,
         className: "has-text-primary",
-        icon: "fas fa-plus",
+        leftIconClass: "i-keplr",
+        rightIconClass: "fas fa-plus",
       },
     ],
     [connectKeplrWallet],
@@ -229,7 +318,7 @@ export default function DepositCard(): React.ReactElement {
         label: "Connect EVM Wallet",
         action: connectEVMWallet,
         className: "has-text-primary",
-        icon: "fas fa-plus",
+        rightIconClass: "fas fa-plus",
       },
     ];
   }, [connectEVMWallet]);
@@ -239,70 +328,96 @@ export default function DepositCard(): React.ReactElement {
       <div className="field">
         <div className="is-flex is-flex-direction-column">
           <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
-            <div className="pl-4 mr-5 w-70">From</div>
+            <div className="label-left">From</div>
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Select..."
                 options={ibcChainsOptions}
                 onSelect={selectIbcChain}
-                leftIcon={"i-wallet"}
+                leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
-                additionalOptionSelectedLabel={fromAddress}
+                valueOverride={selectedIbcChainOption}
               />
             </div>
             {selectedIbcChain && ibcCurrencyOptions && (
-              <div>
+              <div className="ml-3">
                 <Dropdown
                   placeholder="Select a token"
                   options={ibcCurrencyOptions}
                   defaultOption={defaultIbcCurrencyOption}
                   onSelect={selectIbcCurrency}
-                  disabled={!selectedIbcChain}
                 />
               </div>
             )}
           </div>
-          <div>
-            {fromAddress && !isLoadingBalance && (
-              <p className="mt-2 has-text-light">Balance: {balance}</p>
-            )}
-            {fromAddress && isLoadingBalance && (
-              <p className="mt-2 has-text-light">
-                Balance: <i className="fas fa-spinner fa-pulse" />
-              </p>
-            )}
-          </div>
+          {fromAddress && (
+            <div className="field-info-box py-2 px-3">
+              {fromAddress && (
+                <p className="has-text-grey-light has-text-weight-semibold">
+                  Address: {fromAddress}
+                </p>
+              )}
+              {fromAddress && !isLoadingBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: {balance}
+                </p>
+              )}
+              {fromAddress && isLoadingBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: <i className="fas fa-spinner fa-pulse" />
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
-        <div className="is-flex is-flex-direction-row mb-3">
-          <div className="pl-4">
+        <div className="is-flex is-flex-direction-row">
+          <div>
             <span className="icon is-medium">
               <i className="i-arrow-up-arrow-down" />
             </span>
           </div>
-          <div className="card-spacer" />
+          <div className="ml-4 card-spacer" />
         </div>
       )}
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">
-          <div className="pl-4 mr-5 w-70">To</div>
-          <div className="mt-3 is-flex-grow-1">
+          <div className="label-left">To</div>
+          <div className="is-flex-grow-1">
             <Dropdown
               placeholder="Connect EVM Wallet"
-              options={[]}
-              onSelect={connectEVMWallet}
-              disabled={recipientAddress !== ""}
-              leftIcon={"i-wallet"}
+              options={evmChainsOptions}
+              onSelect={selectEvmChain}
+              leftIconClass={"i-wallet"}
               additionalOptions={additionalEvmOptions}
-              additionalOptionSelectedLabel={userAccount?.address}
+              valueOverride={selectedEvmChainOption}
             />
           </div>
+          {selectedEvmChain && evmCurrencyOptions && (
+            <div className="ml-3">
+              <Dropdown
+                placeholder="Select a token"
+                options={evmCurrencyOptions}
+                defaultOption={defaultEvmCurrencyOption}
+                onSelect={selectEvmCurrency}
+              />
+            </div>
+          )}
         </div>
+        {recipientAddress && (
+          <div className="field-info-box mt-3 py-2 px-3">
+            {recipientAddress && (
+              <p className="has-text-grey-light has-text-weight-semibold">
+                Address: {recipientAddress}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="is-flex is-flex-direction-row is-align-items-center">
@@ -311,25 +426,25 @@ export default function DepositCard(): React.ReactElement {
 
       <div className="field">
         <div className="is-flex is-flex-direction-row is-align-items-center">
-          <div className="pl-4 mr-5 w-70">Amount</div>
-          <div className="control mt-1 mr-3 is-flex-grow-1 ">
+          <div className="label-left">Amount</div>
+          <div className="control mt-1 is-flex-grow-1">
             <input
-              className="input"
+              className="input is-medium"
               type="text"
               placeholder="0.00"
               onChange={updateAmount}
               value={amount}
             />
           </div>
-          {!isAmountValid && hasTouchedForm && (
-            <p className="help is-danger mt-2">
-              Amount must be a number greater than 0
-            </p>
-          )}
         </div>
+        {!isAmountValid && hasTouchedForm && (
+          <div className="help is-danger mt-2">
+            Amount must be a number greater than 0
+          </div>
+        )}
       </div>
 
-      <div className="card-footer pl-4 my-3">
+      <div className="card-footer mt-4">
         <button
           type="button"
           className="button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white"
