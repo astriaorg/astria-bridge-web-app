@@ -5,12 +5,17 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import { type EvmChainInfo, type IbcChainInfo, toChainInfo } from "config/chainConfigs";
+import {
+  type EvmChainInfo,
+  type IbcChainInfo,
+  toChainInfo,
+} from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
@@ -91,18 +96,23 @@ export default function DepositCard(): React.ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  // set recipient address if userAccount available,
-  // which means we got it from the eth wallet
+  // create refs to hold the latest state values
+  const latestState = useRef({
+    evmUserAccount,
+    selectedWallet,
+    recipientAddress,
+    selectedEvmChain,
+  });
+
+  // update the ref whenever the state changes
   useEffect(() => {
-    if (evmUserAccount && selectedWallet) {
-      setRecipientAddress(evmUserAccount.address);
-    } else {
-      setRecipientAddress("");
-    }
-    if (!selectedWallet) {
-      selectEvmChain(null);
-    }
-  }, [selectedWallet, evmUserAccount, selectEvmChain]);
+    latestState.current = {
+      evmUserAccount,
+      selectedWallet,
+      recipientAddress,
+      selectedEvmChain,
+    };
+  }, [evmUserAccount, selectedWallet, recipientAddress, selectedEvmChain]);
 
   // check if form is valid whenever values change
   useEffect(() => {
@@ -115,18 +125,18 @@ export default function DepositCard(): React.ReactElement {
 
   // connect to keplr wallet when chain and currency are selected
   useEffect(() => {
-    if (!selectedIbcChain || !selectedIbcCurrency) {
+    if (!selectedIbcChain) {
       return;
     }
     connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain, selectedIbcCurrency]);
+  }, [selectedIbcChain]);
 
   useEffect(() => {
-    if (!selectedEvmChain || !selectedEvmCurrency) {
+    if (!selectedEvmChain) {
       return;
     }
     connectEVMWallet().then((_) => {});
-  }, [selectedEvmChain, selectedEvmCurrency]);
+  }, [selectedEvmChain]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
@@ -200,16 +210,34 @@ export default function DepositCard(): React.ReactElement {
   };
 
   const connectEVMWallet = async () => {
+    if (!selectedEvmChain) {
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectEvmChain(defaultEvmChainOption.value);
+      return;
+    }
+
     addNotification({
       modalOpts: {
         modalType: NotificationType.INFO,
         title: "Connect EVM Wallet",
         component: <EthWalletConnector />,
         onCancel: () => {
+          const currentState = latestState.current;
           setRecipientAddress("");
           selectEvmChain(null);
+          if (currentState.selectedWallet) {
+            currentState.selectedWallet = undefined;
+          }
         },
-        onConfirm: () => {},
+        onConfirm: () => {
+          const currentState = latestState.current;
+          if (!currentState.evmUserAccount) {
+            setRecipientAddress("");
+            selectEvmChain(null);
+          } else {
+            setRecipientAddress(currentState.evmUserAccount.address);
+          }
+        },
       },
     });
   };

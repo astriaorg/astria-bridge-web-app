@@ -196,10 +196,32 @@ const FlameChainInfo: EvmChainInfo = {
       iconClass: "i-celestia",
     },
   ],
-  // TODO - import icon
+  iconClass: "i-flame",
+};
+
+const FakeChainInfo: EvmChainInfo = {
+  chainId: 912559,
+  chainName: "FakeChain (local)",
+  currencies: [
+    {
+      coinDenom: "FAKE",
+      coinMinimalDenom: "ufake",
+      coinDecimals: 18,
+      iconClass: "i-celestia",
+    },
+    {
+      coinDenom: "FAKE",
+      coinMinimalDenom: "ufake",
+      coinDecimals: 6,
+      evmWithdrawerContractAddress:
+        "0x0000000000000000000000000000000000000000",
+      iconClass: "i-flame",
+    },
+  ],
   iconClass: "i-flame",
 };
 
 export const evmChains: EvmChains = {
   Flame: FlameChainInfo,
+  Fake: FakeChainInfo,
 };

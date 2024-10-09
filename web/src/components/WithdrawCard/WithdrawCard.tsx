@@ -1,9 +1,14 @@
 import type React from "react";
+import { useRef } from "react";
 import { useContext, useEffect, useMemo, useState } from "react";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import { type EvmChainInfo, type IbcChainInfo, toChainInfo } from "config/chainConfigs";
+import {
+  type EvmChainInfo,
+  type IbcChainInfo,
+  toChainInfo,
+} from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { useIbcChainSelection } from "features/IbcChainSelector";
 import {
@@ -86,6 +91,24 @@ export default function WithdrawCard(): React.ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
+  // create refs to hold the latest state values
+  const latestState = useRef({
+    evmUserAccount,
+    selectedWallet,
+    recipientAddress,
+    selectedEvmChain,
+  });
+
+  // update the ref whenever the state changes
+  useEffect(() => {
+    latestState.current = {
+      evmUserAccount,
+      selectedWallet,
+      recipientAddress,
+      selectedEvmChain,
+    };
+  }, [evmUserAccount, selectedWallet, recipientAddress, selectedEvmChain]);
+
   useEffect(() => {
     if (evmUserAccount?.address) {
       setFromAddress(evmUserAccount.address);
@@ -103,18 +126,18 @@ export default function WithdrawCard(): React.ReactElement {
   }, [amount, recipientAddress]);
 
   useEffect(() => {
-    if (!selectedIbcChain || !selectedIbcCurrency) {
+    if (!selectedIbcChain) {
       return;
     }
     connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain, selectedIbcCurrency]);
+  }, [selectedIbcChain]);
 
   useEffect(() => {
-    if (!selectedEvmChain || !selectedEvmCurrency) {
+    if (!selectedEvmChain) {
       return;
     }
     connectEVMWallet().then((_) => {});
-  }, [selectedEvmChain, selectedEvmCurrency]);
+  }, [selectedEvmChain]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
@@ -190,19 +213,32 @@ export default function WithdrawCard(): React.ReactElement {
   };
 
   const connectEVMWallet = async () => {
+    if (!selectedEvmChain) {
+      // select default chain if none selected, then return. effect handles retriggering.
+      selectEvmChain(defaultEvmChainOption.value);
+      return;
+    }
+
     addNotification({
       modalOpts: {
         modalType: NotificationType.INFO,
         title: "Connect EVM Wallet",
         component: <EthWalletConnector />,
         onCancel: () => {
+          const currentState = latestState.current;
           setFromAddress("");
           selectEvmChain(null);
+          if (currentState.selectedWallet) {
+            currentState.selectedWallet = undefined;
+          }
         },
         onConfirm: () => {
-          if (!evmUserAccount) {
-            setRecipientAddress("");
+          const currentState = latestState.current;
+          if (!currentState.evmUserAccount) {
+            setFromAddress("");
             selectEvmChain(null);
+          } else {
+            setFromAddress(currentState.evmUserAccount.address);
           }
         },
       },
