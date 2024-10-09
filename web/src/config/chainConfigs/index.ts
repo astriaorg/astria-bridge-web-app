@@ -68,7 +68,7 @@ export function getIbcChains(): IbcChains {
       return JSON.parse(ibcChains);
     }
   } catch (e) {
-    console.log("REACT_APP_IBC_CHAINS not set. Continuing...");
+    console.debug("REACT_APP_IBC_CHAINS not set. Continuing...");
   }
 
   // get default chain configs based on REACT_APP_ENV
@@ -150,7 +150,7 @@ export function getEvmChains(): EvmChains {
       return JSON.parse(evmChains);
     }
   } catch (e) {
-    console.log("REACT_APP_EVM_CHAINS not set. Continuing...");
+    console.debug("REACT_APP_EVM_CHAINS not set. Continuing...");
   }
 
   // get default chain configs based on REACT_APP_ENV

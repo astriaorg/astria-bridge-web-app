@@ -46,7 +46,7 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
       });
       return chainIdHex as string;
     } catch (error) {
-      console.warn("Failed to get chain", error);
+      console.error("Failed to get chain", error);
       return undefined;
     }
   };
@@ -63,7 +63,7 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
       });
       return true;
     } catch (error) {
-      console.warn("Failed to switch chain", error);
+      console.error("Failed to switch chain", error);
       return false;
     }
   };
@@ -90,7 +90,7 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
         ],
       });
     } catch (error) {
-      console.warn("Failed to add chain", error);
+      console.error("Failed to add chain", error);
     }
   };
 
@@ -106,7 +106,7 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
         const chain = getEvmChainById(chainIdHex);
         setSelectedChain(chain);
       } catch (error) {
-        console.warn("Error in getEvmChainById", error);
+        console.error("Error in getEvmChainById", error);
 
         // try to switch chains if getEvmChainById fails
         const chainId = `0x${defaultChain.chainId.toString(16)}`;
@@ -152,7 +152,7 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
         };
         setUserAccount(userAccount);
 
-        console.log(
+        console.debug(
           "Connected to",
           providerWithInfo.info.name,
           "with account",

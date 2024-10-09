@@ -75,7 +75,7 @@ export const sendIbcTransfer = async (
     [msgIBCTransfer],
     fee,
   );
-  console.log("Transaction result: ", result);
+  console.debug("Transaction result: ", result);
 };
 
 export const getBalance = async (
