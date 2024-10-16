@@ -1,7 +1,7 @@
 import type React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../../logo.svg";
+import logo from "../../logo-flame-w-text.svg";
 
 function Navbar() {
   const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);
@@ -10,7 +10,9 @@ function Navbar() {
     setIsMobileMenuActive((prev) => !prev);
   };
 
-  const brandLink = "/";
+  const brandLink = "https://www.astria.org/";
+  const swapLink = "https://flame.astria.org/";
+  const poolLink = "https://flame.astria.org/";
 
   return (
     <nav
@@ -37,10 +39,34 @@ function Navbar() {
 
       <div
         id="topNavbar"
-        className={`navbar-menu ${isMobileMenuActive && "is-active"}`}
+        className={`navbar-menu ${
+          isMobileMenuActive && "navbar-menu-dropdown is-active"
+        }`}
       >
-        <div className="navbar-start" />
+        <div className="navbar-middle has-text-weight-medium is-family-monospace">
+          <Link to="/" className="navbar-item">
+            BRIDGE
+          </Link>
+          <a
+            target="_blank"
+            href={swapLink}
+            className="navbar-item"
+            rel="noreferrer"
+          >
+            SWAP
+          </a>
+          <a
+            target="_blank"
+            href={poolLink}
+            className="navbar-item"
+            rel="noreferrer"
+          >
+            POOL
+          </a>
+        </div>
       </div>
+
+      <div className="navbar-placeholder-end" />
     </nav>
   );
 }

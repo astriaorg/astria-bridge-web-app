@@ -4,7 +4,7 @@ html, body {
 }
 
 // fonts
-@import './fonts';
+@import 'fonts';
 // custom styles
 @import 'icons';
 
@@ -35,6 +35,7 @@ html, body {
 @import 'dropdown-customizations';
 @import 'form-customizations';
 @import 'modal-customizations';
+@import 'navbar-customizations';
 
 
 // body reset
@@ -42,29 +43,6 @@ body {
   margin: 0;
   padding: 0;
   background-color: $astria-black;
-}
-
-// navbar customizations
-.navbar {
-  background-color: transparent;
-  padding: 1rem 2rem;
-
-  .navbar-menu.is-active {
-    background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
-    box-shadow: 1px 1px 1px -1px hsla(0, 0%, 100%, 0.5) inset;
-  }
-
-  &.is-transparent {
-    .navbar-dropdown {
-      background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
-      box-shadow: 1px 1px 1px -1px hsla(0, 0%, 100%, 0.5) inset;
-
-      a.navbar-item:focus, a.navbar-item:hover {
-        color: $astria-text-light;
-      }
-    }
-  }
-
 }
 
 .is-fullheight-with-navbar {
