@@ -11,7 +11,6 @@ function Navbar() {
   };
 
   const brandLink = "https://www.astria.org/";
-  const bridgeLink = "https://bridge.astria.org/";
   const swapLink = "https://flame.astria.org/";
   const poolLink = "https://flame.astria.org/";
 
