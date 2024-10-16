@@ -1,0 +1,54 @@
+@import 'astria-colors';
+
+// navbar customizations
+.navbar {
+  background-color: transparent;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid $astria-grey-lighter;
+
+  .navbar-menu {
+    .navbar-middle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-grow: 1;
+    }
+    &.navbar-menu-dropdown.is-active {
+      background: none;
+      border: none;
+      box-shadow: none;
+      .navbar-middle {
+        display: block;
+        background: none;
+        .navbar-item {
+          &:focus-within, &:hover, &.is-active {
+            //background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+            background: none;
+            box-shadow: none;
+            border: none;
+          }
+        }
+      }
+    }
+
+    &.is-active {
+      background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+      box-shadow: 1px 1px 1px -1px hsla(0, 0%, 100%, 0.5) inset;
+    }
+  }
+
+  &.is-transparent {
+    .navbar-dropdown {
+      background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+      box-shadow: 1px 1px 1px -1px hsla(0, 0%, 100%, 0.5) inset;
+
+      a.navbar-item:focus, a.navbar-item:hover {
+        color: $astria-text-light;
+      }
+    }
+  }
+
+  .navbar-placeholder-end {
+    width: 185px;
+  }
+}
