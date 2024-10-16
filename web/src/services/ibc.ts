@@ -2,7 +2,6 @@ import Long from "long";
 import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
 import type { IbcChainInfo, IbcCurrency } from "config/chainConfigs";
-import { getEnvVariable } from "config/env";
 
 /**
  * Send an IBC transfer from the selected chain to the recipient address.
@@ -37,9 +36,7 @@ export const sendIbcTransfer = async (
   if (!account) {
     throw new Error("Failed to get account from Keplr wallet.");
   }
-  const sequencer_bridge_account = getEnvVariable(
-    "REACT_APP_SEQUENCER_BRIDGE_ACCOUNT",
-  );
+
   // TODO - does this need to be configurable in the ui?
   const feeDenom = selectedIbcChain.feeCurrencies[0].coinMinimalDenom;
   const memo = JSON.stringify({ rollupDepositAddress: recipient });
@@ -57,14 +54,14 @@ export const sendIbcTransfer = async (
     typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
     value: {
       sourcePort: "transfer",
-      sourceChannel: selectedIbcChain.ibcChannel,
+      sourceChannel: currency.ibcChannel,
       token: {
         denom: currency.coinMinimalDenom,
         amount: amount,
       },
       sender: sender,
       memo: memo,
-      receiver: sequencer_bridge_account,
+      receiver: currency.sequencerBridgeAccount,
       // Timeout is in nanoseconds. Use Long.UZERO for default timeout
       timeoutTimestamp: Long.fromNumber(Date.now() + 600_000).multiply(
         1_000_000,
@@ -78,7 +75,7 @@ export const sendIbcTransfer = async (
     [msgIBCTransfer],
     fee,
   );
-  console.log("Transaction result: ", result);
+  console.debug("Transaction result: ", result);
 };
 
 export const getBalance = async (

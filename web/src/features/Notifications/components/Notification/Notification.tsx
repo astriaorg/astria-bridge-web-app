@@ -70,14 +70,14 @@ function Notification({
         <footer className="modal-card-foot">
           <button
             type="button"
-            className={`button ${modalButtonClass()}`}
+            className={`button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white ${modalButtonClass()}`}
             onClick={onModalConfirm}
           >
             Confirm
           </button>
           <button
             type="button"
-            className="button is-light"
+            className="button is-light is-tall is-wide"
             onClick={onModalCancel}
           >
             Cancel

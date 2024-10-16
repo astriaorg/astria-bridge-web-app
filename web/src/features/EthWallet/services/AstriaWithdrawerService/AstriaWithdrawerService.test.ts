@@ -1,9 +1,13 @@
 import { ethers } from "ethers";
-import { getAstriaWithdrawerService } from "./AstriaWithdrawerService";
+import {
+  getAstriaWithdrawerService,
+  AstriaWithdrawerService,
+  AstriaErc20WithdrawerService,
+} from "./AstriaWithdrawerService";
 
 jest.mock("ethers");
 
-describe("AstriaWithdrawerService", () => {
+describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
   const mockContractAddress = "0x1234567890123456789012345678901234567890";
   const mockFromAddress = "0x9876543210987654321098765432109876543210";
   const mockDestinationAddress =
@@ -18,57 +22,202 @@ describe("AstriaWithdrawerService", () => {
   beforeEach(() => {
     jest.resetAllMocks();
 
-    // mock ethers.BrowserProvider
     mockProvider = {
       getSigner: jest.fn(),
     } as unknown as jest.Mocked<ethers.BrowserProvider>;
 
-    // mock ethers.JsonRpcSigner
     mockSigner = {} as jest.Mocked<ethers.JsonRpcSigner>;
 
-    // mock ethers.Contract
     mockContract = {
       withdrawToSequencer: jest.fn(),
       withdrawToIbcChain: jest.fn(),
     } as unknown as jest.Mocked<ethers.Contract>;
 
-    // setup mocks
     (ethers.BrowserProvider as jest.Mock).mockReturnValue(mockProvider);
     mockProvider.getSigner.mockResolvedValue(mockSigner);
-    (ethers.Contract as unknown as jest.Mock).mockReturnValue(mockContract);
-    (ethers.parseEther as jest.Mock).mockReturnValue(mockAmount);
-  });
-
-  it("should throw an error if provider is not supplied on first instantiation", () => {
-    expect(() => getAstriaWithdrawerService()).toThrow(
-      "Provider must be supplied when creating the service instance",
+    (ethers.Contract as jest.Mock).mockReturnValue(mockContract);
+    (ethers.parseEther as jest.Mock).mockReturnValue(
+      ethers.parseUnits(mockAmount, 18),
     );
   });
 
-  it("should throw an error if contract address is not supplied on first instantiation", () => {
-    expect(() =>
-      getAstriaWithdrawerService({} as ethers.Eip1193Provider),
-    ).toThrow(
-      "Contract address must be supplied when creating the service instance",
-    );
+  describe("AstriaWithdrawerService", () => {
+    it("should create a singleton instance", () => {
+      const service1 = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+      );
+      const service2 = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+      );
+
+      expect(service1).toBe(service2);
+      expect(service1).toBeInstanceOf(AstriaWithdrawerService);
+    });
+
+    it("should update provider when a new one is supplied", () => {
+      const initialProvider = {} as ethers.Eip1193Provider;
+      const newProvider = {} as ethers.Eip1193Provider;
+
+      const service1 = getAstriaWithdrawerService(
+        initialProvider,
+        mockContractAddress,
+      );
+      const service2 = getAstriaWithdrawerService(
+        newProvider,
+        mockContractAddress,
+      );
+
+      expect(service1).toBe(service2);
+      expect(ethers.BrowserProvider).toHaveBeenCalledTimes(2);
+      expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(
+        1,
+        initialProvider,
+      );
+      expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(2, newProvider);
+    });
+
+    it("should call withdrawToSequencer with correct parameters", async () => {
+      const service = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+      ) as AstriaWithdrawerService;
+
+      await service.withdrawToSequencer(
+        mockFromAddress,
+        mockDestinationAddress,
+        mockAmount,
+      );
+
+      expect(mockContract.withdrawToSequencer).toHaveBeenCalledWith(
+        mockDestinationAddress,
+        { value: ethers.parseUnits(mockAmount, 18) },
+      );
+    });
+
+    it("should call withdrawToIbcChain with correct parameters", async () => {
+      const service = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+      ) as AstriaWithdrawerService;
+
+      await service.withdrawToIbcChain(
+        mockFromAddress,
+        mockDestinationAddress,
+        mockAmount,
+        mockMemo,
+      );
+
+      expect(mockContract.withdrawToIbcChain).toHaveBeenCalledWith(
+        mockDestinationAddress,
+        mockMemo,
+        { value: ethers.parseUnits(mockAmount, 18) },
+      );
+    });
   });
 
-  it("should create a singleton instance", () => {
-    const service1 = getAstriaWithdrawerService(
-      {} as ethers.Eip1193Provider,
-      mockContractAddress,
-    );
-    const service2 = getAstriaWithdrawerService();
+  describe("AstriaErc20WithdrawerService", () => {
+    it("should create a singleton instance", () => {
+      const service1 = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+        true,
+      );
+      const service2 = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+        true,
+      );
 
-    expect(service1).toBe(service2);
+      expect(service1).toBe(service2);
+      expect(service1).toBeInstanceOf(AstriaErc20WithdrawerService);
+    });
+
+    it("should update provider when a new one is supplied", () => {
+      const initialProvider = {} as ethers.Eip1193Provider;
+      const newProvider = {} as ethers.Eip1193Provider;
+
+      const service1 = getAstriaWithdrawerService(
+        initialProvider,
+        mockContractAddress,
+        true,
+      );
+      const service2 = getAstriaWithdrawerService(
+        newProvider,
+        mockContractAddress,
+        true,
+      );
+
+      expect(service1).toBe(service2);
+      expect(ethers.BrowserProvider).toHaveBeenCalledTimes(2);
+      expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(
+        1,
+        initialProvider,
+      );
+      expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(2, newProvider);
+    });
+
+    it("should call withdrawToSequencer with correct parameters", async () => {
+      const service = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+        true,
+      ) as AstriaErc20WithdrawerService;
+
+      await service.withdrawToSequencer(
+        mockFromAddress,
+        mockDestinationAddress,
+        mockAmount,
+      );
+
+      expect(mockContract.withdrawToSequencer).toHaveBeenCalledWith(
+        ethers.parseUnits(mockAmount, 18),
+        mockDestinationAddress,
+        { value: ethers.parseUnits(mockAmount, 18) },
+      );
+    });
+
+    it("should call withdrawToIbcChain with correct parameters", async () => {
+      const service = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+        true,
+      ) as AstriaErc20WithdrawerService;
+
+      await service.withdrawToIbcChain(
+        mockFromAddress,
+        mockDestinationAddress,
+        mockAmount,
+        mockMemo,
+      );
+
+      expect(mockContract.withdrawToIbcChain).toHaveBeenCalledWith(
+        ethers.parseUnits(mockAmount, 18),
+        mockDestinationAddress,
+        mockMemo,
+        { value: ethers.parseUnits(mockAmount, 18) },
+      );
+    });
   });
 
-  it("should update provider when a new one is supplied", () => {
-    const service = getAstriaWithdrawerService({} as ethers.Eip1193Provider);
-    const newProvider = {} as ethers.Eip1193Provider;
-    const updatedService = getAstriaWithdrawerService(newProvider);
+  describe("getAstriaWithdrawerService", () => {
+    it("should return AstriaWithdrawerService when isErc20 is false", () => {
+      const service = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+        false,
+      );
+      expect(service).toBeInstanceOf(AstriaWithdrawerService);
+    });
 
-    expect(service).toBe(updatedService);
-    expect(ethers.BrowserProvider).toHaveBeenCalledTimes(2);
+    it("should return AstriaErc20WithdrawerService when isErc20 is true", () => {
+      const service = getAstriaWithdrawerService(
+        {} as ethers.Eip1193Provider,
+        mockContractAddress,
+        true,
+      );
+      expect(service).toBeInstanceOf(AstriaErc20WithdrawerService);
+    });
   });
 });
