@@ -39,20 +39,21 @@ function Navbar() {
 
       <div
         id="topNavbar"
-        className={`navbar-menu ${isMobileMenuActive && "navbar-menu-dropdown is-active"}`}
+        className={`navbar-menu ${
+          isMobileMenuActive && "navbar-menu-dropdown is-active"
+        }`}
       >
         <div className="navbar-middle has-text-weight-medium is-family-monospace">
           <Link to="/" className="navbar-item">
             BRIDGE
           </Link>
-          <a target="_blank" href={swapLink} className="navbar-item">
+          <a target="_blank" href={swapLink} className="navbar-item" rel="noreferrer">
             SWAP
           </a>
-          <a target="_blank" href={poolLink} className="navbar-item">
+          <a target="_blank" href={poolLink} className="navbar-item" rel="noreferrer">
             POOL
           </a>
         </div>
-
       </div>
 
       <div className="navbar-placeholder-end" />
