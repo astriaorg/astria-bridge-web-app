@@ -114,6 +114,7 @@ export default function WithdrawCard(): React.ReactElement {
     if (evmUserAccount?.address) {
       setFromAddress(evmUserAccount.address);
     }
+    // TODO - get balance for selected currency
     if (evmUserAccount?.balance) {
       setBalance(`${evmUserAccount.balance} ${selectedEvmCurrency?.coinDenom}`);
     }
@@ -192,7 +193,8 @@ export default function WithdrawCard(): React.ReactElement {
     } catch (e) {
       if (
         e instanceof Error &&
-        e.message.startsWith("There is no chain info")
+        (e.message.startsWith("There is no chain info") ||
+          e.message.startsWith("There is no modular chain info"))
       ) {
         try {
           await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
@@ -271,7 +273,7 @@ export default function WithdrawCard(): React.ReactElement {
       const withdrawerSvc = getAstriaWithdrawerService(
         selectedWallet.provider,
         selectedEvmCurrency.evmWithdrawerContractAddress,
-        true, // FIXME - how to determine when erc20? just add flag to config?
+        Boolean(selectedEvmCurrency.contractAddress),
       );
       await withdrawerSvc.withdrawToIbcChain(
         fromAddress,

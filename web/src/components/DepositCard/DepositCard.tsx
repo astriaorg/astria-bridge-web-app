@@ -180,7 +180,8 @@ export default function DepositCard(): React.ReactElement {
     } catch (e) {
       if (
         e instanceof Error &&
-        (e.message.startsWith("There is no chain info") || e.message.startsWith("There is no modular chain info"))
+        (e.message.startsWith("There is no chain info") ||
+          e.message.startsWith("There is no modular chain info"))
       ) {
         try {
           await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
