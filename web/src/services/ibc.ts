@@ -78,12 +78,10 @@ export const sendIbcTransfer = async (
   console.debug("Transaction result: ", result);
 };
 
-export const getBalance = async (
+export const getBalanceFromKeplr = async (
   selectedIbcChain: IbcChainInfo,
   selectedCurrency: IbcCurrency,
 ): Promise<string> => {
-  // TODO - add ability to get balance for other currencies
-
   const keplr = window.keplr;
   if (!keplr) {
     throw new Error("Keplr extension not installed");
@@ -97,9 +95,9 @@ export const getBalance = async (
   const client = await StargateClient.connect(selectedIbcChain.rpc);
   const balances = await client.getAllBalances(key.bech32Address);
 
-  const denom = selectedIbcChain.currencies[0].coinDenom;
-  const minimalDenom = selectedIbcChain.currencies[0].coinMinimalDenom;
-  const decimals = selectedIbcChain.currencies[0].coinDecimals;
+  const denom = selectedCurrency.coinDenom;
+  const minimalDenom = selectedCurrency.coinMinimalDenom;
+  const decimals = selectedCurrency.coinDecimals;
 
   // find correct balance based on denom
   const balance = balances.find((balance) => balance.denom === minimalDenom);

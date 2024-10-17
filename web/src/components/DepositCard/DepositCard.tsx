@@ -16,7 +16,7 @@ import EthWalletConnector from "features/EthWallet/components/EthWalletConnector
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
-import { getBalance, sendIbcTransfer } from "services/ibc";
+import { sendIbcTransfer } from "services/ibc";
 import { getKeplrFromWindow } from "services/keplr";
 
 export default function DepositCard(): React.ReactElement {
@@ -46,6 +46,8 @@ export default function DepositCard(): React.ReactElement {
     selectIbcCurrency,
     ibcCurrencyOptions,
     selectedIbcCurrency,
+    ibcBalance,
+    isLoadingIbcBalance,
   } = useIbcChainSelection(ibcChains);
   const defaultIbcChainOption = useMemo(() => {
     return ibcChainsOptions[0] || null;
@@ -78,8 +80,6 @@ export default function DepositCard(): React.ReactElement {
   }, [selectedEvmChain]);
 
   const [fromAddress, setFromAddress] = useState<string>("");
-  const [balance, setBalance] = useState<string>("0 TIA");
-  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
@@ -118,11 +118,11 @@ export default function DepositCard(): React.ReactElement {
 
   // connect to keplr wallet when chain and currency are selected
   useEffect(() => {
-    if (!selectedIbcChain) {
+    if (!selectedIbcChain || !selectedIbcCurrency) {
       return;
     }
     connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
+  }, [selectedIbcChain, selectedIbcCurrency]);
 
   useEffect(() => {
     if (!selectedEvmChain) {
@@ -177,11 +177,10 @@ export default function DepositCard(): React.ReactElement {
     try {
       const key = await keplr.getKey(selectedIbcChain.chainId);
       setFromAddress(key.bech32Address);
-      await getAndSetBalance();
     } catch (e) {
       if (
         e instanceof Error &&
-        e.message.startsWith("There is no chain info")
+        (e.message.startsWith("There is no chain info") || e.message.startsWith("There is no modular chain info"))
       ) {
         try {
           await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
@@ -235,23 +234,7 @@ export default function DepositCard(): React.ReactElement {
     });
   };
 
-  const getAndSetBalance = async () => {
-    // TODO - also set evm balance
-    // TODO - get balance for currently selected currency
-    if (!selectedIbcChain || !selectedIbcCurrency) {
-      return;
-    }
-    try {
-      setIsLoadingBalance(true);
-      const balance = await getBalance(selectedIbcChain, selectedIbcCurrency);
-      setBalance(balance);
-    } catch (e) {
-      console.error(e);
-      setBalance("Error fetching balance");
-    } finally {
-      setIsLoadingBalance(false);
-    }
-  };
+  // TODO - also set evm balance
 
   const sendBalance = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
@@ -350,12 +333,12 @@ export default function DepositCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && !isLoadingBalance && (
+              {fromAddress && !isLoadingIbcBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {balance}
+                  Balance: {ibcBalance}
                 </p>
               )}
-              {fromAddress && isLoadingBalance && (
+              {fromAddress && isLoadingIbcBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>

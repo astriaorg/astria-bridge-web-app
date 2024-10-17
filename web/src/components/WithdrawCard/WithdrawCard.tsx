@@ -47,7 +47,8 @@ export default function WithdrawCard(): React.ReactElement {
     selectedIbcChain,
     selectIbcCurrency,
     ibcCurrencyOptions,
-    selectedIbcCurrency,
+    ibcBalance,
+    isLoadingIbcBalance,
   } = useIbcChainSelection(ibcChains);
   const defaultIbcChainOption = useMemo(() => {
     return ibcChainsOptions[0] || null;
@@ -417,6 +418,16 @@ export default function WithdrawCard(): React.ReactElement {
               {recipientAddress && (
                 <p className="has-text-grey-light has-text-weight-semibold">
                   Address: {recipientAddress}
+                </p>
+              )}
+              {recipientAddress && !isLoadingIbcBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: {ibcBalance}
+                </p>
+              )}
+              {recipientAddress && isLoadingIbcBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
             </div>
