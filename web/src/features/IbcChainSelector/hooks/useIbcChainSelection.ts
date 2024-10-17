@@ -11,7 +11,8 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     useState<IbcCurrency | null>(null);
 
   const [ibcBalance, setIbcBalance] = useState<string | null>(null);
-  const [isLoadingIbcBalance, setIsLoadingIbcBalance] = useState<boolean>(false);
+  const [isLoadingIbcBalance, setIsLoadingIbcBalance] =
+    useState<boolean>(false);
 
   useEffect(() => {
     async function getAndSetBalance() {
@@ -20,17 +21,20 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
       }
       setIsLoadingIbcBalance(true);
       try {
-        const balance = await getBalanceFromKeplr(selectedIbcChain, selectedIbcCurrency);
+        const balance = await getBalanceFromKeplr(
+          selectedIbcChain,
+          selectedIbcCurrency,
+        );
         setIbcBalance(balance);
+        setIsLoadingIbcBalance(false);
       } catch (error) {
         console.error("Failed to get balance", error);
-      } finally {
         setIsLoadingIbcBalance(false);
       }
     }
 
     getAndSetBalance().then((_) => {});
-  }, [selectedIbcChain, selectedIbcCurrency])
+  }, [selectedIbcChain, selectedIbcCurrency]);
 
   const ibcChainsOptions = useMemo(() => {
     return Object.entries(ibcChains).map(
