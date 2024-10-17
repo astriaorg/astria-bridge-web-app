@@ -116,13 +116,13 @@ export default function DepositCard(): React.ReactElement {
     checkIsFormValid(recipientAddress, amount);
   }, [recipientAddress, amount]);
 
-  // connect to keplr wallet when chain and currency are selected
+  // connect to keplr wallet when chain
   useEffect(() => {
-    if (!selectedIbcChain || !selectedIbcCurrency) {
+    if (!selectedIbcChain) {
       return;
     }
     connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain, selectedIbcCurrency]);
+  }, [selectedIbcChain]);
 
   useEffect(() => {
     if (!selectedEvmChain) {
