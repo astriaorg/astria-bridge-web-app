@@ -1,6 +1,5 @@
 import type React from "react";
-import { useRef } from "react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
