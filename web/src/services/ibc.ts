@@ -2,7 +2,7 @@ import Long from "long";
 import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
 import type { IbcChainInfo, IbcCurrency } from "config/chainConfigs";
-import { Keplr } from "@keplr-wallet/types";
+import type { Keplr } from "@keplr-wallet/types";
 
 /**
  * Get the Keplr wallet object from the browser window.
