@@ -2,6 +2,34 @@ import Long from "long";
 import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
 import type { IbcChainInfo, IbcCurrency } from "config/chainConfigs";
+import { Keplr } from "@keplr-wallet/types";
+
+/**
+ * Get the Keplr wallet object from the browser window.
+ * Requires the Keplr extension to be installed.
+ */
+function getKeplrFromWindow(): Keplr {
+  const keplr = window.keplr;
+  if (!keplr) {
+    throw new Error("Keplr extension not installed");
+  }
+  return keplr;
+}
+
+/**
+ * Get the key from the Keplr wallet for the selected chain.
+ * @param {string} chainId - The chain ID to get the key for.
+ */
+async function getKeyFromKeplr(
+  chainId: string,
+): Promise<{ bech32Address: string }> {
+  const keplr = getKeplrFromWindow();
+  const key = await keplr.getKey(chainId);
+  if (!key) {
+    throw new Error("Failed to get key from Keplr wallet.");
+  }
+  return key;
+}
 
 /**
  * Send an IBC transfer from the selected chain to the recipient address.
@@ -19,25 +47,21 @@ export const sendIbcTransfer = async (
   amount: string,
   currency: IbcCurrency,
 ) => {
-  const keplr = window.keplr;
-  if (!keplr) {
-    throw new Error("Keplr extension not installed");
-  }
-
-  const key = await keplr.getKey(selectedIbcChain.chainId);
-  const sourceChainId = selectedIbcChain.chainId;
-  const offlineSigner = keplr.getOfflineSigner(sourceChainId);
+  const keplr = getKeplrFromWindow();
+  const offlineSigner = keplr.getOfflineSigner(selectedIbcChain.chainId);
 
   const client = await SigningStargateClient.connectWithSigner(
     selectedIbcChain.rpc,
     offlineSigner,
   );
+
+  const key = await getKeyFromKeplr(selectedIbcChain.chainId);
   const account = await client.getAccount(key.bech32Address);
   if (!account) {
     throw new Error("Failed to get account from Keplr wallet.");
   }
 
-  // TODO - does this need to be configurable in the ui?
+  // TODO - does the fee need to be configurable in the ui?
   const feeDenom = selectedIbcChain.feeCurrencies[0].coinMinimalDenom;
   const memo = JSON.stringify({ rollupDepositAddress: recipient });
   const fee = {
@@ -78,34 +102,29 @@ export const sendIbcTransfer = async (
   console.debug("Transaction result: ", result);
 };
 
+/**
+ * Get the balance of the selected currency from the Keplr wallet.
+ * @param selectedIbcChain
+ * @param selectedCurrency
+ */
 export const getBalanceFromKeplr = async (
   selectedIbcChain: IbcChainInfo,
   selectedCurrency: IbcCurrency,
 ): Promise<string> => {
-  const keplr = window.keplr;
-  if (!keplr) {
-    throw new Error("Keplr extension not installed");
-  }
-
-  const key = await keplr?.getKey(selectedIbcChain.chainId);
-  if (!key) {
-    throw new Error("Failed to get key from Keplr wallet.");
-  }
-
+  const key = await getKeyFromKeplr(selectedIbcChain.chainId);
   const client = await StargateClient.connect(selectedIbcChain.rpc);
-  const balances = await client.getAllBalances(key.bech32Address);
 
-  const denom = selectedCurrency.coinDenom;
-  const minimalDenom = selectedCurrency.coinMinimalDenom;
-  const decimals = selectedCurrency.coinDecimals;
+  const balance = await client.getBalance(
+    key.bech32Address,
+    selectedCurrency.coinMinimalDenom,
+  );
 
-  // find correct balance based on denom
-  const balance = balances.find((balance) => balance.denom === minimalDenom);
+  const { coinDenom, coinDecimals } = selectedCurrency;
 
   if (!balance) {
-    return "0 TIA";
+    return `0 ${coinDenom}`;
   }
 
-  const amount = new Dec(balance.amount, decimals);
-  return `${amount.toString(decimals)} ${denom}`;
+  const amount = new Dec(balance.amount, coinDecimals);
+  return `${amount.toString(coinDecimals)} ${coinDenom}`;
 };

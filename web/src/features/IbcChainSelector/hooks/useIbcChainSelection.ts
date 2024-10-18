@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
-import type { IbcChainInfo, IbcChains, IbcCurrency } from "config/chainConfigs";
-import { getBalanceFromKeplr } from "../../../services/ibc";
+import {
+  type IbcChainInfo,
+  type IbcChains,
+  type IbcCurrency,
+  ibcCurrencyBelongsToChain,
+} from "config/chainConfigs";
+import { getBalanceFromKeplr } from "services/ibc";
 
 export function useIbcChainSelection(ibcChains: IbcChains) {
   const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
@@ -17,6 +22,9 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   useEffect(() => {
     async function getAndSetBalance() {
       if (!selectedIbcChain || !selectedIbcCurrency) {
+        return;
+      }
+      if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedIbcChain)) {
         return;
       }
       setIsLoadingIbcBalance(true);

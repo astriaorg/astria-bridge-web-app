@@ -1,10 +1,14 @@
 import type { ChainInfo } from "@keplr-wallet/types";
 import { getEnvVariable } from "config/env";
+
 import {
-  ibcChains as localIbcChains,
   evmChains as localEvmChains,
-} from "./local";
-import { ibcChains as duskIbcChains, evmChains as duskEvmChains } from "./dusk";
+  ibcChains as localIbcChains,
+} from "./ChainConfigsLocal";
+import {
+  evmChains as duskEvmChains,
+  ibcChains as duskIbcChains,
+} from "./ChainConfigsDusk";
 
 /**
  * Represents information about an IBC (Inter-Blockchain Communication) chain.
@@ -52,6 +56,20 @@ export type IbcCurrency = {
   sequencerBridgeAccount?: string;
   iconClass?: string;
 };
+
+/**
+ * Returns true if the given currency belongs to the given chain.
+ * @param {IbcCurrency} currency - The currency to check.
+ * @param {IbcChainInfo} chain - The chain to check.
+ */
+export function ibcCurrencyBelongsToChain(
+  currency: IbcCurrency,
+  chain: IbcChainInfo,
+): boolean {
+  // FIXME - what if two chains have currencies with the same coinDenom?
+  //   e.g. USDC on Noble and USDC on Celestia
+  return chain.currencies?.includes(currency);
+}
 
 /**
  * Retrieves the IBC chains from the environment variable override or the default chain configurations,
