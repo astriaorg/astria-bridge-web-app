@@ -16,8 +16,7 @@ import EthWalletConnector from "features/EthWallet/components/EthWalletConnector
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
-import { sendIbcTransfer } from "services/ibc";
-import { getKeplrFromWindow } from "services/keplr";
+import { getKeplrFromWindow, sendIbcTransfer } from "services/ibc";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
@@ -40,6 +39,7 @@ export default function DepositCard(): React.ReactElement {
   }, [evmCurrencyOptions]);
 
   const {
+    ibcAccountAddress: fromAddress,
     selectIbcChain,
     ibcChainsOptions,
     selectedIbcChain,
@@ -79,7 +79,6 @@ export default function DepositCard(): React.ReactElement {
     } as DropdownOption<EvmChainInfo>;
   }, [selectedEvmChain]);
 
-  const [fromAddress, setFromAddress] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
@@ -118,6 +117,7 @@ export default function DepositCard(): React.ReactElement {
 
   // connect to keplr wallet when chain
   useEffect(() => {
+    // FIXME - refactor this component to rely fully on useIbcChainSelection
     if (!selectedIbcChain) {
       return;
     }
@@ -150,8 +150,12 @@ export default function DepositCard(): React.ReactElement {
       selectIbcChain(defaultIbcChainOption.value);
       return;
     }
-    const keplr = await getKeplrFromWindow();
-    if (!keplr) {
+
+    // show a notification if the Keplr wallet is not installed
+    let keplr;
+    try {
+      keplr = getKeplrFromWindow();
+    } catch (err) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.DANGER,
@@ -174,9 +178,9 @@ export default function DepositCard(): React.ReactElement {
       return;
     }
 
+    // suggest the chain if it doesn't exist in Keplr
     try {
-      const key = await keplr.getKey(selectedIbcChain.chainId);
-      setFromAddress(key.bech32Address);
+      await keplr.getKey(selectedIbcChain.chainId);
     } catch (e) {
       if (
         e instanceof Error &&
@@ -248,6 +252,16 @@ export default function DepositCard(): React.ReactElement {
       });
       return;
     }
+    if (!fromAddress) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please connect your Keplr wallet first.",
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
 
     setIsLoading(true);
     setIsAnimating(true);
@@ -261,14 +275,24 @@ export default function DepositCard(): React.ReactElement {
       );
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e.message);
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message: "Failed to send IBC transfer",
-            onAcknowledge: () => {},
-          },
-        });
+        if (/failed to get account from keplr wallet/i.test(e.message)) {
+          addNotification({
+            toastOpts: {
+              toastType: NotificationType.DANGER,
+              message: "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
+              onAcknowledge: () => {},
+            },
+          });
+        } else {
+          console.error(e.message);
+          addNotification({
+            toastOpts: {
+              toastType: NotificationType.DANGER,
+              message: "Failed to send IBC transfer",
+              onAcknowledge: () => {},
+            },
+          });
+        }
       }
     } finally {
       setIsLoading(false);

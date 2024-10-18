@@ -6,7 +6,7 @@ import {
   type IbcCurrency,
   ibcCurrencyBelongsToChain,
 } from "config/chainConfigs";
-import { getBalanceFromKeplr } from "services/ibc";
+import { getAddressFromKeplr, getBalanceFromKeplr } from "services/ibc";
 
 export function useIbcChainSelection(ibcChains: IbcChains) {
   const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
@@ -14,6 +14,8 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   );
   const [selectedIbcCurrency, setSelectedIbcCurrency] =
     useState<IbcCurrency | null>(null);
+
+  const [ibcAccountAddress, setIbcAccountAddress] = useState<string | null>(null);
 
   const [ibcBalance, setIbcBalance] = useState<string | null>(null);
   const [isLoadingIbcBalance, setIsLoadingIbcBalance] =
@@ -36,13 +38,29 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
         setIbcBalance(balance);
         setIsLoadingIbcBalance(false);
       } catch (error) {
-        console.error("Failed to get balance", error);
+        console.error("Failed to get balance from Keplr", error);
         setIsLoadingIbcBalance(false);
       }
     }
 
     getAndSetBalance().then((_) => {});
   }, [selectedIbcChain, selectedIbcCurrency]);
+
+  useEffect(() => {
+    async function getAddress() {
+      if (!selectedIbcChain) {
+        return;
+      }
+      try {
+        const address = await getAddressFromKeplr(selectedIbcChain.chainId);
+        setIbcAccountAddress(address);
+      } catch (error) {
+        console.error("Failed to get address from Keplr", error);
+      }
+    }
+
+    getAddress().then((_) => {});
+  }, [selectedIbcChain]);
 
   const ibcChainsOptions = useMemo(() => {
     return Object.entries(ibcChains).map(
@@ -76,6 +94,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   }, []);
 
   return {
+    ibcAccountAddress,
     selectedIbcChain,
     selectIbcChain,
     ibcChainsOptions,

@@ -3,12 +3,13 @@ import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
 import type { IbcChainInfo, IbcCurrency } from "config/chainConfigs";
 import type { Keplr } from "@keplr-wallet/types";
+import type { Key } from "@keplr-wallet/types/src/wallet/keplr";
 
 /**
  * Get the Keplr wallet object from the browser window.
  * Requires the Keplr extension to be installed.
  */
-function getKeplrFromWindow(): Keplr {
+export function getKeplrFromWindow(): Keplr {
   const keplr = window.keplr;
   if (!keplr) {
     throw new Error("Keplr extension not installed");
@@ -20,9 +21,7 @@ function getKeplrFromWindow(): Keplr {
  * Get the key from the Keplr wallet for the selected chain.
  * @param {string} chainId - The chain ID to get the key for.
  */
-async function getKeyFromKeplr(
-  chainId: string,
-): Promise<{ bech32Address: string }> {
+async function getKeyFromKeplr(chainId: string): Promise<Key> {
   const keplr = getKeplrFromWindow();
   const key = await keplr.getKey(chainId);
   if (!key) {
@@ -55,8 +54,12 @@ export const sendIbcTransfer = async (
     offlineSigner,
   );
 
+  // FIXME - should i check if key.bech32Address matches sender?
   const key = await getKeyFromKeplr(selectedIbcChain.chainId);
   const account = await client.getAccount(key.bech32Address);
+
+  // FIXME - no account here when the address does not have any native tokens for the chain?
+  //  e.g. testing w/ Celestia Mocha-4 with an address that doesn't have any TIA on mocha.
   if (!account) {
     throw new Error("Failed to get account from Keplr wallet.");
   }
@@ -128,3 +131,12 @@ export const getBalanceFromKeplr = async (
   const amount = new Dec(balance.amount, coinDecimals);
   return `${amount.toString(coinDecimals)} ${coinDenom}`;
 };
+
+/**
+ * Get the address from the Keplr wallet for the selected chain.
+ * @param chainId
+ */
+export const getAddressFromKeplr = async (chainId: string): Promise<string> => {
+  const key = await getKeyFromKeplr(chainId);
+  return key.bech32Address;
+}
