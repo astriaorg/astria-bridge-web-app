@@ -3,11 +3,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import {
-  type EvmChainInfo,
-  type IbcChainInfo,
-  toChainInfo,
-} from "config/chainConfigs";
+import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { useIbcChainSelection } from "features/IbcChainSelector";
 import {
@@ -18,7 +14,6 @@ import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
-import { getKeplrFromWindow } from "services/keplr";
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
@@ -41,6 +36,7 @@ export default function WithdrawCard(): React.ReactElement {
   }, [evmCurrencyOptions]);
 
   const {
+    ibcAccountAddress: recipientAddress,
     selectIbcChain,
     ibcChainsOptions,
     selectedIbcChain,
@@ -48,10 +44,8 @@ export default function WithdrawCard(): React.ReactElement {
     ibcCurrencyOptions,
     ibcBalance,
     isLoadingIbcBalance,
+    connectKeplrWallet,
   } = useIbcChainSelection(ibcChains);
-  const defaultIbcChainOption = useMemo(() => {
-    return ibcChainsOptions[0] || null;
-  }, [ibcChainsOptions]);
   const defaultIbcCurrencyOption = useMemo(() => {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
@@ -84,7 +78,7 @@ export default function WithdrawCard(): React.ReactElement {
   const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
-  const [recipientAddress, setRecipientAddress] = useState<string>("");
+
   const [isRecipientAddressValid, setIsRecipientAddressValid] =
     useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
@@ -127,13 +121,6 @@ export default function WithdrawCard(): React.ReactElement {
   }, [amount, recipientAddress]);
 
   useEffect(() => {
-    if (!selectedIbcChain) {
-      return;
-    }
-    connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
-
-  useEffect(() => {
     if (!selectedEvmChain) {
       return;
     }
@@ -146,72 +133,17 @@ export default function WithdrawCard(): React.ReactElement {
 
   const checkIsFormValid = (
     amountInput: string,
-    recipientAddressInput: string,
+    recipientAddressInput: string | null,
   ) => {
+    if (recipientAddressInput === null) {
+      setIsRecipientAddressValid(false);
+      return;
+    }
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
     setIsAmountValid(amountValid);
     const isRecipientAddressValid = recipientAddressInput.length > 0;
     setIsRecipientAddressValid(isRecipientAddressValid);
-  };
-
-  const connectKeplrWallet = async () => {
-    if (!selectedIbcChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
-      selectIbcChain(defaultIbcChainOption.value);
-      return;
-    }
-
-    const keplr = await getKeplrFromWindow();
-    if (!keplr) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          component: (
-            <p>
-              Keplr wallet extension must be installed! You can find it{" "}
-              <a
-                target="_blank"
-                href="https://www.keplr.app/download"
-                rel="noreferrer"
-              >
-                here
-              </a>
-              .
-            </p>
-          ),
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    try {
-      const key = await keplr.getKey(selectedIbcChain.chainId);
-      setRecipientAddress(key.bech32Address);
-    } catch (e) {
-      if (
-        e instanceof Error &&
-        (e.message.startsWith("There is no chain info") ||
-          e.message.startsWith("There is no modular chain info"))
-      ) {
-        try {
-          await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
-        } catch (e) {
-          if (e instanceof Error) {
-            selectIbcChain(null);
-          }
-        }
-      } else {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message: "Failed to get key from Keplr wallet.",
-            onAcknowledge: () => {},
-          },
-        });
-      }
-    }
   };
 
   const connectEVMWallet = async () => {
@@ -269,9 +201,11 @@ export default function WithdrawCard(): React.ReactElement {
     setIsLoading(true);
     setIsAnimating(true);
     try {
+      // NOTE - use contract address if it exists, otherwise use withdrawer contract address
       const withdrawerSvc = getAstriaWithdrawerService(
         selectedWallet.provider,
-        selectedEvmCurrency.evmWithdrawerContractAddress,
+        selectedEvmCurrency.contractAddress ||
+          selectedEvmCurrency.evmWithdrawerContractAddress,
         Boolean(selectedEvmCurrency.contractAddress),
       );
       await withdrawerSvc.withdrawToIbcChain(

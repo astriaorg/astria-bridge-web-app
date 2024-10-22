@@ -200,10 +200,8 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "uusdc",
       coinDecimals: 18,
       iconClass: "i-noble",
-      // FIXME - these are currently wrong for dusk-11
       contractAddress: "0xa4f59B3E97EC22a2b949cB5b6E8Cd6135437E857",
-      evmWithdrawerContractAddress:
-        "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+      evmWithdrawerContractAddress: "",
     },
     {
       coinDenom: "TIA",
