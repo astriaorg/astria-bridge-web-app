@@ -139,4 +139,4 @@ export const getBalanceFromKeplr = async (
 export const getAddressFromKeplr = async (chainId: string): Promise<string> => {
   const key = await getKeyFromKeplr(chainId);
   return key.bech32Address;
-}
+};
