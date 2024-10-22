@@ -4,11 +4,7 @@ import { useContext, useEffect, useMemo, useState, useRef } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import {
-  type EvmChainInfo,
-  type IbcChainInfo,
-  toChainInfo,
-} from "config/chainConfigs";
+import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
@@ -16,8 +12,7 @@ import EthWalletConnector from "features/EthWallet/components/EthWalletConnector
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
-import { getBalance, sendIbcTransfer } from "services/ibc";
-import { getKeplrFromWindow } from "services/keplr";
+import { sendIbcTransfer } from "services/ibc";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
@@ -40,22 +35,24 @@ export default function DepositCard(): React.ReactElement {
   }, [evmCurrencyOptions]);
 
   const {
+    ibcAccountAddress: fromAddress,
     selectIbcChain,
     ibcChainsOptions,
     selectedIbcChain,
     selectIbcCurrency,
     ibcCurrencyOptions,
     selectedIbcCurrency,
+    ibcBalance,
+    isLoadingIbcBalance,
+    connectKeplrWallet,
   } = useIbcChainSelection(ibcChains);
-  const defaultIbcChainOption = useMemo(() => {
-    return ibcChainsOptions[0] || null;
-  }, [ibcChainsOptions]);
   const defaultIbcCurrencyOption = useMemo(() => {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
 
   // selectedIbcChainOption allows us to ensure the label is set properly
-  // in the dropdown when connecting via additional action
+  // in the dropdown when connecting via an "additional option"s action,
+  //  e.g. the "Connect Keplr Wallet" option in the dropdown
   const selectedIbcChainOption = useMemo(() => {
     if (!selectedIbcChain) {
       return null;
@@ -77,9 +74,6 @@ export default function DepositCard(): React.ReactElement {
     } as DropdownOption<EvmChainInfo>;
   }, [selectedEvmChain]);
 
-  const [fromAddress, setFromAddress] = useState<string>("");
-  const [balance, setBalance] = useState<string>("0 TIA");
-  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
@@ -89,24 +83,6 @@ export default function DepositCard(): React.ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  // create refs to hold the latest state values
-  const latestState = useRef({
-    evmUserAccount,
-    selectedWallet,
-    recipientAddress,
-    selectedEvmChain,
-  });
-
-  // update the ref whenever the state changes
-  useEffect(() => {
-    latestState.current = {
-      evmUserAccount,
-      selectedWallet,
-      recipientAddress,
-      selectedEvmChain,
-    };
-  }, [evmUserAccount, selectedWallet, recipientAddress, selectedEvmChain]);
-
   // check if form is valid whenever values change
   useEffect(() => {
     if (recipientAddress || amount) {
@@ -115,21 +91,6 @@ export default function DepositCard(): React.ReactElement {
     }
     checkIsFormValid(recipientAddress, amount);
   }, [recipientAddress, amount]);
-
-  // connect to keplr wallet when chain and currency are selected
-  useEffect(() => {
-    if (!selectedIbcChain) {
-      return;
-    }
-    connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
-
-  useEffect(() => {
-    if (!selectedEvmChain) {
-      return;
-    }
-    connectEVMWallet().then((_) => {});
-  }, [selectedEvmChain]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
@@ -144,63 +105,32 @@ export default function DepositCard(): React.ReactElement {
     setIsRecipientAddressValid(addressValid);
   };
 
-  const connectKeplrWallet = async () => {
-    if (!selectedIbcChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
-      selectIbcChain(defaultIbcChainOption.value);
-      return;
-    }
-    const keplr = await getKeplrFromWindow();
-    if (!keplr) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          component: (
-            <p>
-              Keplr wallet extension must be installed! You can find it{" "}
-              <a
-                target="_blank"
-                href="https://www.keplr.app/download"
-                rel="noreferrer"
-              >
-                here
-              </a>
-              .
-            </p>
-          ),
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
+  // NOTE - this was required to ensure the latest state was used in a callback
+  //  used in the modal that connects to the evm wallet.
+  // create refs to hold the latest state values
+  const latestState = useRef({
+    evmUserAccount,
+    selectedWallet,
+    recipientAddress,
+    selectedEvmChain,
+  });
+  // update the ref whenever the state changes
+  useEffect(() => {
+    latestState.current = {
+      evmUserAccount,
+      selectedWallet,
+      recipientAddress,
+      selectedEvmChain,
+    };
+  }, [evmUserAccount, selectedWallet, recipientAddress, selectedEvmChain]);
 
-    try {
-      const key = await keplr.getKey(selectedIbcChain.chainId);
-      setFromAddress(key.bech32Address);
-      await getAndSetBalance();
-    } catch (e) {
-      if (
-        e instanceof Error &&
-        e.message.startsWith("There is no chain info")
-      ) {
-        try {
-          await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
-        } catch (e) {
-          if (e instanceof Error) {
-            selectIbcChain(null);
-          }
-        }
-      } else {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message: "Failed to get key from Keplr wallet.",
-            onAcknowledge: () => {},
-          },
-        });
-      }
+  // ensure evm wallet connection when selected EVM chain changes
+  useEffect(() => {
+    if (!selectedEvmChain) {
+      return;
     }
-  };
+    connectEVMWallet().then((_) => {});
+  }, [selectedEvmChain]);
 
   const connectEVMWallet = async () => {
     if (!selectedEvmChain) {
@@ -235,23 +165,7 @@ export default function DepositCard(): React.ReactElement {
     });
   };
 
-  const getAndSetBalance = async () => {
-    // TODO - also set evm balance
-    // TODO - get balance for currently selected currency
-    if (!selectedIbcChain || !selectedIbcCurrency) {
-      return;
-    }
-    try {
-      setIsLoadingBalance(true);
-      const balance = await getBalance(selectedIbcChain, selectedIbcCurrency);
-      setBalance(balance);
-    } catch (e) {
-      console.error(e);
-      setBalance("Error fetching balance");
-    } finally {
-      setIsLoadingBalance(false);
-    }
-  };
+  // TODO - also set evm balance
 
   const sendBalance = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
@@ -259,6 +173,16 @@ export default function DepositCard(): React.ReactElement {
         toastOpts: {
           toastType: NotificationType.WARNING,
           message: "Please select a chain and token first.",
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
+    if (!fromAddress) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please connect your Keplr wallet first.",
           onAcknowledge: () => {},
         },
       });
@@ -277,14 +201,25 @@ export default function DepositCard(): React.ReactElement {
       );
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e.message);
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message: "Failed to send IBC transfer",
-            onAcknowledge: () => {},
-          },
-        });
+        if (/failed to get account from keplr wallet/i.test(e.message)) {
+          addNotification({
+            toastOpts: {
+              toastType: NotificationType.DANGER,
+              message:
+                "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
+              onAcknowledge: () => {},
+            },
+          });
+        } else {
+          console.error(e.message);
+          addNotification({
+            toastOpts: {
+              toastType: NotificationType.DANGER,
+              message: "Failed to send IBC transfer",
+              onAcknowledge: () => {},
+            },
+          });
+        }
       }
     } finally {
       setIsLoading(false);
@@ -292,6 +227,7 @@ export default function DepositCard(): React.ReactElement {
     }
   };
 
+  // this additional option is the "Connect Keplr Wallet" button
   const additionalIbcOptions = useMemo(
     () => [
       {
@@ -305,6 +241,7 @@ export default function DepositCard(): React.ReactElement {
     [connectKeplrWallet],
   );
 
+  // this additional option is the "Connect EVM Wallet" button
   const additionalEvmOptions = useMemo(() => {
     return [
       {
@@ -350,12 +287,12 @@ export default function DepositCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && !isLoadingBalance && (
+              {fromAddress && !isLoadingIbcBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {balance}
+                  Balance: {ibcBalance}
                 </p>
               )}
-              {fromAddress && isLoadingBalance && (
+              {fromAddress && isLoadingIbcBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>

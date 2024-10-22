@@ -144,6 +144,7 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
         setSigner(ethersSigner);
 
         // get balance using ethers
+        // TODO - get balance of selected coin
         const balance = await ethersProvider.getBalance(address);
         const formattedBalance = formatBalance(balance.toString());
         const userAccount: UserAccount = {

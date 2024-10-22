@@ -1,10 +1,9 @@
 /// <reference types="react-scripts" />
-import type { MetaMaskInpageProvider } from "@metamask/providers";
 import type { Keplr } from "@keplr-wallet/types";
 
 declare global {
   interface Window {
-    ethereum?: MetaMaskInpageProvider;
+    // window.keplr should be provided by the Keplr extension
     keplr?: Keplr;
   }
 }

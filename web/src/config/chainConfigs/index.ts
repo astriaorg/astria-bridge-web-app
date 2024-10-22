@@ -1,10 +1,18 @@
 import type { ChainInfo } from "@keplr-wallet/types";
 import { getEnvVariable } from "config/env";
+
 import {
-  ibcChains as localIbcChains,
   evmChains as localEvmChains,
-} from "./local";
-import { ibcChains as duskIbcChains, evmChains as duskEvmChains } from "./dusk";
+  ibcChains as localIbcChains,
+} from "./ChainConfigsLocal";
+import {
+  evmChains as duskEvmChains,
+  ibcChains as duskIbcChains,
+} from "./ChainConfigsDusk";
+import {
+  evmChains as dawnEvmChains,
+  ibcChains as dawnIbcChains,
+} from "./ChainConfigsDawn";
 
 /**
  * Represents information about an IBC (Inter-Blockchain Communication) chain.
@@ -54,6 +62,20 @@ export type IbcCurrency = {
 };
 
 /**
+ * Returns true if the given currency belongs to the given chain.
+ * @param {IbcCurrency} currency - The currency to check.
+ * @param {IbcChainInfo} chain - The chain to check.
+ */
+export function ibcCurrencyBelongsToChain(
+  currency: IbcCurrency,
+  chain: IbcChainInfo,
+): boolean {
+  // FIXME - what if two chains have currencies with the same coinDenom?
+  //   e.g. USDC on Noble and USDC on Celestia
+  return chain.currencies?.includes(currency);
+}
+
+/**
  * Retrieves the IBC chains from the environment variable override or the default chain configurations,
  * depending on the environment.
  *
@@ -74,6 +96,9 @@ export function getIbcChains(): IbcChains {
   // get default chain configs based on REACT_APP_ENV
   if (getEnvVariable("REACT_APP_ENV") === "dusk") {
     return duskIbcChains;
+  }
+  if (getEnvVariable("REACT_APP_ENV") === "dawn") {
+    return dawnIbcChains;
   }
   return localIbcChains;
 }
@@ -103,6 +128,7 @@ export type EvmChainInfo = {
  * @property {string} coinDenom - The coin denomination to display to the user.
  * @property {string} coinMinimalDenom - The actual denomination used by the blockchain.
  * @property {number} coinDecimals - The number of decimal points to convert the minimal denomination to the user-facing denomination.
+ * @property {string} contractAddress - The address of the contract of an ERC20 token.
  * @property {string} evmWithdrawerContractAddress - The address of the contract used to withdraw tokens from the EVM chain.
  * @property {string} iconClass - The classname to use for the currency's icon.
  */
@@ -110,6 +136,7 @@ export type EvmCurrency = {
   coinDenom: string;
   coinMinimalDenom: string;
   coinDecimals: number;
+  contractAddress?: string;
   evmWithdrawerContractAddress?: string;
   iconClass?: string;
 };
@@ -156,6 +183,9 @@ export function getEvmChains(): EvmChains {
   // get default chain configs based on REACT_APP_ENV
   if (getEnvVariable("REACT_APP_ENV") === "dusk") {
     return duskEvmChains;
+  }
+  if (getEnvVariable("REACT_APP_ENV") === "dawn") {
+    return dawnEvmChains;
   }
   return localEvmChains;
 }
