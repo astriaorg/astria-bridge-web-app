@@ -149,7 +149,7 @@ const NobleChainInfo: IbcChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-231",
       // NOTE - noble requires bech32 address, not bech32m.
-      sequencerBridgeAccount: "astria14wyh2u6efndllr8gup29295krc98rqasj3l3kj",
+      sequencerBridgeAccount: "astria12saluecm8dd7hkutk83eavkl2p70lf5w7txezg",
       iconClass: "i-noble",
     },
   ],
@@ -186,8 +186,8 @@ export const ibcChains: IbcChains = {
 
 const FlameChainInfo: EvmChainInfo = {
   chainId: 912559,
-  chainName: "Flame Dusk-10",
-  rpcUrls: ["https://rpc.evm.dusk-10.devnet.astria.org"],
+  chainName: "Flame Dusk-11",
+  rpcUrls: ["https://rpc.evm.dusk-11.devnet.astria.org"],
   currencies: [
     {
       coinDenom: "RIA",
@@ -196,10 +196,21 @@ const FlameChainInfo: EvmChainInfo = {
       iconClass: "i-celestia",
     },
     {
+      coinDenom: "USDC",
+      coinMinimalDenom: "uusdc",
+      coinDecimals: 18,
+      iconClass: "i-noble",
+      // FIXME - these are currently wrong for dusk-11
+      contractAddress: "0xa4f59B3E97EC22a2b949cB5b6E8Cd6135437E857",
+      evmWithdrawerContractAddress:
+        "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+    },
+    {
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 6,
       // NOTE - is this actually the same address as withdrawer since it extends ERC20?
+      // FIXME - these are currently wrong for dusk-11
       contractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
       evmWithdrawerContractAddress:
         "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
@@ -210,5 +221,5 @@ const FlameChainInfo: EvmChainInfo = {
 };
 
 export const evmChains: EvmChains = {
-  "Flame Dusk-10": FlameChainInfo,
+  "Flame Dusk-11": FlameChainInfo,
 };
