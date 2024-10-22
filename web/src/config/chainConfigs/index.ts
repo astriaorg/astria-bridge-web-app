@@ -9,6 +9,10 @@ import {
   evmChains as duskEvmChains,
   ibcChains as duskIbcChains,
 } from "./ChainConfigsDusk";
+import {
+  evmChains as dawnEvmChains,
+  ibcChains as dawnIbcChains,
+} from "./ChainConfigsDawn";
 
 /**
  * Represents information about an IBC (Inter-Blockchain Communication) chain.
@@ -93,6 +97,9 @@ export function getIbcChains(): IbcChains {
   if (getEnvVariable("REACT_APP_ENV") === "dusk") {
     return duskIbcChains;
   }
+  if (getEnvVariable("REACT_APP_ENV") === "dawn") {
+    return dawnIbcChains;
+  }
   return localIbcChains;
 }
 
@@ -176,6 +183,9 @@ export function getEvmChains(): EvmChains {
   // get default chain configs based on REACT_APP_ENV
   if (getEnvVariable("REACT_APP_ENV") === "dusk") {
     return duskEvmChains;
+  }
+  if (getEnvVariable("REACT_APP_ENV") === "dawn") {
+    return dawnEvmChains;
   }
   return localEvmChains;
 }

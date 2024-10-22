@@ -51,7 +51,7 @@ const CelestiaChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
-      ibcChannel: "channel-128",
+      ibcChannel: "channel-159",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
       iconClass: "i-celestia",
     },
@@ -65,7 +65,7 @@ const CelestiaChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
-      ibcChannel: "channel-128",
+      ibcChannel: "channel-420",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
       iconClass: "i-celestia",
     },
@@ -147,7 +147,7 @@ const NobleChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
-      ibcChannel: "channel-0",
+      ibcChannel: "channel-231",
       // NOTE - noble requires bech32 address, not bech32m.
       sequencerBridgeAccount: "astria14wyh2u6efndllr8gup29295krc98rqasj3l3kj",
       iconClass: "i-noble",
@@ -206,7 +206,6 @@ const FlameChainInfo: EvmChainInfo = {
       iconClass: "i-celestia",
     },
   ],
-  // TODO - import icon
   iconClass: "i-flame",
 };
 
