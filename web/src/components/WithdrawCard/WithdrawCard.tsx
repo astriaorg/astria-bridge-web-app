@@ -184,17 +184,27 @@ export default function WithdrawCard(): React.ReactElement {
       !selectedWallet ||
       !selectedEvmCurrency ||
       !isAmountValid ||
-      !recipientAddress ||
-      !selectedEvmCurrency?.evmWithdrawerContractAddress
+      !recipientAddress
     ) {
-      console.warn(
+      console.error(
         "Withdrawal cannot proceed: missing required fields or fields are invalid",
         {
           selectedWallet,
+          selectedEvmCurrency,
           isAmountValid,
           recipientAddress,
         },
       );
+      // shouldn't really fall into this case
+      return;
+    }
+
+    if (
+      !selectedEvmCurrency?.evmWithdrawerContractAddress &&
+      !selectedEvmCurrency?.contractAddress
+    ) {
+      console.error("Withdrawal cannot proceed: missing contract address");
+      // shouldn't really fall into this case
       return;
     }
 
@@ -204,10 +214,13 @@ export default function WithdrawCard(): React.ReactElement {
       // NOTE - use contract address if it exists, otherwise use withdrawer contract address
       // FIXME - i don't like the implicit logic of using the existence of contractAddress
       //  to determine if it's an erc20 or not
+      const contractAddress =
+        selectedEvmCurrency.contractAddress ||
+        selectedEvmCurrency.evmWithdrawerContractAddress ||
+        "";
       const withdrawerSvc = getAstriaWithdrawerService(
         selectedWallet.provider,
-        selectedEvmCurrency.contractAddress ||
-          selectedEvmCurrency.evmWithdrawerContractAddress,
+        contractAddress,
         Boolean(selectedEvmCurrency.contractAddress),
       );
       await withdrawerSvc.withdrawToIbcChain(
