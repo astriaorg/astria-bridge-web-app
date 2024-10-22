@@ -202,6 +202,8 @@ export default function WithdrawCard(): React.ReactElement {
     setIsAnimating(true);
     try {
       // NOTE - use contract address if it exists, otherwise use withdrawer contract address
+      // FIXME - i don't like the implicit logic of using the existence of contractAddress
+      //  to determine if it's an erc20 or not
       const withdrawerSvc = getAstriaWithdrawerService(
         selectedWallet.provider,
         selectedEvmCurrency.contractAddress ||

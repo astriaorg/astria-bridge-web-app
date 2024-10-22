@@ -200,7 +200,9 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "uusdc",
       coinDecimals: 18,
       iconClass: "i-noble",
+      // address of erc20 contract on dusk-11
       contractAddress: "0xa4f59B3E97EC22a2b949cB5b6E8Cd6135437E857",
+      // this value would only exist for native tokens
       evmWithdrawerContractAddress: "",
     },
     {
