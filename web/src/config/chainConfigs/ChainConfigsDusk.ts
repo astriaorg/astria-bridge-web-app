@@ -206,8 +206,8 @@ const FlameChainInfo: EvmChainInfo = {
       evmWithdrawerContractAddress: "",
     },
     {
-      coinDenom: "TIA",
-      coinMinimalDenom: "utia",
+      coinDenom: "fakeTIA",
+      coinMinimalDenom: "ufaketia",
       coinDecimals: 6,
       // NOTE - is this actually the same address as withdrawer since it extends ERC20?
       // FIXME - these are currently wrong for dusk-11
