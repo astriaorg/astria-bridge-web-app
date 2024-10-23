@@ -25,7 +25,6 @@ export default function DepositCard(): React.ReactElement {
     selectedEvmChain,
     selectEvmCurrency,
     evmCurrencyOptions,
-    selectedEvmCurrency,
   } = useEvmChainSelection(evmChains);
   const defaultEvmChainOption = useMemo(() => {
     return evmChainsOptions[0] || null;
