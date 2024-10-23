@@ -148,7 +148,6 @@ const NobleChainInfo: IbcChainInfo = {
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
       ibcChannel: "channel-231",
-      // NOTE - noble requires bech32 address, not bech32m.
       sequencerBridgeAccount: "astria12saluecm8dd7hkutk83eavkl2p70lf5w7txezg",
       iconClass: "i-noble",
     },
