@@ -95,8 +95,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 18,
-      // contractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
-      evmWithdrawerContractAddress:
+      nativeTokenWithdrawerContractAddress:
         "0x77Af806d724699B3644F9CCBFD45CC999CCC3d49",
       iconClass: "i-celestia",
     },

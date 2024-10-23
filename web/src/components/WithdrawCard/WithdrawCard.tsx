@@ -200,8 +200,8 @@ export default function WithdrawCard(): React.ReactElement {
     }
 
     if (
-      !selectedEvmCurrency?.evmWithdrawerContractAddress &&
-      !selectedEvmCurrency?.contractAddress
+      !selectedEvmCurrency?.nativeTokenWithdrawerContractAddress &&
+      !selectedEvmCurrency?.erc20ContractAddress
     ) {
       console.error("Withdrawal cannot proceed: missing contract address");
       // shouldn't really fall into this case
@@ -215,13 +215,13 @@ export default function WithdrawCard(): React.ReactElement {
       // FIXME - i don't like the implicit logic of using the existence of contractAddress
       //  to determine if it's an erc20 or not
       const contractAddress =
-        selectedEvmCurrency.contractAddress ||
-        selectedEvmCurrency.evmWithdrawerContractAddress ||
+        selectedEvmCurrency.erc20ContractAddress ||
+        selectedEvmCurrency.nativeTokenWithdrawerContractAddress ||
         "";
       const withdrawerSvc = getAstriaWithdrawerService(
         selectedWallet.provider,
         contractAddress,
-        Boolean(selectedEvmCurrency.contractAddress),
+        Boolean(selectedEvmCurrency.erc20ContractAddress),
       );
       await withdrawerSvc.withdrawToIbcChain(
         fromAddress,

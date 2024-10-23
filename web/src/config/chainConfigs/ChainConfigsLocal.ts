@@ -191,7 +191,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 6,
-      evmWithdrawerContractAddress:
+      nativeTokenWithdrawerContractAddress:
         "0xA58639fB5458e65E4fA917FF951C390292C24A15",
       iconClass: "i-celestia",
     },
@@ -213,7 +213,7 @@ const FakeChainInfo: EvmChainInfo = {
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 6,
-      evmWithdrawerContractAddress:
+      nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
       iconClass: "i-flame",
     },
