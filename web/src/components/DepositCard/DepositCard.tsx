@@ -351,7 +351,7 @@ export default function DepositCard(): React.ReactElement {
               {/* NOTE - the placeholder happens to only be shown when there isn't a matching */}
               {/* evm currency. It's also always disabled because it's controlled by sender currency selection. */}
               <Dropdown
-                placeholder="No matching EVM token"
+                placeholder="No matching token"
                 options={evmCurrencyOptions}
                 defaultOption={defaultEvmCurrencyOption}
                 onSelect={selectEvmCurrency}
@@ -405,7 +405,9 @@ export default function DepositCard(): React.ReactElement {
             !isAmountValid ||
             !isRecipientAddressValid ||
             !fromAddress ||
-            !recipientAddress
+            !recipientAddress ||
+            selectedIbcCurrency?.coinDenom !==
+              selectedEvmCurrencyOption?.value?.coinDenom
           }
         >
           {isLoading ? "Processing..." : "Deposit"}
