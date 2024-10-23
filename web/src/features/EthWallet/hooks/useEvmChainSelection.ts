@@ -31,7 +31,8 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     // can only withdraw the currency if it has a withdraw contract address defined
     const withdrawableTokens = selectedEvmChain.currencies?.filter(
       (currency) =>
-        currency.contractAddress || currency.evmWithdrawerContractAddress,
+        currency.erc20ContractAddress ||
+        currency.nativeTokenWithdrawerContractAddress,
     );
 
     return withdrawableTokens.map(
