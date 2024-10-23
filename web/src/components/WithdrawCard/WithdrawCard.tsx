@@ -374,7 +374,7 @@ export default function WithdrawCard(): React.ReactElement {
             {selectedIbcChain && ibcCurrencyOptions && (
               <div className="ml-3">
                 <Dropdown
-                  placeholder="No matching IBC token"
+                  placeholder="No matching token"
                   options={ibcCurrencyOptions}
                   defaultOption={defaultIbcCurrencyOption}
                   onSelect={selectIbcCurrency}
@@ -440,7 +440,9 @@ export default function WithdrawCard(): React.ReactElement {
             !isRecipientAddressValid ||
             isLoading ||
             !fromAddress ||
-            !recipientAddress
+            !recipientAddress ||
+            selectedEvmCurrency?.coinDenom !==
+              selectedIbcCurrencyOption?.value?.coinDenom
           }
         >
           {isLoading ? "Processing..." : "Withdraw"}
