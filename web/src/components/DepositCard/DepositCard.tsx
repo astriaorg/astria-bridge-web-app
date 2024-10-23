@@ -1,5 +1,5 @@
 import type React from "react";
-import { useContext, useEffect, useMemo, useState, useRef } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
@@ -25,7 +25,6 @@ export default function DepositCard(): React.ReactElement {
     selectedEvmChain,
     selectEvmCurrency,
     evmCurrencyOptions,
-    selectedEvmCurrency,
   } = useEvmChainSelection(evmChains);
   const defaultEvmChainOption = useMemo(() => {
     return evmChainsOptions[0] || null;
@@ -73,6 +72,25 @@ export default function DepositCard(): React.ReactElement {
       leftIconClass: selectedEvmChain?.iconClass || "",
     } as DropdownOption<EvmChainInfo>;
   }, [selectedEvmChain]);
+
+  // the evm currency selection is controlled by the sender's chosen ibc currency,
+  // and should be updated when an ibc currency or evm chain is selected
+  const selectedEvmCurrencyOption = useMemo(() => {
+    if (!selectedIbcCurrency) {
+      return defaultEvmCurrencyOption;
+    }
+    const matchingEvmCurrency = selectedEvmChain?.currencies.find(
+      (currency) => currency.coinDenom === selectedIbcCurrency.coinDenom,
+    );
+    if (!matchingEvmCurrency) {
+      return null;
+    }
+    return {
+      label: matchingEvmCurrency.coinDenom,
+      value: matchingEvmCurrency,
+      leftIconClass: matchingEvmCurrency.iconClass,
+    };
+  }, [selectedIbcCurrency, selectedEvmChain, defaultEvmCurrencyOption]);
 
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
@@ -330,11 +348,15 @@ export default function DepositCard(): React.ReactElement {
           </div>
           {selectedEvmChain && evmCurrencyOptions && (
             <div className="ml-3">
+              {/* NOTE - the placeholder happens to only be shown when there isn't a matching */}
+              {/* evm currency. It's also always disabled because it's controlled by sender currency selection. */}
               <Dropdown
-                placeholder="Select a token"
+                placeholder="No matching EVM token"
                 options={evmCurrencyOptions}
                 defaultOption={defaultEvmCurrencyOption}
                 onSelect={selectEvmCurrency}
+                valueOverride={selectedEvmCurrencyOption}
+                disabled={true}
               />
             </div>
           )}

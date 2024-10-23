@@ -73,6 +73,25 @@ export default function WithdrawCard(): React.ReactElement {
     } as DropdownOption<EvmChainInfo>;
   }, [selectedEvmChain]);
 
+  // the ibc currency selection is controlled by the sender's chosen evm currency,
+  // and should be updated when an ibc currency or ibc chain is selected
+  const selectedIbcCurrencyOption = useMemo(() => {
+    if (!selectedEvmCurrency) {
+      return defaultIbcCurrencyOption;
+    }
+    const matchingIbcCurrency = selectedIbcChain?.currencies.find(
+      (currency) => currency.coinDenom === selectedEvmCurrency.coinDenom,
+    );
+    if (!matchingIbcCurrency) {
+      return null;
+    }
+    return {
+      label: matchingIbcCurrency.coinDenom,
+      value: matchingIbcCurrency,
+      leftIconClass: matchingIbcCurrency.iconClass,
+    };
+  }, [selectedEvmCurrency, selectedIbcChain, defaultIbcCurrencyOption]);
+
   const [fromAddress, setFromAddress] = useState<string>("");
   const [balance, setBalance] = useState<string>("0");
   const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
@@ -355,10 +374,12 @@ export default function WithdrawCard(): React.ReactElement {
             {selectedIbcChain && ibcCurrencyOptions && (
               <div className="ml-3">
                 <Dropdown
-                  placeholder="Select a token"
+                  placeholder="No matching IBC token"
                   options={ibcCurrencyOptions}
                   defaultOption={defaultIbcCurrencyOption}
                   onSelect={selectIbcCurrency}
+                  valueOverride={selectedIbcCurrencyOption}
+                  disabled={true}
                 />
               </div>
             )}

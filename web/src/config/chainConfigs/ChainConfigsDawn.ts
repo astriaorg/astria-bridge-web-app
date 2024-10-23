@@ -55,6 +55,20 @@ const CelestiaChainInfo: IbcChainInfo = {
       sequencerBridgeAccount: "astria1lepnry7tlpzvrukp5xej4v5wp532k2f94vxqnr",
       iconClass: "i-celestia",
     },
+    {
+      // Coin denomination to be displayed to the user.
+      coinDenom: "fakeTIA",
+      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
+      coinMinimalDenom: "ufaketia",
+      // # of decimal points to convert minimal denomination to user-facing denomination.
+      coinDecimals: 6,
+      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
+      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
+      // coinGeckoId: ""
+      ibcChannel: "channel-420",
+      sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
+      iconClass: "i-celestia",
+    },
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
