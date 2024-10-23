@@ -201,19 +201,18 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       iconClass: "i-noble",
       // address of erc20 contract on dusk-11
-      contractAddress: "0xa4f59B3E97EC22a2b949cB5b6E8Cd6135437E857",
+      erc20ContractAddress: "0xa4f59B3E97EC22a2b949cB5b6E8Cd6135437E857",
       // this value would only exist for native tokens
-      evmWithdrawerContractAddress: "",
+      nativeTokenWithdrawerContractAddress: "",
     },
     {
       coinDenom: "fakeTIA",
       coinMinimalDenom: "ufaketia",
       coinDecimals: 6,
-      // NOTE - is this actually the same address as withdrawer since it extends ERC20?
-      // FIXME - these are currently wrong for dusk-11
-      contractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
-      evmWithdrawerContractAddress:
-        "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
+      // NOTE - there is not actually a contract for this fakeTIA.
+      //  just using this for testing the UI.
+      erc20ContractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
+      nativeTokenWithdrawerContractAddress: "",
       iconClass: "i-celestia",
     },
   ],

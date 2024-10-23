@@ -128,16 +128,16 @@ export type EvmChainInfo = {
  * @property {string} coinDenom - The coin denomination to display to the user.
  * @property {string} coinMinimalDenom - The actual denomination used by the blockchain.
  * @property {number} coinDecimals - The number of decimal points to convert the minimal denomination to the user-facing denomination.
- * @property {string} contractAddress - The address of the contract of an ERC20 token.
- * @property {string} evmWithdrawerContractAddress - The address of the contract used to withdraw tokens from the EVM chain.
+ * @property {string} erc20ContractAddress - The address of the contract of an ERC20 token.
+ * @property {string} nativeTokenWithdrawerContractAddress - The address of the contract used to withdraw tokens from the EVM chain.
  * @property {string} iconClass - The classname to use for the currency's icon.
  */
 export type EvmCurrency = {
   coinDenom: string;
   coinMinimalDenom: string;
   coinDecimals: number;
-  contractAddress?: string;
-  evmWithdrawerContractAddress?: string;
+  erc20ContractAddress?: string;
+  nativeTokenWithdrawerContractAddress?: string;
   iconClass?: string;
 };
 
