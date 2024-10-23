@@ -172,7 +172,7 @@ export const ibcChains: IbcChains = {
 const FlameChainInfo: EvmChainInfo = {
   chainId: 16604737732183,
   chainName: "Flame Dawn-1",
-  rpcUrls: ["https://rpc.evm.dawn-1.devnet.astria.org"],
+  rpcUrls: ["https://rpc.flame.dawn-1.astria.org"],
   currencies: [
     {
       coinDenom: "TIA",
