@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import { AppConfig } from "config";
+import type { AppConfig } from "config";
 import {
   type EvmChainInfo,
   type EvmChains,

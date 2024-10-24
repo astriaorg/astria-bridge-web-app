@@ -3,8 +3,8 @@
  * @param rawBalance
  * @param decimals - number of decimal places this
  */
-export const formatBalance = (rawBalance: string, decimals: number = 18) => {
-  const denom = Math.pow(10, decimals);
+export const formatBalance = (rawBalance: string, decimals = 18) => {
+  const denom = 10 ** decimals;
   return (Number.parseInt(rawBalance) / denom).toFixed(2);
 };
 

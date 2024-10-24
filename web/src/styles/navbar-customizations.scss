@@ -12,6 +12,9 @@
       align-items: center;
       flex-grow: 1;
     }
+    a.navbar-item.is-active {
+      color: $astria-grey-light;
+    }
     &.navbar-menu-dropdown.is-active {
       background: none;
       border: none;

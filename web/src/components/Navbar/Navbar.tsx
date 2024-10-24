@@ -49,7 +49,8 @@ function Navbar() {
         }`}
       >
         <div className="navbar-middle has-text-weight-medium is-family-monospace">
-          <Link to="/" className="navbar-item">
+          {/* this link is always active right now since the bridge is a separate app */}
+          <Link to="/" className="navbar-item is-active">
             BRIDGE
           </Link>
           <a
