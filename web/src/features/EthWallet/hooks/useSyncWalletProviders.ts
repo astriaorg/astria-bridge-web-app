@@ -32,6 +32,9 @@ const ethWalletProviderStore = {
   },
 };
 
+/**
+ * A hook that listens for eip6963:announceProvider events and returns the detected wallet providers.
+ */
 export const useSyncWalletProviders = () =>
   useSyncExternalStore(
     ethWalletProviderStore.subscribe,
