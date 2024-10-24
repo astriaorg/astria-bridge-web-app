@@ -1,7 +1,8 @@
 import React from "react";
 
-import { useEthWallet } from "../../hooks/useEthWallet";
-import { getEvmChains } from "config/chainConfigs";
+import { useConfig } from "config";
+
+import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 
 /**
  * A card component for connecting to an ethereum wallet
@@ -10,7 +11,7 @@ export default function EthWalletConnector() {
   const { providers, selectedWallet, userAccount, handleConnect } =
     useEthWallet();
 
-  const evmChains = getEvmChains();
+  const { evmChains } = useConfig();
   const firstKey = Object.keys(evmChains)[0];
   const defaultChain = evmChains[firstKey];
 

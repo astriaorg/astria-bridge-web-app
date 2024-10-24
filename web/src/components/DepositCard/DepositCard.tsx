@@ -1,20 +1,18 @@
 import type React from "react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
-import { useConfig } from "config/hooks/useConfig";
-import { NotificationType } from "features/Notifications/components/Notification/types";
-import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
-import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
-import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
+import { useConfig, type EvmChainInfo, type IbcChainInfo } from "config";
+import { useEvmChainSelection } from "features/EthWallet";
+import { useIbcChainSelection } from "features/IbcChainSelector";
+import { useNotifications, NotificationType } from "features/Notifications";
 import { sendIbcTransfer } from "services/ibc";
 
 export default function DepositCard(): React.ReactElement {
-  const { addNotification } = useContext(NotificationsContext);
   const { evmChains, ibcChains } = useConfig();
+  const { addNotification } = useNotifications();
 
   const {
     evmAccountAddress: recipientAddress,
