@@ -111,7 +111,6 @@ export default function WithdrawCard(): React.ReactElement {
     if (!selectedEvmChain) {
       return;
     }
-    console.log("connecting EVM wallet");
     connectEVMWallet().then((_) => {});
   }, [selectedEvmChain]);
 
