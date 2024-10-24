@@ -1,7 +1,7 @@
 import Long from "long";
 import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
-import type { IbcChainInfo, IbcCurrency } from "config/chainConfigs";
+import type { IbcChainInfo, IbcCurrency } from "config";
 import type { Keplr } from "@keplr-wallet/types";
 import type { Key } from "@keplr-wallet/types/src/wallet/keplr";
 

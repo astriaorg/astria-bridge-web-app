@@ -1,6 +1,5 @@
 import React, {
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -12,19 +11,20 @@ import {
   type EvmChains,
   type EvmCurrency,
   evmCurrencyBelongsToChain,
-} from "config/chainConfigs";
-import { useEthWallet } from "./useEthWallet";
-import {
-  EthWalletConnector,
-  getAstriaWithdrawerService,
-} from "features/EthWallet";
-import { NotificationType } from "features/Notifications/components/Notification/types";
-import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
-import { AstriaErc20WithdrawerService } from "../services/AstriaWithdrawerService/AstriaWithdrawerService";
+} from "config";
+import { useNotifications, NotificationType } from "features/Notifications";
 import { formatBalance } from "utils";
 
+import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
+import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
+import {
+  AstriaErc20WithdrawerService,
+  getAstriaWithdrawerService,
+} from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
+
 export function useEvmChainSelection(evmChains: EvmChains) {
-  const { addNotification } = useContext(NotificationsContext);
+  const { addNotification } = useNotifications();
+  const { selectedWallet, userAccount } = useEthWallet();
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
@@ -39,8 +39,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   const [isLoadingEvmBalance, setIsLoadingEvmBalance] =
     useState<boolean>(false);
 
-  const { selectedWallet, provider, userAccount } = useEthWallet();
-
   useEffect(() => {
     async function getAndSetBalance() {
       if (
@@ -50,17 +48,9 @@ export function useEvmChainSelection(evmChains: EvmChains) {
         !selectedEvmCurrency ||
         !evmAccountAddress
       ) {
-        console.debug("no selected wallet, user account, chain, or currency", {
-          selectedWallet,
-          userAccount,
-          selectedEvmChain,
-          selectedEvmCurrency,
-          evmAccountAddress,
-        });
         return;
       }
       if (!evmCurrencyBelongsToChain(selectedEvmCurrency, selectedEvmChain)) {
-        console.debug("currency doesn't belong to chain");
         return;
       }
       setIsLoadingEvmBalance(true);

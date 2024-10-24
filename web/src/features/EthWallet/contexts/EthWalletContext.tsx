@@ -1,10 +1,12 @@
 import type React from "react";
 import { createContext, type ReactNode, useState } from "react";
-import { useSyncWalletProviders } from "../hooks/useSyncWalletProviders";
-import type { UserAccount } from "../types";
-import { formatBalance } from "utils";
 import { ethers } from "ethers";
-import { type EvmChainInfo, getEvmChainById } from "config/chainConfigs";
+
+import { type EvmChainInfo, useConfig } from "config";
+import { formatBalance } from "utils";
+
+import { useSyncWalletProviders } from "features/EthWallet/hooks/useSyncWalletProviders";
+import type { UserAccount } from "features/EthWallet/types";
 
 export interface EthWalletContextProps {
   providers: EIP6963ProviderDetail[];
@@ -35,6 +37,7 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
   const [selectedChain, setSelectedChain] = useState<
     EvmChainInfo | undefined
   >();
+  const { getEvmChainById } = useConfig();
 
   // get chain id from provider
   const getChainId = async (
@@ -144,7 +147,6 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
         setSigner(ethersSigner);
 
         // get balance using ethers
-        // TODO - get balance of selected coin
         const balance = await ethersProvider.getBalance(address);
         const formattedBalance = formatBalance(balance.toString());
         const userAccount: UserAccount = {

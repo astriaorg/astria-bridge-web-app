@@ -95,9 +95,9 @@ const NobleChainInfo: IbcChainInfo = {
   chainId: "noble-local-0",
   chainName: "noble-local-0",
   // RPC endpoint of the chain
-  rpc: "http://rpc.app.celestia.localdev.me",
+  rpc: "http://rpc.app.noble.localdev.me",
   // REST endpoint of the chain.
-  rest: "http://rest.app.celestia.localdev.me",
+  rest: "http://rest.app.noble.localdev.me",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -213,6 +213,7 @@ const FakeChainInfo: EvmChainInfo = {
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 6,
+      // fake address here so it shows up in the currency dropdown
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
       iconClass: "i-flame",

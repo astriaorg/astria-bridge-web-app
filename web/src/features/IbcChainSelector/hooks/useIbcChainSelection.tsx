@@ -1,20 +1,19 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { DropdownOption } from "components/Dropdown/Dropdown";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Keplr } from "@keplr-wallet/types";
+import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
+  ibcCurrencyBelongsToChain,
+  toChainInfo,
   type IbcChainInfo,
   type IbcChains,
   type IbcCurrency,
-  ibcCurrencyBelongsToChain,
-  toChainInfo,
-} from "config/chainConfigs";
+} from "config";
+import { useNotifications, NotificationType } from "features/Notifications";
 import {
   getAddressFromKeplr,
   getBalanceFromKeplr,
   getKeplrFromWindow,
 } from "services/ibc";
-import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
-import { NotificationType } from "features/Notifications/components/Notification/types";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.
@@ -24,7 +23,7 @@ import { NotificationType } from "features/Notifications/components/Notification
  * @param ibcChains - The possible IBC chains to select from.
  */
 export function useIbcChainSelection(ibcChains: IbcChains) {
-  const { addNotification } = useContext(NotificationsContext);
+  const { addNotification } = useNotifications();
 
   const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
     null,

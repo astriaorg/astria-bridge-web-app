@@ -7,7 +7,7 @@ import type {
   Notification,
 } from "features/Notifications/components/Notification/types";
 
-interface NotificationsContextProps {
+export interface NotificationsContextProps {
   notifications: Notification[];
   addNotification: (opts: AddNotificationOpts) => void;
   removeNotification: (id: string) => void;

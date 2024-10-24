@@ -1,21 +1,21 @@
 import type React from "react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { useConfig, type EvmChainInfo, type IbcChainInfo } from "config";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
-import { useConfig } from "config/hooks/useConfig";
+import {
+  getAstriaWithdrawerService,
+  useEthWallet,
+  useEvmChainSelection,
+} from "features/EthWallet";
 import { useIbcChainSelection } from "features/IbcChainSelector";
-import { getAstriaWithdrawerService } from "features/EthWallet";
-import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
-import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
-import { NotificationType } from "features/Notifications/components/Notification/types";
-import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
+import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function WithdrawCard(): React.ReactElement {
-  const { addNotification } = useContext(NotificationsContext);
-  const { selectedWallet } = useEthWallet();
   const { evmChains, ibcChains } = useConfig();
+  const { addNotification } = useNotifications();
+  const { selectedWallet } = useEthWallet();
 
   const {
     evmAccountAddress: fromAddress,
