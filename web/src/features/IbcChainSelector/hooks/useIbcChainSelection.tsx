@@ -14,7 +14,7 @@ import {
   getKeplrFromWindow,
 } from "services/ibc";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
-import { NotificationType } from "../../Notifications/components/Notification/types";
+import { NotificationType } from "features/Notifications/components/Notification/types";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.

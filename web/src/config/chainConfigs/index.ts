@@ -141,6 +141,15 @@ export type EvmCurrency = {
   iconClass?: string;
 };
 
+export function evmCurrencyBelongsToChain(
+  currency: EvmCurrency,
+  chain: EvmChainInfo,
+): boolean {
+  // FIXME - what if two chains have currencies with the same coinDenom?
+  //   e.g. USDC on Noble and USDC on Celestia
+  return chain.currencies?.includes(currency);
+}
+
 // EvmChains type maps labels to EvmChainInfo objects
 export type EvmChains = {
   [label: string]: EvmChainInfo;
