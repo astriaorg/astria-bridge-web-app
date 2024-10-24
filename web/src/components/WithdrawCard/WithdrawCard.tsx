@@ -1,15 +1,12 @@
 import type React from "react";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
 import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { useIbcChainSelection } from "features/IbcChainSelector";
-import {
-  EthWalletConnector,
-  getAstriaWithdrawerService,
-} from "features/EthWallet";
+import { getAstriaWithdrawerService } from "features/EthWallet";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
 import { NotificationType } from "features/Notifications/components/Notification/types";
@@ -17,20 +14,21 @@ import { NotificationsContext } from "features/Notifications/contexts/Notificati
 
 export default function WithdrawCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount: evmUserAccount, selectedWallet } = useEthWallet();
+  const { selectedWallet } = useEthWallet();
   const { evmChains, ibcChains } = useConfig();
 
   const {
+    evmAccountAddress: fromAddress,
     selectEvmChain,
     evmChainsOptions,
     selectedEvmChain,
     selectEvmCurrency,
     evmCurrencyOptions,
     selectedEvmCurrency,
+    evmBalance,
+    isLoadingEvmBalance,
+    connectEVMWallet,
   } = useEvmChainSelection(evmChains);
-  const defaultEvmChainOption = useMemo(() => {
-    return evmChainsOptions[0] || null;
-  }, [evmChainsOptions]);
   const defaultEvmCurrencyOption = useMemo(() => {
     return evmCurrencyOptions[0] || null;
   }, [evmCurrencyOptions]);
@@ -92,9 +90,6 @@ export default function WithdrawCard(): React.ReactElement {
     };
   }, [selectedEvmCurrency, selectedIbcChain, defaultIbcCurrencyOption]);
 
-  const [fromAddress, setFromAddress] = useState<string>("");
-  const [balance, setBalance] = useState<string>("0");
-  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
 
@@ -104,34 +99,6 @@ export default function WithdrawCard(): React.ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  // create refs to hold the latest state values
-  const latestState = useRef({
-    evmUserAccount,
-    selectedWallet,
-    recipientAddress,
-    selectedEvmChain,
-  });
-
-  // update the ref whenever the state changes
-  useEffect(() => {
-    latestState.current = {
-      evmUserAccount,
-      selectedWallet,
-      recipientAddress,
-      selectedEvmChain,
-    };
-  }, [evmUserAccount, selectedWallet, recipientAddress, selectedEvmChain]);
-
-  useEffect(() => {
-    if (evmUserAccount?.address) {
-      setFromAddress(evmUserAccount.address);
-    }
-    // TODO - get balance for selected currency
-    if (evmUserAccount?.balance) {
-      setBalance(`${evmUserAccount.balance} ${selectedEvmCurrency?.coinDenom}`);
-    }
-  }, [evmUserAccount, selectedEvmCurrency]);
-
   useEffect(() => {
     if (amount || recipientAddress) {
       setHasTouchedForm(true);
@@ -139,6 +106,7 @@ export default function WithdrawCard(): React.ReactElement {
     checkIsFormValid(amount, recipientAddress);
   }, [amount, recipientAddress]);
 
+  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
   useEffect(() => {
     if (!selectedEvmChain) {
       return;
@@ -165,45 +133,13 @@ export default function WithdrawCard(): React.ReactElement {
     setIsRecipientAddressValid(isRecipientAddressValid);
   };
 
-  const connectEVMWallet = async () => {
-    if (!selectedEvmChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
-      selectEvmChain(defaultEvmChainOption.value);
-      return;
-    }
-
-    addNotification({
-      modalOpts: {
-        modalType: NotificationType.INFO,
-        title: "Connect EVM Wallet",
-        component: <EthWalletConnector />,
-        onCancel: () => {
-          const currentState = latestState.current;
-          setFromAddress("");
-          selectEvmChain(null);
-          if (currentState.selectedWallet) {
-            currentState.selectedWallet = undefined;
-          }
-        },
-        onConfirm: () => {
-          const currentState = latestState.current;
-          if (!currentState.evmUserAccount) {
-            setFromAddress("");
-            selectEvmChain(null);
-          } else {
-            setFromAddress(currentState.evmUserAccount.address);
-          }
-        },
-      },
-    });
-  };
-
   const handleWithdraw = async () => {
     if (
       !selectedWallet ||
       !selectedEvmCurrency ||
       !isAmountValid ||
-      !recipientAddress
+      !recipientAddress ||
+      !fromAddress
     ) {
       console.error(
         "Withdrawal cannot proceed: missing required fields or fields are invalid",
@@ -321,7 +257,6 @@ export default function WithdrawCard(): React.ReactElement {
               </div>
             )}
           </div>
-          {/* TODO - show balance of whatever coin selected */}
           {fromAddress && (
             <div className="field-info-box py-2 px-3">
               {fromAddress && (
@@ -329,12 +264,12 @@ export default function WithdrawCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && !isLoadingBalance && (
+              {fromAddress && !isLoadingEvmBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {balance}
+                  Balance: {evmBalance}
                 </p>
               )}
-              {fromAddress && isLoadingBalance && (
+              {fromAddress && isLoadingEvmBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>

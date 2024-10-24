@@ -1,5 +1,5 @@
 import type React from "react";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
@@ -8,27 +8,25 @@ import type { EvmChainInfo, IbcChainInfo } from "config/chainConfigs";
 import { useConfig } from "config/hooks/useConfig";
 import { NotificationType } from "features/Notifications/components/Notification/types";
 import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
-import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
-import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import { useEvmChainSelection } from "features/EthWallet/hooks/useEvmChainSelection";
 import { useIbcChainSelection } from "features/IbcChainSelector/hooks/useIbcChainSelection";
 import { sendIbcTransfer } from "services/ibc";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useContext(NotificationsContext);
-  const { userAccount: evmUserAccount, selectedWallet } = useEthWallet();
   const { evmChains, ibcChains } = useConfig();
 
   const {
+    evmAccountAddress: recipientAddress,
     selectEvmChain,
     evmChainsOptions,
     selectedEvmChain,
     selectEvmCurrency,
     evmCurrencyOptions,
+    evmBalance,
+    isLoadingEvmBalance,
+    connectEVMWallet,
   } = useEvmChainSelection(evmChains);
-  const defaultEvmChainOption = useMemo(() => {
-    return evmChainsOptions[0] || null;
-  }, [evmChainsOptions]);
   const defaultEvmCurrencyOption = useMemo(() => {
     return evmCurrencyOptions[0] || null;
   }, [evmCurrencyOptions]);
@@ -94,7 +92,6 @@ export default function DepositCard(): React.ReactElement {
 
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
-  const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [isRecipientAddressValid, setIsRecipientAddressValid] =
     useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
@@ -114,7 +111,15 @@ export default function DepositCard(): React.ReactElement {
     setAmount(event.target.value);
   };
 
-  const checkIsFormValid = (addressInput: string, amountInput: string) => {
+  const checkIsFormValid = (
+    addressInput: string | null,
+    amountInput: string,
+  ) => {
+    if (addressInput === null) {
+      setIsRecipientAddressValid(false);
+      return;
+    }
+
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
     setIsAmountValid(amountValid);
@@ -123,67 +128,14 @@ export default function DepositCard(): React.ReactElement {
     setIsRecipientAddressValid(addressValid);
   };
 
-  // NOTE - this was required to ensure the latest state was used in a callback
-  //  used in the modal that connects to the evm wallet.
-  // create refs to hold the latest state values
-  const latestState = useRef({
-    evmUserAccount,
-    selectedWallet,
-    recipientAddress,
-    selectedEvmChain,
-  });
-  // update the ref whenever the state changes
-  useEffect(() => {
-    latestState.current = {
-      evmUserAccount,
-      selectedWallet,
-      recipientAddress,
-      selectedEvmChain,
-    };
-  }, [evmUserAccount, selectedWallet, recipientAddress, selectedEvmChain]);
-
   // ensure evm wallet connection when selected EVM chain changes
+  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
   useEffect(() => {
     if (!selectedEvmChain) {
       return;
     }
     connectEVMWallet().then((_) => {});
   }, [selectedEvmChain]);
-
-  const connectEVMWallet = async () => {
-    if (!selectedEvmChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
-      selectEvmChain(defaultEvmChainOption.value);
-      return;
-    }
-
-    addNotification({
-      modalOpts: {
-        modalType: NotificationType.INFO,
-        title: "Connect EVM Wallet",
-        component: <EthWalletConnector />,
-        onCancel: () => {
-          const currentState = latestState.current;
-          setRecipientAddress("");
-          selectEvmChain(null);
-          if (currentState.selectedWallet) {
-            currentState.selectedWallet = undefined;
-          }
-        },
-        onConfirm: () => {
-          const currentState = latestState.current;
-          if (!currentState.evmUserAccount) {
-            setRecipientAddress("");
-            selectEvmChain(null);
-          } else {
-            setRecipientAddress(currentState.evmUserAccount.address);
-          }
-        },
-      },
-    });
-  };
-
-  // TODO - also set evm balance
 
   const sendBalance = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
@@ -196,11 +148,11 @@ export default function DepositCard(): React.ReactElement {
       });
       return;
     }
-    if (!fromAddress) {
+    if (!fromAddress || !recipientAddress) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
-          message: "Please connect your Keplr wallet first.",
+          message: "Please connect your Keplr and EVM wallet first.",
           onAcknowledge: () => {},
         },
       });
@@ -366,6 +318,16 @@ export default function DepositCard(): React.ReactElement {
             {recipientAddress && (
               <p className="has-text-grey-light has-text-weight-semibold">
                 Address: {recipientAddress}
+              </p>
+            )}
+            {recipientAddress && !isLoadingEvmBalance && (
+              <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                Balance: {evmBalance}
+              </p>
+            )}
+            {recipientAddress && isLoadingEvmBalance && (
+              <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                Balance: <i className="fas fa-spinner fa-pulse" />
               </p>
             )}
           </div>
