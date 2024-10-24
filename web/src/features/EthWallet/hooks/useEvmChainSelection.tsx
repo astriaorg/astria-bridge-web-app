@@ -80,8 +80,8 @@ export function useEvmChainSelection(evmChains: EvmChains) {
           const balance = `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
           setEvmBalance(balance);
         } else {
-          console.log("not an erc20 withdrawer service");
-          setEvmBalance(userAccount.balance);
+          const balance = `${userAccount.balance} ${selectedEvmCurrency.coinDenom}`;
+          setEvmBalance(balance);
         }
         setIsLoadingEvmBalance(false);
       } catch (error) {
