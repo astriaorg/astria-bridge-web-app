@@ -258,7 +258,6 @@ export default function WithdrawCard(): React.ReactElement {
               </div>
             )}
           </div>
-          {/* TODO - show balance of whatever coin selected */}
           {fromAddress && (
             <div className="field-info-box py-2 px-3">
               {fromAddress && (
