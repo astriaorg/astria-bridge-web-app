@@ -1,10 +1,10 @@
 import type React from "react";
 import { Route, Routes } from "react-router-dom";
-import { EthWalletContextProvider } from "features/EthWallet/contexts/EthWalletContext";
 import BridgePage from "pages/BridgePage/BridgePage";
 import Layout from "pages/Layout";
-import { NotificationsContextProvider } from "features/Notifications/contexts/NotificationsContext";
-import { ConfigContextProvider } from "config/contexts/ConfigContext";
+import { ConfigContextProvider } from "config";
+import { EthWalletContextProvider } from "features/EthWallet";
+import { NotificationsContextProvider } from "features/Notifications";
 
 /**
  * App component with routes.

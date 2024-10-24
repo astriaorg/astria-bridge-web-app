@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import GenericContractService from "../GenericContractService";
+import GenericContractService from "features/EthWallet/services/GenericContractService";
 
 export class AstriaWithdrawerService extends GenericContractService {
   protected static override ABI: ethers.InterfaceAbi = [

@@ -1,7 +1,8 @@
 import type React from "react";
 import { render, screen } from "@testing-library/react";
-import { ConfigContextProvider } from "./ConfigContext";
-import { useConfig } from "../hooks/useConfig";
+
+import { ConfigContextProvider } from "config/contexts/ConfigContext";
+import { useConfig } from "config/hooks/useConfig";
 
 const TestComponent: React.FC = () => {
   const config = useConfig();

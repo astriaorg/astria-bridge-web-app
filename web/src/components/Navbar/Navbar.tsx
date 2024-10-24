@@ -1,7 +1,9 @@
 import type React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../../logo-flame-w-text.svg";
+
+import { useConfig } from "config";
+import logo from "logo-flame-w-text.svg";
 
 function Navbar() {
   const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);
@@ -10,9 +12,7 @@ function Navbar() {
     setIsMobileMenuActive((prev) => !prev);
   };
 
-  const brandLink = "https://www.astria.org/";
-  const swapLink = "https://flame.astria.org/";
-  const poolLink = "https://flame.astria.org/";
+  const { brandURL, bridgeURL, swapURL, poolURL } = useConfig();
 
   return (
     <nav
@@ -20,9 +20,14 @@ function Navbar() {
       aria-label="main navigation"
     >
       <div className="navbar-brand">
-        <Link className="navbar-item" to={brandLink}>
+        <a
+          target="_blank"
+          href={brandURL}
+          className="navbar-item"
+          rel="noreferrer"
+        >
           <img src={logo} width="161" height="32" alt="logo" />
-        </Link>
+        </a>
         <button
           type="button"
           className={`navbar-burger ${isMobileMenuActive && "is-active"}`}
@@ -44,12 +49,13 @@ function Navbar() {
         }`}
       >
         <div className="navbar-middle has-text-weight-medium is-family-monospace">
-          <Link to="/" className="navbar-item">
+          {/* this link is always active right now since the bridge is a separate app */}
+          <Link to="/" className="navbar-item is-active">
             BRIDGE
           </Link>
           <a
             target="_blank"
-            href={swapLink}
+            href={swapURL}
             className="navbar-item"
             rel="noreferrer"
           >
@@ -57,7 +63,7 @@ function Navbar() {
           </a>
           <a
             target="_blank"
-            href={poolLink}
+            href={poolURL}
             className="navbar-item"
             rel="noreferrer"
           >

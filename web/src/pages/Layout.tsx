@@ -1,18 +1,15 @@
 import type React from "react";
-import { useContext } from "react";
 import { Outlet } from "react-router-dom";
 
 import Navbar from "components/Navbar/Navbar";
-import Notification from "features/Notifications/components/Notification/Notification";
-import { NotificationsContext } from "features/Notifications/contexts/NotificationsContext";
+import { Notification, useNotifications } from "features/Notifications";
 
 /**
  * Layout component with Navbar and footer.
  * Uses `<Outlet />` to render children.
  */
 export default function Layout(): React.ReactElement {
-  const { notifications, removeNotification } =
-    useContext(NotificationsContext);
+  const { notifications, removeNotification } = useNotifications();
 
   return (
     <div>

@@ -10,4 +10,14 @@ describe("Navbar Component", () => {
     const logoElem = screen.getByAltText(/logo/i);
     expect(logoElem).toBeInTheDocument();
   });
+
+  test("renders navbar links", () => {
+    renderWithRouter(<Navbar />);
+    const bridgeLink = screen.getByText(/bridge/i);
+    expect(bridgeLink).toBeInTheDocument();
+    const swapLink = screen.getByText(/swap/i);
+    expect(swapLink).toBeInTheDocument();
+    const poolLink = screen.getByText(/pool/i);
+    expect(poolLink).toBeInTheDocument();
+  });
 });
