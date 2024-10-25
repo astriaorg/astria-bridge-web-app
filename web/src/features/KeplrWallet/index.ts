@@ -1,3 +1,4 @@
 import { useIbcChainSelection } from "./hooks/useIbcChainSelection";
+import { sendIbcTransfer } from "./services/ibc";
 
-export { useIbcChainSelection };
+export { sendIbcTransfer, useIbcChainSelection };

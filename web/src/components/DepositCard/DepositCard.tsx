@@ -6,9 +6,8 @@ import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDown
 import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
 import { useConfig, type EvmChainInfo, type IbcChainInfo } from "config";
 import { useEvmChainSelection } from "features/EthWallet";
-import { useIbcChainSelection } from "features/KeplrWallet";
+import { sendIbcTransfer, useIbcChainSelection } from "features/KeplrWallet";
 import { useNotifications, NotificationType } from "features/Notifications";
-import { sendIbcTransfer } from "features/KeplrWallet/services/ibc";
 
 export default function DepositCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
