@@ -60,7 +60,10 @@ function Notification({
             type="button"
             className="delete"
             aria-label="close"
-            onClick={() => onRemove(id)}
+            onClick={() => {
+              onRemove(id);
+              onModalCancel();
+            }}
           />
         </header>
         <section className="modal-card-body has-text-dark">
