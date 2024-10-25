@@ -3,10 +3,10 @@ import { createContext, type ReactNode, useState } from "react";
 import { ethers } from "ethers";
 
 import { type EvmChainInfo, useConfig } from "config";
-import { formatBalance } from "utils";
 
 import { useSyncWalletProviders } from "features/EthWallet/hooks/useSyncWalletProviders";
 import type { UserAccount } from "features/EthWallet/types";
+import { formatBalance } from "features/EthWallet/utils/utils";
 
 export interface EthWalletContextProps {
   providers: EIP6963ProviderDetail[];

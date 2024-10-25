@@ -13,7 +13,7 @@ import {
   getAddressFromKeplr,
   getBalanceFromKeplr,
   getKeplrFromWindow,
-} from "services/ibc";
+} from "features/KeplrWallet/services/ibc";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.

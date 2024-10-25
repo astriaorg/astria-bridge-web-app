@@ -9,7 +9,7 @@ import {
   useEthWallet,
   useEvmChainSelection,
 } from "features/EthWallet";
-import { useIbcChainSelection } from "features/IbcChainSelector";
+import { useIbcChainSelection } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function WithdrawCard(): React.ReactElement {

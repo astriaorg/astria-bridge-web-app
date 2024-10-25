@@ -1,4 +1,4 @@
-import { formatBalance, formatChainAsNum } from "utils";
+import { formatBalance } from "./utils";
 
 describe("Utility Functions", () => {
   describe("formatBalance", () => {
@@ -10,14 +10,6 @@ describe("Utility Functions", () => {
       expect(formatBalance("100000000000", 6)).toBe("100000.00");
       expect(formatBalance("150000000000", 6)).toBe("150000.00");
       expect(formatBalance("123456000000", 6)).toBe("123456.00");
-    });
-  });
-
-  describe("formatChainAsNum", () => {
-    it("should correctly convert hex chain ID to number", () => {
-      expect(formatChainAsNum("0x1")).toBe(1);
-      expect(formatChainAsNum("0xa")).toBe(10);
-      expect(formatChainAsNum("0x2710")).toBe(10000);
     });
   });
 });

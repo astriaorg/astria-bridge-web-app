@@ -7,11 +7,3 @@ export const formatBalance = (rawBalance: string, decimals = 18) => {
   const denom = 10 ** decimals;
   return (Number.parseInt(rawBalance) / denom).toFixed(2);
 };
-
-/**
- * Format chain id as a number
- * @param chainIdHex
- */
-export const formatChainAsNum = (chainIdHex: string) => {
-  return Number.parseInt(chainIdHex);
-};
