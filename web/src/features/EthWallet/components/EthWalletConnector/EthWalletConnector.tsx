@@ -24,7 +24,7 @@ export default function EthWalletConnector() {
             providers.map((provider) => (
               <button
                 type="button"
-                className="button is-tall"
+                className="button is-tall mt-2"
                 key={provider.info.uuid}
                 onClick={() => handleConnect(provider, defaultChain)}
               >
