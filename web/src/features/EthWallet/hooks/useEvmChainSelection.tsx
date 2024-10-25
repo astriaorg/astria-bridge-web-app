@@ -13,7 +13,6 @@ import {
   evmCurrencyBelongsToChain,
 } from "config";
 import { useNotifications, NotificationType } from "features/Notifications";
-import { formatBalance } from "utils";
 
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
@@ -21,6 +20,7 @@ import {
   AstriaErc20WithdrawerService,
   getAstriaWithdrawerService,
 } from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
+import { formatBalance } from "features/EthWallet/utils/utils";
 
 export function useEvmChainSelection(evmChains: EvmChains) {
   const { addNotification } = useNotifications();
