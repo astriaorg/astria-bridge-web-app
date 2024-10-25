@@ -5,6 +5,10 @@
   padding: 1rem 2rem;
   border-bottom: 1px solid $astria-grey-lighter;
 
+  @include mobile {
+    padding: 0;
+  }
+
   .navbar-menu {
     .navbar-middle {
       display: flex;

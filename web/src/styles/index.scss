@@ -32,6 +32,7 @@ html, body {
 // NOTE - these css customizations must be imported AFTER bulma to override the css classes
 @import 'button-customizations';
 @import 'card-customizations';
+@import 'columns-customizations';
 @import 'dropdown-customizations';
 @import 'form-customizations';
 @import 'modal-customizations';
@@ -46,8 +47,8 @@ body {
 }
 
 .is-fullheight-with-navbar {
-  // viewport height minus navbar height minus footer height minus margins
-  min-height: calc(100vh - 72px - 24px)
+  // viewport height minus navbar height
+  min-height: calc(100vh - 85px)
 }
 
 .notifications-toast-container {
