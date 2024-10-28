@@ -51,8 +51,8 @@ const CelestiaChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
-      ibcChannel: "channel-160", // TODO
-      sequencerBridgeAccount: "astria1lepnry7tlpzvrukp5xej4v5wp532k2f94vxqnr", // TODO
+      ibcChannel: "channel-48",
+      sequencerBridgeAccount: "astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p",
       iconClass: "i-celestia",
     },
   ],
@@ -131,8 +131,10 @@ const NobleChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
-      ibcChannel: "channel-232", // TODO
-      sequencerBridgeAccount: "astria1u6ewl0tejz0df2l6tzc7k2degx6mqsjahldqxd", // TODO
+      ibcChannel: "channel-104",
+      // NOTE - noble requires the astria compat address (https://slowli.github.io/bech32-buffer/)
+      sequencerBridgeAccount:
+        "astriacompat1eg8hhey0n4untdvqqdvlyl0e7zx8wfcaz3l6wu",
       iconClass: "i-noble",
     },
   ],
@@ -168,23 +170,23 @@ export const ibcChains: IbcChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
-  chainId: 16604737732183, // TODO
+  chainId: 253368190,
   chainName: "Flame",
-  rpcUrls: ["https://rpc.flame.dawn-1.astria.org"], // TODO
+  rpcUrls: ["https://rpc.flame.astria.org"],
   currencies: [
     {
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
-        "0x77Af806d724699B3644F9CCBFD45CC999CCC3d49", // TODO
+        "0xB086557f9B5F6fAe5081CC5850BE94e62B1dDE57",
       iconClass: "i-celestia",
     },
     {
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",
-      coinDecimals: 18,
-      erc20ContractAddress: "0x6e18cE6Ec3Fc7b8E3EcFca4fA35e25F3f6FA879a", // TODO
+      coinDecimals: 6,
+      erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F",
       iconClass: "i-noble",
     },
   ],
