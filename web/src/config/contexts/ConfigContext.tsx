@@ -4,8 +4,7 @@ import type { AppConfig } from "config";
 import {
   type EvmChainInfo,
   type EvmChains,
-  getEvmChains,
-  getIbcChains,
+  getEnvChainConfigs,
   type IbcChains,
 } from "config/chainConfigs";
 import { getEnvVariable } from "config/env";
@@ -25,11 +24,8 @@ type ConfigContextProps = {
 export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   children,
 }) => {
-  const evmChains: EvmChains = useMemo(() => {
-    return getEvmChains();
-  }, []);
-  const ibcChains: IbcChains = useMemo(() => {
-    return getIbcChains();
+  const { evm: evmChains, ibc: ibcChains } = useMemo(() => {
+    return getEnvChainConfigs();
   }, []);
 
   const brandURL = getEnvVariable("REACT_APP_BRAND_URL");

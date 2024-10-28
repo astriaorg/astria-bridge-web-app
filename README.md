@@ -56,10 +56,21 @@ just web build
     ```sh
     touch web/src/config/chainConfigs/ChainConfigsMainnet.ts
     ```
-  * update logic in `getIbcChains` and `getEvmChains`. add new condition to
-    check for the new environment and use the correct config
+  * import new configs in
+    `astria-bridge-web-app/web/src/config/chainConfigs/index.ts`, while renaming
+    them
     ```typescript
-    if (getEnvVariable("REACT_APP_ENV") === "mainnet") {
-      return mainnetIbcChains;
-    }
+    import {
+      evmChains as mainnetEvmChains,
+      ibcChains as mainnetIbcChains,
+    } from "./ChainConfigsMainnet"; 
+    ```
+  * add entry to `EVM_CHAIN_CONFIGS`
+    ```typescript
+    const ENV_CHAIN_CONFIGS = {
+      local: { evm: localEvmChains, ibc: localIbcChains },
+      dusk: { evm: duskEvmChains, ibc: duskIbcChains },
+      dawn: { evm: dawnEvmChains, ibc: dawnIbcChains },
+      mainnet: { evm: mainnetEvmChains, ibc: mainnetIbcChains },
+    } as const;
     ```
