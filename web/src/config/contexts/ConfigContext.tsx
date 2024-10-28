@@ -24,10 +24,7 @@ type ConfigContextProps = {
 export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   children,
 }) => {
-  const { evm: evmChains, ibc: ibcChains } = useMemo(() => {
-    return getEnvChainConfigs();
-  }, []);
-
+  const { evm: evmChains, ibc: ibcChains } = getEnvChainConfigs();
   const brandURL = getEnvVariable("REACT_APP_BRAND_URL");
   const bridgeURL = getEnvVariable("REACT_APP_BRIDGE_URL");
   const swapURL = getEnvVariable("REACT_APP_SWAP_URL");
