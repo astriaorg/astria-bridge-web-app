@@ -35,7 +35,7 @@ export function toChainInfo(chain: IbcChainInfo): ChainInfo {
   return chainInfo as ChainInfo;
 }
 
-// Map of environment labels to their chain configurations
+// IbcChains type maps labels to IbcChainInfo objects
 export type IbcChains = {
   [label: string]: IbcChainInfo;
 };
@@ -85,6 +85,9 @@ export type EvmCurrency = {
   iconClass?: string;
 };
 
+/**
+ * Returns true if the given currency belongs to the given chain.
+ */
 export function evmCurrencyBelongsToChain(
   currency: EvmCurrency,
   chain: EvmChainInfo,
@@ -93,11 +96,12 @@ export function evmCurrencyBelongsToChain(
 }
 
 // Map of environment labels to their chain configurations
+// EvmChains type maps labels to EvmChainInfo objects
 export type EvmChains = {
   [label: string]: EvmChainInfo;
 };
 
-// environment to chain config mapping
+// Map of environment labels to their chain configurations
 const ENV_CHAIN_CONFIGS = {
   local: { evm: localEvmChains, ibc: localIbcChains },
   dusk: { evm: duskEvmChains, ibc: duskIbcChains },
