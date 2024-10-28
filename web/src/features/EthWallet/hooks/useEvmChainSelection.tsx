@@ -66,7 +66,10 @@ export function useEvmChainSelection(evmChains: EvmChains) {
         );
         if (withdrawerSvc instanceof AstriaErc20WithdrawerService) {
           const balanceRes = await withdrawerSvc.getBalance(evmAccountAddress);
-          const balanceStr = formatBalance(balanceRes.toString(), selectedEvmCurrency.coinDecimals);
+          const balanceStr = formatBalance(
+            balanceRes.toString(),
+            selectedEvmCurrency.coinDecimals,
+          );
           const balance = `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
           setEvmBalance(balance);
         } else {
