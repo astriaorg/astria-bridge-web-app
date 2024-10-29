@@ -1,11 +1,7 @@
 import React from "react";
 
 import type { AppConfig } from "config";
-import type {
-  EvmChainInfo,
-  EvmChains,
-  IbcChains,
-} from "config/chainConfigs/types";
+import type { EvmChainInfo } from "config/chainConfigs/types";
 import { getEnvChainConfigs } from "config/chainConfigs";
 import { getEnvVariable } from "config/env";
 

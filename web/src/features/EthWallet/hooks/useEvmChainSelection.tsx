@@ -5,6 +5,8 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { ethers } from "ethers";
+
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
   type EvmChainInfo,
@@ -12,7 +14,7 @@ import {
   type EvmCurrency,
   evmCurrencyBelongsToChain,
 } from "config";
-import { useNotifications, NotificationType } from "features/Notifications";
+import { NotificationType, useNotifications } from "features/Notifications";
 
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
@@ -93,6 +95,18 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     evmAccountAddress,
   ]);
 
+  const selectedEvmChainNativeToken = useMemo(() => {
+    return selectedEvmChain?.currencies[0];
+  }, [selectedEvmChain]);
+
+  const withdrawFeeDisplay = useMemo(() => {
+    if (!selectedEvmChainNativeToken || !selectedEvmCurrency) {
+      return "";
+    }
+    const fee = ethers.formatUnits(selectedEvmCurrency.ibcWithdrawalFeeWei, 18);
+    return `${fee} ${selectedEvmChainNativeToken.coinDenom}`;
+  }, [selectedEvmChainNativeToken, selectedEvmCurrency]);
+
   const evmChainsOptions = useMemo(() => {
     return Object.entries(evmChains).map(
       ([chainLabel, chain]): DropdownOption<EvmChainInfo> => ({
@@ -103,6 +117,20 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     );
   }, [evmChains]);
 
+  // selectedEvmChainOption allows us to ensure the label is set properly
+  // in the dropdown when connecting via an "additional option"s action,
+  //  e.g. the "Connect Keplr Wallet" option in the dropdown
+  const selectedEvmChainOption = useMemo(() => {
+    if (!selectedEvmChain) {
+      return null;
+    }
+    return {
+      label: selectedEvmChain?.chainName || "",
+      value: selectedEvmChain,
+      leftIconClass: selectedEvmChain?.iconClass || "",
+    } as DropdownOption<EvmChainInfo>;
+  }, [selectedEvmChain]);
+
   const selectEvmChain = useCallback((chain: EvmChainInfo | null) => {
     setSelectedEvmChain(chain);
   }, []);
@@ -112,7 +140,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       return [];
     }
 
-    // can only withdraw the currency if it has a withdraw contract address defined
+    // can only withdraw the currency if it has a withdrawer contract address defined
     const withdrawableTokens = selectedEvmChain.currencies?.filter(
       (currency) =>
         currency.erc20ContractAddress ||
@@ -127,6 +155,10 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       }),
     );
   }, [selectedEvmChain]);
+
+  const defaultEvmCurrencyOption = useMemo(() => {
+    return evmCurrencyOptions[0] || null;
+  }, [evmCurrencyOptions]);
 
   const selectEvmCurrency = useCallback((currency: EvmCurrency) => {
     setSelectedEvmCurrency(currency);
@@ -191,7 +223,11 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     selectEvmCurrency,
 
     selectedEvmChain,
+    selectedEvmChainNativeToken,
+    withdrawFeeDisplay,
     selectedEvmCurrency,
+    defaultEvmCurrencyOption,
+    selectedEvmChainOption,
 
     evmAccountAddress,
     evmBalance,
