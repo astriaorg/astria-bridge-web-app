@@ -48,7 +48,49 @@ i.i-flame {
 }
 
 i.i-noble {
-  background-image: url('https://avatars.githubusercontent.com/u/133800472?s=200&v=4');
+  background-image: url('../../public/assets/icons/logos/noble-logo-color.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 100%;
+  width: 100%;
+  // crop to circle
+  border-radius: 50%;
+}
+
+i.i-usdc {
+  background-image: url('../../public/assets/icons/logos/usdc-logo-color.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 100%;
+  width: 100%;
+}
+
+i.i-milk-tia {
+  background-image: url('../../public/assets/icons/logos/milk-tia-logo-color.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 100%;
+  width: 100%;
+}
+
+i.i-stride {
+  background-image: url('../../public/assets/icons/logos/stride-logo-color.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 100%;
+  width: 100%;
+}
+
+i.i-stride-tia {
+  background-image: url('../../public/assets/icons/logos/stride-tia-logo-color.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 100%;
+  width: 100%;
+}
+
+i.i-osmosis {
+  background-image: url('../../public/assets/icons/logos/osmosis-logo-color.svg');
   background-repeat: no-repeat;
   background-size: contain;
   height: 100%;

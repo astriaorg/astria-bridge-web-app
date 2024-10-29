@@ -53,20 +53,10 @@ function Navbar() {
           <Link to="/" className="navbar-item is-active">
             BRIDGE
           </Link>
-          <a
-            target="_blank"
-            href={swapURL}
-            className="navbar-item"
-            rel="noreferrer"
-          >
+          <a href={swapURL} className="navbar-item" rel="noreferrer">
             SWAP
           </a>
-          <a
-            target="_blank"
-            href={poolURL}
-            className="navbar-item"
-            rel="noreferrer"
-          >
+          <a href={poolURL} className="navbar-item" rel="noreferrer">
             POOL
           </a>
         </div>
