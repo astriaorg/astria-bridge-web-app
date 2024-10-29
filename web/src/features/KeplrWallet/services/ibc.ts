@@ -64,9 +64,10 @@ export const sendIbcTransfer = async (
     throw new Error("Failed to get account from Keplr wallet.");
   }
 
-  // TODO - does the fee need to be configurable in the ui?
-  const feeDenom = selectedIbcChain.feeCurrencies[0].coinMinimalDenom;
+  const feeDenom = currency.coinMinimalDenom;
   const memo = JSON.stringify({ rollupDepositAddress: recipient });
+
+  // TODO - does the fee need to be configurable in the ui?
   const fee = {
     amount: [
       {
@@ -74,7 +75,7 @@ export const sendIbcTransfer = async (
         amount: "0",
       },
     ],
-    gas: "180000",
+    gas: "350000",
   };
 
   const msgIBCTransfer = {
