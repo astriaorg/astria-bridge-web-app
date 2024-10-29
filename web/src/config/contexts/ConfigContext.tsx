@@ -1,13 +1,12 @@
-import React, { useMemo } from "react";
+import React from "react";
 
 import type { AppConfig } from "config";
-import {
-  type EvmChainInfo,
-  type EvmChains,
-  getEvmChains,
-  getIbcChains,
-  type IbcChains,
-} from "config/chainConfigs";
+import type {
+  EvmChainInfo,
+  EvmChains,
+  IbcChains,
+} from "config/chainConfigs/types";
+import { getEnvChainConfigs } from "config/chainConfigs";
 import { getEnvVariable } from "config/env";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
@@ -25,13 +24,7 @@ type ConfigContextProps = {
 export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   children,
 }) => {
-  const evmChains: EvmChains = useMemo(() => {
-    return getEvmChains();
-  }, []);
-  const ibcChains: IbcChains = useMemo(() => {
-    return getIbcChains();
-  }, []);
-
+  const { evm: evmChains, ibc: ibcChains } = getEnvChainConfigs();
   const brandURL = getEnvVariable("REACT_APP_BRAND_URL");
   const bridgeURL = getEnvVariable("REACT_APP_BRIDGE_URL");
   const swapURL = getEnvVariable("REACT_APP_SWAP_URL");

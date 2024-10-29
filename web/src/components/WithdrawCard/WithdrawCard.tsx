@@ -182,6 +182,8 @@ export default function WithdrawCard(): React.ReactElement {
         fromAddress,
         recipientAddress,
         amount,
+        selectedEvmCurrency.coinDecimals,
+        selectedEvmCurrency.ibcWithdrawalFeeWei,
         "",
       );
       addNotification({

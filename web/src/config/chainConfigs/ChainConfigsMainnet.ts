@@ -2,13 +2,13 @@ import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from "./types";
 
 const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.
-  chainId: "mocha-4",
+  chainId: "celestia",
   // The name of the chain to be displayed to the user.
-  chainName: "Celestia Mocha-4",
+  chainName: "Celestia",
   // RPC endpoint of the chain
-  rpc: "wss://rpc-mocha.pops.one",
+  rpc: "wss://rpc.celestia.pops.one",
   // REST endpoint of the chain.
-  rest: "https://api-mocha.pops.one",
+  rest: "https://api.celestia.pops.one",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -51,22 +51,8 @@ const CelestiaChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
-      ibcChannel: "channel-160",
-      sequencerBridgeAccount: "astria1lepnry7tlpzvrukp5xej4v5wp532k2f94vxqnr",
-      iconClass: "i-celestia",
-    },
-    {
-      // Coin denomination to be displayed to the user.
-      coinDenom: "fakeTIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-      coinMinimalDenom: "ufaketia",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
-      coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
-      ibcChannel: "channel-420",
-      sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
+      ibcChannel: "channel-48",
+      sequencerBridgeAccount: "astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p",
       iconClass: "i-celestia",
     },
   ],
@@ -97,14 +83,12 @@ const CelestiaChainInfo: IbcChainInfo = {
 };
 
 const NobleChainInfo: IbcChainInfo = {
-  chainId: "grand-1",
-  chainName: "Noble Testnet",
+  chainId: "noble-1",
+  chainName: "Noble",
   // RPC endpoint of the chain
-  // rpc: "https://rpc.testnet.noble.strange.love:443",
-  // rpc: "https://rpc.testnet.noble.strange.love",
-  rpc: "https://noble-testnet-rpc.polkachu.com",
+  rpc: "https://noble-rpc.polkachu.com:443",
   // REST endpoint of the chain.
-  rest: "https://noble-testnet-api.polkachu.com",
+  rest: "https://noble-api.polkachu.com",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -147,8 +131,10 @@ const NobleChainInfo: IbcChainInfo = {
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
       // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       // coinGeckoId: ""
-      ibcChannel: "channel-232",
-      sequencerBridgeAccount: "astria1u6ewl0tejz0df2l6tzc7k2degx6mqsjahldqxd",
+      ibcChannel: "channel-104",
+      // NOTE - noble requires the astria compat address (https://slowli.github.io/bech32-buffer/)
+      sequencerBridgeAccount:
+        "astriacompat1eg8hhey0n4untdvqqdvlyl0e7zx8wfcaz3l6wu",
       iconClass: "i-noble",
     },
   ],
@@ -179,29 +165,29 @@ const NobleChainInfo: IbcChainInfo = {
 };
 
 export const ibcChains: IbcChains = {
-  "Celestia Mocha-4": CelestiaChainInfo,
-  "Noble Testnet": NobleChainInfo,
+  Celestia: CelestiaChainInfo,
+  Noble: NobleChainInfo,
 };
 
 const FlameChainInfo: EvmChainInfo = {
-  chainId: 16604737732183,
-  chainName: "Flame Dawn-1",
-  rpcUrls: ["https://rpc.flame.dawn-1.astria.org"],
+  chainId: 253368190,
+  chainName: "Flame",
+  rpcUrls: ["https://rpc.flame.astria.org"],
   currencies: [
     {
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
-        "0x77Af806d724699B3644F9CCBFD45CC999CCC3d49",
+        "0xB086557f9B5F6fAe5081CC5850BE94e62B1dDE57",
       ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-celestia",
     },
     {
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",
-      coinDecimals: 18,
-      erc20ContractAddress: "0x6e18cE6Ec3Fc7b8E3EcFca4fA35e25F3f6FA879a",
+      coinDecimals: 6,
+      erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F",
       ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-noble",
     },
@@ -210,5 +196,5 @@ const FlameChainInfo: EvmChainInfo = {
 };
 
 export const evmChains: EvmChains = {
-  "Flame Dawn-1": FlameChainInfo,
+  Flame: FlameChainInfo,
 };

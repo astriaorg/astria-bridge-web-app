@@ -13,6 +13,8 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
   const mockDestinationAddress =
     "celestia1m0ksdjl2p5nzhqy3p47fksv52at3ln885xvl96";
   const mockAmount = "1.0";
+  const mockAmountDenom = 18;
+  const mockFee: string = "10000000000000000";
   const mockMemo = "Test memo";
 
   let mockProvider: jest.Mocked<ethers.BrowserProvider>;
@@ -29,16 +31,20 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
     mockSigner = {} as jest.Mocked<ethers.JsonRpcSigner>;
 
     mockContract = {
-      withdrawToSequencer: jest.fn(),
       withdrawToIbcChain: jest.fn(),
     } as unknown as jest.Mocked<ethers.Contract>;
 
     (ethers.BrowserProvider as jest.Mock).mockReturnValue(mockProvider);
     mockProvider.getSigner.mockResolvedValue(mockSigner);
     (ethers.Contract as jest.Mock).mockReturnValue(mockContract);
-    (ethers.parseEther as jest.Mock).mockReturnValue(
-      ethers.parseUnits(mockAmount, 18),
-    );
+    (ethers.parseUnits as jest.Mock).mockImplementation((amount, decimals) => {
+      // Create a number that would represent the amount in wei
+      const [whole, decimal = ""] = amount.split(".");
+      const paddedDecimal = decimal.padEnd(decimals, "0");
+      const fullNumber = whole + paddedDecimal;
+      // Return an object that mimics ethers BigNumber with toString
+      return BigInt(fullNumber.padEnd(decimals + whole.length, "0"));
+    });
   });
 
   describe("AstriaWithdrawerService", () => {
@@ -78,24 +84,6 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
       expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(2, newProvider);
     });
 
-    it("should call withdrawToSequencer with correct parameters", async () => {
-      const service = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
-        mockContractAddress,
-      ) as AstriaWithdrawerService;
-
-      await service.withdrawToSequencer(
-        mockFromAddress,
-        mockDestinationAddress,
-        mockAmount,
-      );
-
-      expect(mockContract.withdrawToSequencer).toHaveBeenCalledWith(
-        mockDestinationAddress,
-        { value: ethers.parseUnits(mockAmount, 18) },
-      );
-    });
-
     it("should call withdrawToIbcChain with correct parameters", async () => {
       const service = getAstriaWithdrawerService(
         {} as ethers.Eip1193Provider,
@@ -106,13 +94,18 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
         mockFromAddress,
         mockDestinationAddress,
         mockAmount,
+        mockAmountDenom,
+        mockFee,
         mockMemo,
       );
+
+      const total =
+        ethers.parseUnits(mockAmount, mockAmountDenom) + BigInt(mockFee);
 
       expect(mockContract.withdrawToIbcChain).toHaveBeenCalledWith(
         mockDestinationAddress,
         mockMemo,
-        { value: ethers.parseUnits(mockAmount, 18) },
+        { value: total },
       );
     });
   });
@@ -158,26 +151,6 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
       expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(2, newProvider);
     });
 
-    it("should call withdrawToSequencer with correct parameters", async () => {
-      const service = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
-        mockContractAddress,
-        true,
-      ) as AstriaErc20WithdrawerService;
-
-      await service.withdrawToSequencer(
-        mockFromAddress,
-        mockDestinationAddress,
-        mockAmount,
-      );
-
-      expect(mockContract.withdrawToSequencer).toHaveBeenCalledWith(
-        ethers.parseUnits(mockAmount, 18),
-        mockDestinationAddress,
-        { value: ethers.parseUnits(mockAmount, 18) },
-      );
-    });
-
     it("should call withdrawToIbcChain with correct parameters", async () => {
       const service = getAstriaWithdrawerService(
         {} as ethers.Eip1193Provider,
@@ -189,14 +162,16 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
         mockFromAddress,
         mockDestinationAddress,
         mockAmount,
+        mockAmountDenom,
+        mockFee,
         mockMemo,
       );
 
       expect(mockContract.withdrawToIbcChain).toHaveBeenCalledWith(
-        ethers.parseUnits(mockAmount, 18),
+        ethers.parseUnits(mockAmount, mockAmountDenom),
         mockDestinationAddress,
         mockMemo,
-        { value: ethers.parseUnits(mockAmount, 18) },
+        { value: BigInt(mockFee) },
       );
     });
   });
