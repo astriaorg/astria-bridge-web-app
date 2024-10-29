@@ -1,8 +1,5 @@
-import {
-  getEnvChainConfigs,
-  type IbcChains,
-  type EvmChains,
-} from "./chainConfigs";
+import { getEnvChainConfigs } from "./chainConfigs";
+import type { IbcChains, EvmChains } from "./chainConfigs/types";
 
 // mock the config import to control getEnvVariable
 jest.mock("config", () => ({
@@ -80,6 +77,7 @@ describe("Chain Configs", () => {
             coinDenom: "TEST",
             coinMinimalDenom: "utest",
             coinDecimals: 18,
+            ibcWithdrawalFeeWei: "10000000000000000",
           },
         ],
       },

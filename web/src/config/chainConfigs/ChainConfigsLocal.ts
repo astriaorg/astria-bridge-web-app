@@ -1,4 +1,4 @@
-import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from ".";
+import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from "./types";
 
 const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.
@@ -185,6 +185,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDenom: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
+      ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-celestia",
     },
     {
@@ -193,6 +194,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       nativeTokenWithdrawerContractAddress:
         "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+      ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-celestia",
     },
   ],
@@ -207,6 +209,7 @@ const FakeChainInfo: EvmChainInfo = {
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
+      ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-celestia",
     },
     {
@@ -216,6 +219,7 @@ const FakeChainInfo: EvmChainInfo = {
       // fake address here so it shows up in the currency dropdown
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
+      ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-flame",
     },
   ],

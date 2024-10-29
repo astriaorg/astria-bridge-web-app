@@ -1,4 +1,4 @@
-import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from ".";
+import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from "./types";
 
 const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.
@@ -180,6 +180,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
         "0xB086557f9B5F6fAe5081CC5850BE94e62B1dDE57",
+      ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-celestia",
     },
     {
@@ -187,6 +188,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
       erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F",
+      ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-noble",
     },
   ],

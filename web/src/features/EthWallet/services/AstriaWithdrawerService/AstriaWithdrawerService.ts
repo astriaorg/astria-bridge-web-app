@@ -3,7 +3,6 @@ import GenericContractService from "features/EthWallet/services/GenericContractS
 
 export class AstriaWithdrawerService extends GenericContractService {
   protected static override ABI: ethers.InterfaceAbi = [
-    "function withdrawToSequencer(string destinationChainAddress) payable",
     "function withdrawToIbcChain(string destinationChainAddress, string memo) payable",
   ];
 
@@ -18,32 +17,22 @@ export class AstriaWithdrawerService extends GenericContractService {
     ) as AstriaWithdrawerService;
   }
 
-  async withdrawToSequencer(
-    fromAddress: string,
-    destinationChainAddress: string,
-    amount: string,
-  ): Promise<ethers.ContractTransactionResponse> {
-    const amountWei = ethers.parseEther(amount);
-    return this.callContractMethod(
-      "withdrawToSequencer",
-      fromAddress,
-      [destinationChainAddress],
-      amountWei,
-    );
-  }
-
   async withdrawToIbcChain(
     fromAddress: string,
     destinationChainAddress: string,
     amount: string,
+    amountDenom: number,
+    fee: string,
     memo: string,
   ): Promise<ethers.ContractTransactionResponse> {
-    const amountWei = ethers.parseEther(amount);
+    const amountWei = ethers.parseUnits(amount, amountDenom);
+    const feeWei = BigInt(fee);
+    const totalAmount = amountWei + feeWei;
     return this.callContractMethod(
       "withdrawToIbcChain",
       fromAddress,
       [destinationChainAddress, memo],
-      amountWei,
+      totalAmount,
     );
   }
 }
@@ -54,7 +43,6 @@ export class AstriaWithdrawerService extends GenericContractService {
  */
 export class AstriaErc20WithdrawerService extends GenericContractService {
   protected static override ABI: ethers.InterfaceAbi = [
-    "function withdrawToSequencer(uint256 amount, string destinationChainAddress) payable",
     "function withdrawToIbcChain(uint256 amount, string destinationChainAddress, string memo) payable",
     "function balanceOf(address owner) view returns (uint256)",
   ];
@@ -69,30 +57,23 @@ export class AstriaErc20WithdrawerService extends GenericContractService {
       contractAddress,
     ) as AstriaErc20WithdrawerService;
   }
-  async withdrawToSequencer(
-    fromAddress: string,
-    destinationChainAddress: string,
-    amount: string,
-  ): Promise<ethers.ContractTransactionResponse> {
-    const amountWei = ethers.parseEther(amount);
-    return this.callContractMethod("withdrawToSequencer", fromAddress, [
-      amountWei,
-      destinationChainAddress,
-    ]);
-  }
 
   async withdrawToIbcChain(
     fromAddress: string,
     destinationChainAddress: string,
     amount: string,
+    amountDenom: number,
+    fee: string,
     memo: string,
   ): Promise<ethers.ContractTransactionResponse> {
-    const amountWei = ethers.parseEther(amount);
-    return this.callContractMethod("withdrawToIbcChain", fromAddress, [
-      amountWei,
-      destinationChainAddress,
-      memo,
-    ]);
+    const amountBaseUnits = ethers.parseUnits(amount, amountDenom);
+    const feeWei = BigInt(fee);
+    return this.callContractMethod(
+      "withdrawToIbcChain",
+      fromAddress,
+      [amountBaseUnits, destinationChainAddress, memo],
+      feeWei,
+    );
   }
 
   async getBalance(

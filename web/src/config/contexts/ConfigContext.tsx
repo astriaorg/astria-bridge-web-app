@@ -1,12 +1,12 @@
-import React, { useMemo } from "react";
+import React from "react";
 
 import type { AppConfig } from "config";
-import {
-  type EvmChainInfo,
-  type EvmChains,
-  getEnvChainConfigs,
-  type IbcChains,
-} from "config/chainConfigs";
+import type {
+  EvmChainInfo,
+  EvmChains,
+  IbcChains,
+} from "config/chainConfigs/types";
+import { getEnvChainConfigs } from "config/chainConfigs";
 import { getEnvVariable } from "config/env";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(

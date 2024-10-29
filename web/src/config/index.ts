@@ -8,7 +8,7 @@ import {
   type IbcCurrency,
   ibcCurrencyBelongsToChain,
   toChainInfo,
-} from "./chainConfigs";
+} from "./chainConfigs/types";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
 import { useConfig } from "./hooks/useConfig";
