@@ -136,7 +136,8 @@ const OsmosisChainInfo: IbcChainInfo = {
   rest: "https://osmosis-api.polkachu.com/",
   stakeCurrency: {
     coinDenom: "milkTIA",
-    coinMinimalDenom: "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
+    coinMinimalDenom:
+      "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
     coinDecimals: 6,
   },
   bip44: {
@@ -153,7 +154,8 @@ const OsmosisChainInfo: IbcChainInfo = {
   currencies: [
     {
       coinDenom: "milkTIA",
-      coinMinimalDenom: "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
+      coinMinimalDenom:
+        "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
       coinDecimals: 6,
       ibcChannel: "channel-85486",
       sequencerBridgeAccount: "astria1kgxhyhvynhcwwrylkzzx6q3a8rn3tuvasxvuy8",
@@ -163,7 +165,8 @@ const OsmosisChainInfo: IbcChainInfo = {
   feeCurrencies: [
     {
       coinDenom: "milkTIA",
-      coinMinimalDenom: "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
+      coinMinimalDenom:
+        "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
       coinDecimals: 6,
       gasPriceStep: {
         low: 0.01,
@@ -252,7 +255,8 @@ const FlameChainInfo: EvmChainInfo = {
     },
     {
       coinDenom: "milkTIA",
-      coinMinimalDenom: "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
+      coinMinimalDenom:
+        "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
       coinDecimals: 18,
       erc20ContractAddress: "0xcbb93e854AA4EF5Db51c3b094F28952eF0dC67bE",
       ibcWithdrawalFeeWei: "10000000000000000",
