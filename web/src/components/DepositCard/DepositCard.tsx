@@ -18,15 +18,13 @@ export default function DepositCard(): React.ReactElement {
     selectEvmChain,
     evmChainsOptions,
     selectedEvmChain,
+    defaultEvmCurrencyOption,
     selectEvmCurrency,
     evmCurrencyOptions,
     evmBalance,
     isLoadingEvmBalance,
     connectEVMWallet,
   } = useEvmChainSelection(evmChains);
-  const defaultEvmCurrencyOption = useMemo(() => {
-    return evmCurrencyOptions[0] || null;
-  }, [evmCurrencyOptions]);
 
   const {
     ibcAccountAddress: fromAddress,
@@ -36,27 +34,13 @@ export default function DepositCard(): React.ReactElement {
     selectIbcCurrency,
     ibcCurrencyOptions,
     selectedIbcCurrency,
+    defaultIbcCurrencyOption,
+    selectedIbcChainOption,
     ibcBalance,
     isLoadingIbcBalance,
     connectKeplrWallet,
   } = useIbcChainSelection(ibcChains);
-  const defaultIbcCurrencyOption = useMemo(() => {
-    return ibcCurrencyOptions[0] || null;
-  }, [ibcCurrencyOptions]);
 
-  // selectedIbcChainOption allows us to ensure the label is set properly
-  // in the dropdown when connecting via an "additional option"s action,
-  //  e.g. the "Connect Keplr Wallet" option in the dropdown
-  const selectedIbcChainOption = useMemo(() => {
-    if (!selectedIbcChain) {
-      return null;
-    }
-    return {
-      label: selectedIbcChain?.chainName || "",
-      value: selectedIbcChain,
-      leftIconClass: selectedIbcChain?.iconClass || "",
-    } as DropdownOption<IbcChainInfo>;
-  }, [selectedIbcChain]);
   const selectedEvmChainOption = useMemo(() => {
     if (!selectedEvmChain) {
       return null;
