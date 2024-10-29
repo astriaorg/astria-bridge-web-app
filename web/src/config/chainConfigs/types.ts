@@ -1,5 +1,4 @@
 import type { ChainInfo } from "@keplr-wallet/types";
-import { ethers } from "ethers";
 
 /**
  * Represents information about an IBC chain.
