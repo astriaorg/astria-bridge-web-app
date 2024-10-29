@@ -148,7 +148,10 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
 
         // get balance using ethers
         const balance = await ethersProvider.getBalance(address);
-        const formattedBalance = formatBalance(balance.toString());
+        const formattedBalance = formatBalance(
+          balance.toString(),
+          defaultChain.currencies[0].coinDecimals,
+        );
         const userAccount: UserAccount = {
           address: address,
           balance: formattedBalance,
