@@ -1,9 +1,9 @@
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import { useConfig, type EvmChainInfo, type IbcChainInfo } from "config";
+import { useConfig } from "config";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
+import Dropdown from "components/Dropdown/Dropdown";
 import {
   getAstriaWithdrawerService,
   useEthWallet,
@@ -22,6 +22,9 @@ export default function WithdrawCard(): React.ReactElement {
     selectEvmChain,
     evmChainsOptions,
     selectedEvmChain,
+    selectedEvmChainOption,
+    withdrawFeeDisplay,
+    defaultEvmCurrencyOption,
     selectEvmCurrency,
     evmCurrencyOptions,
     selectedEvmCurrency,
@@ -29,47 +32,20 @@ export default function WithdrawCard(): React.ReactElement {
     isLoadingEvmBalance,
     connectEVMWallet,
   } = useEvmChainSelection(evmChains);
-  const defaultEvmCurrencyOption = useMemo(() => {
-    return evmCurrencyOptions[0] || null;
-  }, [evmCurrencyOptions]);
 
   const {
     ibcAccountAddress: recipientAddress,
     selectIbcChain,
     ibcChainsOptions,
     selectedIbcChain,
+    selectedIbcChainOption,
+    defaultIbcCurrencyOption,
     selectIbcCurrency,
     ibcCurrencyOptions,
     ibcBalance,
     isLoadingIbcBalance,
     connectKeplrWallet,
   } = useIbcChainSelection(ibcChains);
-  const defaultIbcCurrencyOption = useMemo(() => {
-    return ibcCurrencyOptions[0] || null;
-  }, [ibcCurrencyOptions]);
-
-  // selectedIbcChainOption allows us to ensure the label is set properly
-  // in the dropdown when connecting via additional action
-  const selectedIbcChainOption = useMemo(() => {
-    if (!selectedIbcChain) {
-      return null;
-    }
-    return {
-      label: selectedIbcChain?.chainName || "",
-      value: selectedIbcChain,
-      leftIconClass: selectedIbcChain?.iconClass || "",
-    } as DropdownOption<IbcChainInfo>;
-  }, [selectedIbcChain]);
-  const selectedEvmChainOption = useMemo(() => {
-    if (!selectedEvmChain) {
-      return null;
-    }
-    return {
-      label: selectedEvmChain?.chainName || "",
-      value: selectedEvmChain,
-      leftIconClass: selectedEvmChain?.iconClass || "",
-    } as DropdownOption<EvmChainInfo>;
-  }, [selectedEvmChain]);
 
   // the ibc currency selection is controlled by the sender's chosen evm currency,
   // and should be updated when an ibc currency or ibc chain is selected
@@ -337,6 +313,11 @@ export default function WithdrawCard(): React.ReactElement {
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
+              )}
+              {withdrawFeeDisplay && (
+                <div className="mt-2 has-text-grey-light help">
+                  Withdrawal fee: {withdrawFeeDisplay}
+                </div>
               )}
             </div>
           )}
