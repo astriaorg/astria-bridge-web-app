@@ -314,11 +314,6 @@ export default function WithdrawCard(): React.ReactElement {
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
-              {withdrawFeeDisplay && (
-                <div className="mt-2 has-text-grey-light help">
-                  Withdrawal fee: {withdrawFeeDisplay}
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -344,6 +339,11 @@ export default function WithdrawCard(): React.ReactElement {
         {!isAmountValid && hasTouchedForm && (
           <div className="help is-danger mt-2">
             Amount must be a number greater than 0
+          </div>
+        )}
+        {withdrawFeeDisplay && (
+          <div className="mt-2 has-text-grey-light help">
+            Withdrawal fee: {withdrawFeeDisplay}
           </div>
         )}
       </div>
