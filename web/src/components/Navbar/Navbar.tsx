@@ -54,7 +54,6 @@ function Navbar() {
             BRIDGE
           </Link>
           <a
-            target="_blank"
             href={swapURL}
             className="navbar-item"
             rel="noreferrer"
@@ -62,7 +61,6 @@ function Navbar() {
             SWAP
           </a>
           <a
-            target="_blank"
             href={poolURL}
             className="navbar-item"
             rel="noreferrer"
