@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
-import { useConfig, type EvmChainInfo, type IbcChainInfo } from "config";
+import Dropdown from "components/Dropdown/Dropdown";
+import { useConfig } from "config";
 import { useEvmChainSelection } from "features/EthWallet";
 import { sendIbcTransfer, useIbcChainSelection } from "features/KeplrWallet";
 import { useNotifications, NotificationType } from "features/Notifications";
@@ -18,6 +18,7 @@ export default function DepositCard(): React.ReactElement {
     selectEvmChain,
     evmChainsOptions,
     selectedEvmChain,
+    selectedEvmChainOption,
     defaultEvmCurrencyOption,
     selectEvmCurrency,
     evmCurrencyOptions,
@@ -31,26 +32,15 @@ export default function DepositCard(): React.ReactElement {
     selectIbcChain,
     ibcChainsOptions,
     selectedIbcChain,
-    selectIbcCurrency,
-    ibcCurrencyOptions,
-    selectedIbcCurrency,
-    defaultIbcCurrencyOption,
     selectedIbcChainOption,
+    defaultIbcCurrencyOption,
+    selectIbcCurrency,
+    selectedIbcCurrency,
+    ibcCurrencyOptions,
     ibcBalance,
     isLoadingIbcBalance,
     connectKeplrWallet,
   } = useIbcChainSelection(ibcChains);
-
-  const selectedEvmChainOption = useMemo(() => {
-    if (!selectedEvmChain) {
-      return null;
-    }
-    return {
-      label: selectedEvmChain?.chainName || "",
-      value: selectedEvmChain,
-      leftIconClass: selectedEvmChain?.iconClass || "",
-    } as DropdownOption<EvmChainInfo>;
-  }, [selectedEvmChain]);
 
   // the evm currency selection is controlled by the sender's chosen ibc currency,
   // and should be updated when an ibc currency or evm chain is selected

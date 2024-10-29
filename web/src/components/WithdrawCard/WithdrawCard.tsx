@@ -1,9 +1,9 @@
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import { useConfig, type EvmChainInfo, type IbcChainInfo } from "config";
+import { useConfig } from "config";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import Dropdown, { type DropdownOption } from "components/Dropdown/Dropdown";
+import Dropdown from "components/Dropdown/Dropdown";
 import {
   getAstriaWithdrawerService,
   useEthWallet,
