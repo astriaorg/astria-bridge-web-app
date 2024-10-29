@@ -15,26 +15,29 @@ the Astria bridge.
   * main application component
   * define routes
   * use context providers
-* `src/chainInfos` - Celestia and Astria chain information
-* `src/components` - React components
-* `src/contexts` - React context definitions
+* `src/components` - More general React components for the app, e.g. Navbar,
+  Dropdown, CopyToClipboardButton, etc
+* `src/config` - Configuration for the web app
+  * `src/config/chainConfigs` - Celestia and Astria chain information
+  * `src/config/contexts` - Config context and context provider
+  * `src/config/hooks` - Custom hook to make config easy to use
+  * `src/config/env.ts` - Environment variable definitions plus utilities for
+    consuming them
+  * `src/config/index.ts` - AppConfig and exports
+* `src/features` - Organizes components, contexts, hooks, services, types, and
+  utils for different features
+  * `src/features/EthWallet` - Used for interacting with EVM wallets
+  * `src/features/KeplrWallet` - User for interacting with Keplr wallet
+  * `src/features/Notifications` - Used for displaying notifications and toasts
 * `src/pages`
   * React components for each page
   * `src/pages/Layout.tsx`
     * page layout component using `<Outlet />`
     * contains `<Navbar />`, `<Notification />`
-* `src/providers` - React context provider definitions
-* `src/services`
-  * api services
-  * Keplr services
-  * IBC services
-  * 3rd party wrappers
 * `src/styles`
   * all style definitions
   * using scss
   * using [bulma](https://bulma.io/documentation/) css framework
-* `src/types` - type definitions
-* `src/utils` - utility functions
 
 ## Commands
 
@@ -53,19 +56,24 @@ just web build
 * How to add new chain configs for a new environment (e.g. you want to add new
   chain configs for "mainnet")
   * create file that will contain the config values
+
     ```sh
     touch web/src/config/chainConfigs/ChainConfigsMainnet.ts
     ```
+
   * import new configs in
     `astria-bridge-web-app/web/src/config/chainConfigs/index.ts`, while renaming
     them
+
     ```typescript
     import {
       evmChains as mainnetEvmChains,
       ibcChains as mainnetIbcChains,
     } from "./ChainConfigsMainnet"; 
     ```
+
   * add entry to `EVM_CHAIN_CONFIGS`
+
     ```typescript
     const ENV_CHAIN_CONFIGS = {
       local: { evm: localEvmChains, ibc: localIbcChains },
