@@ -1,6 +1,6 @@
 {
   "name": "astria-bridge-web-app",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "dependencies": {
     "@cosmjs/launchpad": "^0.27.1",
@@ -20,6 +20,7 @@
     "ethers": "^6.13.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-ga4": "^2.1.0",
     "react-hook-form": "^7.50.0",
     "react-router-dom": "^6.17.0",
     "react-scripts": "5.0.1",
@@ -41,7 +42,11 @@
     "lint-apply-unsafe": "biome lint --apply-unsafe ./src ./public"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",

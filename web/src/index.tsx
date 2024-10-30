@@ -1,9 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "styles/index.scss";
-import reportWebVitals from "./reportWebVitals";
+import ReactGA from "react-ga4";
 import { BrowserRouter } from "react-router-dom";
+import reportWebVitals from "./reportWebVitals";
+
 import App from "./App";
+import "styles/index.scss";
+
+// load ga tracking if id available
+if (process.env.REACT_APP_GA_TRACKING_ID) {
+  ReactGA.initialize(process.env.REACT_APP_GA_TRACKING_ID);
+}
 
 const domRoot: ReactDOM.Root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
