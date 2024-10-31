@@ -1,6 +1,5 @@
 html, body {
   height: 100vh;
-
 }
 
 // fonts
@@ -15,6 +14,7 @@ html, body {
 @import 'button-overrides';
 @import 'card-overrides';
 @import 'dropdown-overrides';
+@import 'footer-overrides';
 @import 'form-overrides';
 @import 'modal-overrides';
 
@@ -24,7 +24,7 @@ html, body {
 @import '../../node_modules/bulma/sass/components/navbar';
 @import '../../node_modules/@creativebulma/bulma-tooltip/dist/bulma-tooltip';
 // NOTE - responsive-spacing-mixins weren't needed for v0, but i'm leaving them b/c
-  // i think they'll quickly be needed for v1
+// i think they'll quickly be needed for v1
 //@import 'responsive-spacing-mixins';
 @import 'fixed-widths';
 
@@ -34,6 +34,7 @@ html, body {
 @import 'card-customizations';
 @import 'columns-customizations';
 @import 'dropdown-customizations';
+@import 'footer-customizations';
 @import 'form-customizations';
 @import 'modal-customizations';
 @import 'navbar-customizations';
@@ -46,15 +47,58 @@ body {
   background-color: $astria-black;
 }
 
-.is-fullheight-with-navbar {
-  // viewport height minus navbar height
-  min-height: calc(100vh - 85px)
+.is-fullheight-with-navbar-and-footer {
+  // viewport height minus navbar and footer height
+  min-height: calc(100vh - 85px - 56px);
+}
+
+// custom styles for the side tag component
+.side-tag {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  background-color: $astria-orange-soft;
+  color: $astria-white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transform: translateX(40px) rotate(-90deg);
+  overflow: hidden;
+
+  @include mobile {
+    top: 75%;
+  }
+
+  .side-tag-link {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    color: $astria-white;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: $astria-white;
+    }
+  }
+
+  .icon {
+    margin-right: 0.5rem;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+
+  .label {
+    white-space: nowrap;
+  }
 }
 
 .notifications-toast-container {
   position: fixed;
   z-index: 9999;
   padding: 1rem;
+
   &.mid {
     top: 50%;
     left: 50%;
