@@ -137,17 +137,17 @@ export default function DepositCard(): React.ReactElement {
     setIsLoading(true);
     setIsAnimating(true);
 
-    // must left pad the amount with 0 if it starts with a dot because
-    // keplr's regex for a decimal is ^-?\d+.?\d*$ so it requires a leading digit
-    const amountStrPadded = padDecimal(amount);
-    const formattedAmount = DecUtils.getTenExponentN(
-      selectedIbcCurrency.coinDecimals,
-    )
-      .mul(new Dec(amountStrPadded))
-      .truncate()
-      .toString();
-
     try {
+      // must left pad the amount with 0 if it starts with a dot because
+      // keplr's regex for a decimal is ^-?\d+.?\d*$ so it requires a leading digit
+      const amountStrPadded = padDecimal(amount);
+      const formattedAmount = DecUtils.getTenExponentN(
+        selectedIbcCurrency.coinDecimals,
+      )
+        .mul(new Dec(amountStrPadded))
+        .truncate()
+        .toString();
+      
       await sendIbcTransfer(
         selectedIbcChain,
         fromAddress,
