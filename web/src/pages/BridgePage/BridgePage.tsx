@@ -41,7 +41,7 @@ export default function BridgePage(): React.ReactElement {
   return (
     <section className="">
       <div className="container px-2">
-        <div className="columns is-centered is-vcentered is-fullheight-with-navbar">
+        <div className="columns is-centered is-vcentered is-fullheight-with-navbar-and-footer">
           <div className="column is-12-mobile is-8-tablet is-8-desktop is-6-widescreen">
             <div className="card">
               <div className="tabs is-fullwidth">
