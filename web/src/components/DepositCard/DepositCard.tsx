@@ -6,7 +6,11 @@ import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDown
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config";
 import { useEvmChainSelection } from "features/EthWallet";
-import { sendIbcTransfer, useIbcChainSelection } from "features/KeplrWallet";
+import {
+  padDecimal,
+  sendIbcTransfer,
+  useIbcChainSelection,
+} from "features/KeplrWallet";
 import { useNotifications, NotificationType } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
@@ -132,12 +136,23 @@ export default function DepositCard(): React.ReactElement {
 
     setIsLoading(true);
     setIsAnimating(true);
+
+    // must left pad the amount with 0 if it starts with a dot because
+    // keplr's regex for a decimal is ^-?\d+.?\d*$ so it requires a leading digit
+    const amountStrPadded = padDecimal(amount);
+    const formattedAmount = DecUtils.getTenExponentN(
+      selectedIbcCurrency.coinDecimals,
+    )
+      .mul(new Dec(amountStrPadded))
+      .truncate()
+      .toString();
+
     try {
       await sendIbcTransfer(
         selectedIbcChain,
         fromAddress,
         recipientAddress,
-        DecUtils.getTenExponentN(6).mul(new Dec(amount)).truncate().toString(),
+        formattedAmount,
         selectedIbcCurrency,
       );
     } catch (e) {
