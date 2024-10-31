@@ -32,6 +32,7 @@ export type AppConfig = {
   bridgeURL: string;
   swapURL: string;
   poolURL: string;
+  feedbackFormURL: string;
   getEvmChainById(chainIdHex: string): EvmChainInfo;
 };
 
