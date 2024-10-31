@@ -6,6 +6,12 @@ interface SideTagProps {
   iconClass: string;
 }
 
+/**
+ * SideTag component to render a side tag with an icon and label.
+ * @param label
+ * @param url
+ * @param iconClass
+ */
 export default function SideTag({
   label,
   url,
@@ -15,7 +21,6 @@ export default function SideTag({
     <div className="side-tag">
       <a href={url} target="_blank" rel="noreferrer" className="side-tag-link">
         <span className="icon is-small">
-          {/* TODO - up-right-from-square icon; not in our version of font-awesome? */}
           <i className={`fas ${iconClass}`} />
         </span>
         <span className="label">{label}</span>

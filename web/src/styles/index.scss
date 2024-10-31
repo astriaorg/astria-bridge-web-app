@@ -64,6 +64,10 @@ body {
   transform: translateX(40px) rotate(-90deg);
   overflow: hidden;
 
+  @include mobile {
+    top: 75%;
+  }
+
   .side-tag-link {
     display: flex;
     align-items: center;
