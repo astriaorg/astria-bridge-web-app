@@ -26,6 +26,13 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const swapURL = getEnvVariable("REACT_APP_SWAP_URL");
   const poolURL = getEnvVariable("REACT_APP_POOL_URL");
 
+  let feedbackFormURL: string;
+  try {
+    feedbackFormURL = getEnvVariable("REACT_APP_FEEDBACK_FORM_URL");
+  } catch (e) {
+    feedbackFormURL = brandURL;
+  }
+
   // retrieves the EVM chain with the given chain ID.
   const getEvmChainById = (chainIdHex: string): EvmChainInfo => {
     const chainIdNum = Number.parseInt(chainIdHex, 16);
@@ -46,6 +53,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         bridgeURL,
         swapURL,
         poolURL,
+        feedbackFormURL,
         getEvmChainById,
       }}
     >
