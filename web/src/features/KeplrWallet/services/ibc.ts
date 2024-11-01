@@ -130,7 +130,7 @@ export const getBalanceFromKeplr = async (
   }
 
   const amount = new Dec(balance.amount, coinDecimals);
-  return `${amount.toString(coinDecimals)} ${coinDenom}`;
+  return `${amount.toString(2)} ${coinDenom}`;
 };
 
 /**
