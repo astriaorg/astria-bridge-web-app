@@ -10,4 +10,3 @@ export function formatBalance(rawBalance: string, decimals = 18): string {
   const denom = 10 ** decimals;
   return (Number.parseInt(rawBalance) / denom).toFixed(2);
 }
-

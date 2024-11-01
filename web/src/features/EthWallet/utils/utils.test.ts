@@ -12,7 +12,9 @@ describe("Utility Functions", () => {
       expect(formatBalance("123456000000", 6)).toBe("123456.00");
 
       // huge number
-      expect(formatBalance("1000000000000000000000000000000000")).toBe("1000000000000000.00");
+      expect(formatBalance("1000000000000000000000000000000000")).toBe(
+        "1000000000000000.00",
+      );
     });
   });
 });

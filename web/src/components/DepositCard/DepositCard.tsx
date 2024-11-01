@@ -147,7 +147,7 @@ export default function DepositCard(): React.ReactElement {
         .mul(new Dec(amountStrPadded))
         .truncate()
         .toString();
-      
+
       await sendIbcTransfer(
         selectedIbcChain,
         fromAddress,
