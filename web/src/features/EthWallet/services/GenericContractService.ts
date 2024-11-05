@@ -54,9 +54,9 @@ export default class GenericContractService {
         try {
           const signer = await this.walletProvider.getSigner(address);
           return new ethers.Contract(this.contractAddress, this.abi, signer);
-        } catch (error) {
+        } catch (e) {
           this.contractPromise = null;
-          throw error;
+          throw e;
         }
       })();
     }
@@ -76,9 +76,9 @@ export default class GenericContractService {
         throw new Error(`Method ${methodName} not found in contract`);
       }
       return method(...args, { value });
-    } catch (error) {
-      console.error(`Error in ${methodName}:`, error);
-      throw error;
+    } catch (e) {
+      console.error(`Error in ${methodName}:`, e);
+      throw e;
     }
   }
 }

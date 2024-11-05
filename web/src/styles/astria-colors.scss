@@ -30,11 +30,6 @@ $text: $astria-text-light;
 $link: $astria-white;
 $link-hover: $astria-whitest;
 
-// navbar colors
-$navbar-item-hover-color: $astria-text-dark;
-$navbar-item-hover-background-color: $astria-orange-soft;
-
-
 // gradient mixins
 @mixin astria-bg-gradient {
   background: linear-gradient(to right, $astria-orange-soft, $astria-orange);
@@ -48,15 +43,4 @@ $navbar-item-hover-background-color: $astria-orange-soft;
   @include astria-bg-gradient;
   border: none;
   @include astria-border-gradient;
-}
-
-@mixin astria-bottom-border-gradient {
-  background: linear-gradient(
-                  to right,
-                  $astria-orange-soft,
-                  50%,
-                  $astria-orange,
-  ) left bottom no-repeat;
-  background-size: 100% 5px;
-  border-radius: 0;
 }
