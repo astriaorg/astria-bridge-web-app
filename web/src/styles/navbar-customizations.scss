@@ -11,7 +11,7 @@ $astria-orange-navbar-soft: #EA9B57;
   left: 50%;
   transform: translateX(-50%);
   width: 85%;
-  height: 3.75px;
+  height: 4px;
 }
 
 .navbar {
@@ -46,7 +46,7 @@ $astria-orange-navbar-soft: #EA9B57;
 
         &::after {
           @include navbar-item-active-border-bottom;
-          background: linear-gradient(83.18deg, $astria-orange-soft, $astria-orange);
+          background: linear-gradient(83.18deg, $astria-orange-navbar-soft, $astria-orange-navbar);
         }
       }
     }
