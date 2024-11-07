@@ -1,0 +1,97 @@
+@import 'astria-colors';
+
+.notifications-toast-container {
+  position: fixed;
+  z-index: 9999;
+  padding: 1rem;
+  max-width: 50vw;
+
+  &.mid {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.top-left {
+    top: 0;
+    left: 0;
+  }
+
+  &.top-mid {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &.top-right {
+    top: 0;
+    right: 0;
+  }
+
+  &.bottom-left {
+    bottom: 0;
+    left: 0;
+    margin-bottom: 30px;
+  }
+
+  &.bottom-mid {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 30px;
+  }
+
+  &.bottom-right {
+    bottom: 0;
+    right: 0;
+    margin-bottom: 30px;
+  }
+
+  .notification {
+    margin-bottom: 0.5rem;
+  }
+
+  .message {
+    background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+    box-shadow: 1px 1px 1px -1px hsla(0, 0%, 100%, 0.5) inset;
+    border-radius: 12px;
+
+    .message-header {
+      background: transparent;
+    }
+    .message-body {
+      color: $astria-white;
+      padding: 0 1rem 1rem 1rem;
+
+      p.message-body-inner {
+        background-color: $astria-grey-dark;
+        padding: 0.5rem;
+        border-radius: 4px;
+      }
+    }
+
+    &.is-info {
+      .message-header p {
+        color: $astria-white;
+      }
+    }
+
+    &.is-success {
+      .message-header p {
+        color: $astria-green;
+      }
+    }
+
+    &.is-warning {
+      .message-header p {
+        color: $astria-yellow;
+      }
+    }
+
+    &.is-danger {
+      .message-header p {
+        color: $astria-red;
+      }
+    }
+  }
+}

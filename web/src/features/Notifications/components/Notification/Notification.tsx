@@ -107,7 +107,7 @@ function Notification({
       case NotificationType.WARNING:
         return "Warning";
       case NotificationType.DANGER:
-        return "Danger";
+        return "Error";
       default:
         return "";
     }

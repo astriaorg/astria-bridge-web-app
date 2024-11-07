@@ -63,8 +63,8 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
         );
         setIbcBalance(balance);
         setIsLoadingIbcBalance(false);
-      } catch (error) {
-        console.error("Failed to get balance from Keplr", error);
+      } catch (e) {
+        console.error("Failed to get balance from Keplr", e);
         setIsLoadingIbcBalance(false);
       }
     }
@@ -80,8 +80,8 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
       try {
         const address = await getAddressFromKeplr(selectedIbcChain.chainId);
         setIbcAccountAddress(address);
-      } catch (error) {
-        console.error("Failed to get address from Keplr", error);
+      } catch (e) {
+        console.error("Failed to get address from Keplr", e);
       }
     }
 
@@ -150,10 +150,10 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     let keplr: Keplr;
     try {
       keplr = getKeplrFromWindow();
-    } catch (err) {
+    } catch (e) {
       addNotification({
         toastOpts: {
-          toastType: NotificationType.DANGER,
+          toastType: NotificationType.WARNING,
           component: (
             <p>
               Keplr wallet extension must be installed! You can find it{" "}

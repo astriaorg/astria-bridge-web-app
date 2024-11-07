@@ -80,8 +80,8 @@ export function useEvmChainSelection(evmChains: EvmChains) {
           setEvmBalance(balance);
         }
         setIsLoadingEvmBalance(false);
-      } catch (error) {
-        console.error("Failed to get balance from EVM", error);
+      } catch (e) {
+        console.error("Failed to get balance from EVM", e);
         setIsLoadingEvmBalance(false);
       }
     }

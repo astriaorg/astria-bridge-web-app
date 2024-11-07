@@ -169,12 +169,19 @@ export default function WithdrawCard(): React.ReactElement {
           onAcknowledge: () => {},
         },
       });
-    } catch (error) {
-      console.error("Withdrawal failed:", error);
+    } catch (e) {
+      setIsAnimating(false);
+      console.error("Withdrawal failed:", e);
+      const message = e instanceof Error ? e.message : "Unknown error.";
       addNotification({
         toastOpts: {
           toastType: NotificationType.DANGER,
-          message: "Withdrawal failed. Please try again.",
+          component: (
+            <>
+              <p className="mb-1">Withdrawal failed.</p>
+              <p className="message-body-inner">{message}</p>
+            </>
+          ),
           onAcknowledge: () => {},
         },
       });
