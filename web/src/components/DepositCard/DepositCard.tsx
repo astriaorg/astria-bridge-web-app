@@ -148,6 +148,15 @@ export default function DepositCard(): React.ReactElement {
     handleConnectEVMWallet().then((_) => {});
   }, [selectedEvmChain]);
 
+  // ensure keplr wallet connection when selected ibc chain changes
+  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
+  useEffect(() => {
+    if (!selectedIbcChain) {
+      return;
+    }
+    connectKeplrWallet().then((_) => {});
+  }, [selectedIbcChain]);
+
   const handleDeposit = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
       addNotification({
