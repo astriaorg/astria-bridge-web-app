@@ -34,7 +34,7 @@ export default function WithdrawCard(): React.ReactElement {
   } = useEvmChainSelection(evmChains);
 
   const {
-    ibcAccountAddress: recipientAddress,
+    ibcAccountAddress,
     selectIbcChain,
     ibcChainsOptions,
     selectedIbcChain,
@@ -45,6 +45,7 @@ export default function WithdrawCard(): React.ReactElement {
     ibcBalance,
     isLoadingIbcBalance,
     connectKeplrWallet,
+    resetState: resetIbcWalletState,
   } = useIbcChainSelection(ibcChains);
 
   // the ibc currency selection is controlled by the sender's chosen evm currency,
@@ -75,28 +76,44 @@ export default function WithdrawCard(): React.ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
+  // recipientAddressOverride is used to allow manual entry of an address
+  const [recipientAddressOverride, setRecipientAddressOverride] =
+    useState<string>("");
+  const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
+    useState<boolean>(false);
+  const handleEditRecipientClick = () => {
+    setIsRecipientAddressEditable(!isRecipientAddressEditable);
+  };
+  const handleEditRecipientSave = () => {
+    setIsRecipientAddressEditable(false);
+    // reset ibcWalletState when user manually enters address
+    resetIbcWalletState();
+  };
+  const handleEditRecipientClear = () => {
+    setIsRecipientAddressEditable(false);
+    setRecipientAddressOverride("");
+  };
+  const updateRecipientAddressOverride = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRecipientAddressOverride(event.target.value);
+  };
+
   useEffect(() => {
-    if (amount || recipientAddress) {
+    if (amount || ibcAccountAddress || recipientAddressOverride) {
       setHasTouchedForm(true);
     }
-    checkIsFormValid(amount, recipientAddress);
-  }, [amount, recipientAddress]);
-
-  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
-  useEffect(() => {
-    if (!selectedEvmChain) {
-      return;
-    }
-    connectEVMWallet().then((_) => {});
-  }, [selectedEvmChain]);
+    const recipientAddress = recipientAddressOverride || ibcAccountAddress;
+    checkIsFormValid(recipientAddress, amount);
+  }, [amount, ibcAccountAddress, recipientAddressOverride]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
   };
 
   const checkIsFormValid = (
-    amountInput: string,
     recipientAddressInput: string | null,
+    amountInput: string,
   ) => {
     if (recipientAddressInput === null) {
       setIsRecipientAddressValid(false);
@@ -109,30 +126,57 @@ export default function WithdrawCard(): React.ReactElement {
     setIsRecipientAddressValid(isRecipientAddressValid);
   };
 
+  const handleConnectKeplrWallet = async () => {
+    setIsRecipientAddressEditable(false);
+    setRecipientAddressOverride("");
+    await connectKeplrWallet();
+  };
+
+  // ensure evm wallet connection when selected EVM chain changes
+  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
+  useEffect(() => {
+    if (!selectedEvmChain) {
+      return;
+    }
+    connectEVMWallet().then((_) => {});
+  }, [selectedEvmChain]);
+
+  // ensure keplr wallet connection when selected ibc chain changes
+  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
+  useEffect(() => {
+    if (!selectedIbcChain) {
+      return;
+    }
+    handleConnectKeplrWallet().then((_) => {});
+  }, [selectedIbcChain]);
+
   const handleWithdraw = async () => {
-    if (
-      !selectedWallet ||
-      !selectedEvmCurrency ||
-      !isAmountValid ||
-      !recipientAddress ||
-      !fromAddress
-    ) {
-      console.error(
-        "Withdrawal cannot proceed: missing required fields or fields are invalid",
-        {
-          selectedWallet,
-          selectedEvmCurrency,
-          isAmountValid,
-          recipientAddress,
+    if (!selectedEvmChain || !selectedEvmCurrency) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please select a chain and token to bridge first.",
+          onAcknowledge: () => {},
         },
-      );
-      // shouldn't really fall into this case
+      });
+      return;
+    }
+
+    const recipientAddress = recipientAddressOverride || ibcAccountAddress;
+    if (!selectedWallet || !fromAddress || !recipientAddress) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please connect your Keplr and EVM wallet first.",
+          onAcknowledge: () => {},
+        },
+      });
       return;
     }
 
     if (
-      !selectedEvmCurrency?.nativeTokenWithdrawerContractAddress &&
-      !selectedEvmCurrency?.erc20ContractAddress
+      !selectedEvmCurrency.nativeTokenWithdrawerContractAddress &&
+      !selectedEvmCurrency.erc20ContractAddress
     ) {
       console.error("Withdrawal cannot proceed: missing contract address");
       // shouldn't really fall into this case
@@ -187,21 +231,52 @@ export default function WithdrawCard(): React.ReactElement {
       });
     } finally {
       setIsLoading(false);
-      setTimeout(() => setIsAnimating(false), 2000);
+      setTimeout(() => setIsAnimating(false), 1000);
     }
   };
+
+  // disable withdraw button if form is invalid
+  const isWithdrawDisabled = useMemo<boolean>((): boolean => {
+    if (recipientAddressOverride) {
+      // there won't be a selected ibc chain and currency if user manually
+      // enters a recipient address
+      return !(isAmountValid && isRecipientAddressValid && fromAddress);
+    }
+    return !(
+      ibcAccountAddress &&
+      isAmountValid &&
+      isRecipientAddressValid &&
+      fromAddress &&
+      selectedEvmCurrency?.coinDenom ===
+        selectedIbcCurrencyOption?.value?.coinDenom
+    );
+  }, [
+    recipientAddressOverride,
+    ibcAccountAddress,
+    isAmountValid,
+    isRecipientAddressValid,
+    fromAddress,
+    selectedEvmCurrency,
+    selectedIbcCurrencyOption,
+  ]);
 
   const additionalIbcOptions = useMemo(
     () => [
       {
         label: "Connect Keplr Wallet",
-        action: connectKeplrWallet,
+        action: handleConnectKeplrWallet,
         className: "has-text-primary",
         leftIconClass: "i-keplr",
         rightIconClass: "fas fa-plus",
       },
+      {
+        label: "Enter address manually",
+        action: handleEditRecipientClick,
+        className: "has-text-primary",
+        rightIconClass: "fas fa-pen-to-square",
+      },
     ],
-    [connectKeplrWallet],
+    [handleConnectKeplrWallet, handleEditRecipientClick],
   );
 
   const additionalEvmOptions = useMemo(() => {
@@ -304,28 +379,84 @@ export default function WithdrawCard(): React.ReactElement {
               </div>
             )}
           </div>
-          {recipientAddress && (
+          {ibcAccountAddress &&
+            !isRecipientAddressEditable &&
+            !recipientAddressOverride && (
+              <div className="field-info-box mt-3 py-2 px-3">
+                {ibcAccountAddress && (
+                  <p
+                    className="has-text-grey-light has-text-weight-semibold is-clickable"
+                    onKeyDown={handleEditRecipientClick}
+                    onClick={handleEditRecipientClick}
+                  >
+                    <span className="mr-2">Address: {ibcAccountAddress}</span>
+                    <i className="fas fa-pen-to-square" />
+                  </p>
+                )}
+                {ibcAccountAddress && !isLoadingIbcBalance && (
+                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                    Balance: {ibcBalance}
+                  </p>
+                )}
+                {ibcAccountAddress && isLoadingIbcBalance && (
+                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                    Balance: <i className="fas fa-spinner fa-pulse" />
+                  </p>
+                )}
+                {withdrawFeeDisplay && (
+                  <div className="mt-2 has-text-grey-light help">
+                    Withdrawal fee: {withdrawFeeDisplay}
+                  </div>
+                )}
+              </div>
+            )}
+          {recipientAddressOverride && !isRecipientAddressEditable && (
             <div className="field-info-box mt-3 py-2 px-3">
-              {recipientAddress && (
-                <p className="has-text-grey-light has-text-weight-semibold">
-                  Address: {recipientAddress}
-                </p>
-              )}
-              {recipientAddress && !isLoadingIbcBalance && (
-                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {ibcBalance}
-                </p>
-              )}
-              {recipientAddress && isLoadingIbcBalance && (
-                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: <i className="fas fa-spinner fa-pulse" />
-                </p>
-              )}
-              {withdrawFeeDisplay && (
-                <div className="mt-2 has-text-grey-light help">
-                  Withdrawal fee: {withdrawFeeDisplay}
+              <p
+                className="has-text-grey-light has-text-weight-semibold is-clickable"
+                onKeyDown={handleEditRecipientClick}
+                onClick={handleEditRecipientClick}
+              >
+                <span className="mr-2">
+                  Address: {recipientAddressOverride}
+                </span>
+                <i className="fas fa-pen-to-square" />
+              </p>
+              {!isRecipientAddressValid && hasTouchedForm && (
+                <div className="help is-danger mt-2">
+                  Recipient address must be a valid address
                 </div>
               )}
+              <p className="mt-2 has-text-grey-lighter has-text-weight-semibold is-size-7">
+                Connect via wallet to show balance
+              </p>
+            </div>
+          )}
+          {isRecipientAddressEditable && (
+            <div className="field-info-box mt-3 py-2 px-3">
+              <div className="has-text-grey-light has-text-weight-semibold">
+                <input
+                  className="input is-medium is-outlined-white"
+                  type="text"
+                  placeholder="Enter address"
+                  onChange={updateRecipientAddressOverride}
+                  value={recipientAddressOverride}
+                />
+                <button
+                  type="button"
+                  className="button is-ghost is-outlined-white mr-2 mt-2"
+                  onClick={handleEditRecipientSave}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="button is-ghost is-outlined-white mt-2"
+                  onClick={handleEditRecipientClear}
+                >
+                  Clear
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -360,15 +491,7 @@ export default function WithdrawCard(): React.ReactElement {
           type="button"
           className="button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white"
           onClick={handleWithdraw}
-          disabled={
-            !isAmountValid ||
-            !isRecipientAddressValid ||
-            isLoading ||
-            !fromAddress ||
-            !recipientAddress ||
-            selectedEvmCurrency?.coinDenom !==
-              selectedIbcCurrencyOption?.value?.coinDenom
-          }
+          disabled={isWithdrawDisabled}
         >
           {isLoading ? "Processing..." : "Withdraw"}
         </button>

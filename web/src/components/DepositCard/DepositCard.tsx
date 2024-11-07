@@ -11,14 +11,14 @@ import {
   sendIbcTransfer,
   useIbcChainSelection,
 } from "features/KeplrWallet";
-import { useNotifications, NotificationType } from "features/Notifications";
+import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
   const { addNotification } = useNotifications();
 
   const {
-    evmAccountAddress: recipientAddress,
+    evmAccountAddress,
     selectEvmChain,
     evmChainsOptions,
     selectedEvmChain,
@@ -29,6 +29,7 @@ export default function DepositCard(): React.ReactElement {
     evmBalance,
     isLoadingEvmBalance,
     connectEVMWallet,
+    resetState: resetEvmWalletState,
   } = useEvmChainSelection(evmChains);
 
   const {
@@ -73,14 +74,38 @@ export default function DepositCard(): React.ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
+  // recipientAddressOverride is used to allow manual entry of an address
+  const [recipientAddressOverride, setRecipientAddressOverride] =
+    useState<string>("");
+  const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
+    useState<boolean>(false);
+  const handleEditRecipientClick = () => {
+    setIsRecipientAddressEditable(!isRecipientAddressEditable);
+  };
+  const handleEditRecipientSave = () => {
+    setIsRecipientAddressEditable(false);
+    // reset evmWalletState when user manually enters address
+    resetEvmWalletState();
+  };
+  const handleEditRecipientClear = () => {
+    setIsRecipientAddressEditable(false);
+    setRecipientAddressOverride("");
+  };
+  const updateRecipientAddressOverride = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRecipientAddressOverride(event.target.value);
+  };
+
   // check if form is valid whenever values change
   useEffect(() => {
-    if (recipientAddress || amount) {
-      // have touched form when recipientAddress or amount change
+    if (evmAccountAddress || amount || recipientAddressOverride) {
+      // have touched form when evmAccountAddress or amount change
       setHasTouchedForm(true);
     }
+    const recipientAddress = recipientAddressOverride || evmAccountAddress;
     checkIsFormValid(recipientAddress, amount);
-  }, [recipientAddress, amount]);
+  }, [evmAccountAddress, amount, recipientAddressOverride]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
@@ -94,6 +119,11 @@ export default function DepositCard(): React.ReactElement {
       setIsRecipientAddressValid(false);
       return;
     }
+    // check that address is correct evm address format
+    if (!addressInput.startsWith("0x")) {
+      setIsRecipientAddressValid(false);
+      return;
+    }
 
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
@@ -103,26 +133,43 @@ export default function DepositCard(): React.ReactElement {
     setIsRecipientAddressValid(addressValid);
   };
 
+  const handleConnectEVMWallet = async () => {
+    setIsRecipientAddressEditable(false);
+    setRecipientAddressOverride("");
+    await connectEVMWallet();
+  };
+
   // ensure evm wallet connection when selected EVM chain changes
   /* biome-ignore lint/correctness/useExhaustiveDependencies: */
   useEffect(() => {
     if (!selectedEvmChain) {
       return;
     }
-    connectEVMWallet().then((_) => {});
+    handleConnectEVMWallet().then((_) => {});
   }, [selectedEvmChain]);
 
-  const sendBalance = async () => {
+  // ensure keplr wallet connection when selected ibc chain changes
+  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
+  useEffect(() => {
+    if (!selectedIbcChain) {
+      return;
+    }
+    connectKeplrWallet().then((_) => {});
+  }, [selectedIbcChain]);
+
+  const handleDeposit = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
-          message: "Please select a chain and token first.",
+          message: "Please select a chain and token to bridge first.",
           onAcknowledge: () => {},
         },
       });
       return;
     }
+
+    const recipientAddress = recipientAddressOverride || evmAccountAddress;
     if (!fromAddress || !recipientAddress) {
       addNotification({
         toastOpts: {
@@ -155,6 +202,13 @@ export default function DepositCard(): React.ReactElement {
         formattedAmount,
         selectedIbcCurrency,
       );
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.SUCCESS,
+          message: "Deposit successful!",
+          onAcknowledge: () => {},
+        },
+      });
     } catch (e) {
       setIsAnimating(false);
       console.error("IBC transfer failed", e);
@@ -184,9 +238,34 @@ export default function DepositCard(): React.ReactElement {
       }
     } finally {
       setIsLoading(false);
-      setTimeout(() => setIsAnimating(false), 2000);
+      setTimeout(() => setIsAnimating(false), 1000);
     }
   };
+
+  // disable deposit button if form is invalid
+  const isDepositDisabled = useMemo<boolean>((): boolean => {
+    if (recipientAddressOverride) {
+      // there won't be a selected evm chain and currency if user manually
+      // enters a recipient address
+      return !(isAmountValid && isRecipientAddressValid && fromAddress);
+    }
+    return !(
+      evmAccountAddress &&
+      isAmountValid &&
+      isRecipientAddressValid &&
+      fromAddress &&
+      selectedIbcCurrency?.coinDenom ===
+        selectedEvmCurrencyOption?.value?.coinDenom
+    );
+  }, [
+    recipientAddressOverride,
+    evmAccountAddress,
+    isAmountValid,
+    isRecipientAddressValid,
+    fromAddress,
+    selectedIbcCurrency,
+    selectedEvmCurrencyOption,
+  ]);
 
   const additionalIbcOptions = useMemo(
     () => [
@@ -205,12 +284,18 @@ export default function DepositCard(): React.ReactElement {
     return [
       {
         label: "Connect EVM Wallet",
-        action: connectEVMWallet,
+        action: handleConnectEVMWallet,
         className: "has-text-primary",
         rightIconClass: "fas fa-plus",
       },
+      {
+        label: "Enter address manually",
+        action: handleEditRecipientClick,
+        className: "has-text-primary",
+        rightIconClass: "fas fa-pen-to-square",
+      },
     ];
-  }, [connectEVMWallet]);
+  }, [handleConnectEVMWallet, handleEditRecipientClick]);
 
   return (
     <div>
@@ -279,7 +364,7 @@ export default function DepositCard(): React.ReactElement {
           <div className="label-left">To</div>
           <div className="is-flex-grow-1">
             <Dropdown
-              placeholder="Connect EVM Wallet"
+              placeholder="Connect EVM Wallet or enter address"
               options={evmChainsOptions}
               onSelect={selectEvmChain}
               leftIconClass={"i-wallet"}
@@ -302,23 +387,77 @@ export default function DepositCard(): React.ReactElement {
             </div>
           )}
         </div>
-        {recipientAddress && (
+        {evmAccountAddress &&
+          !isRecipientAddressEditable &&
+          !recipientAddressOverride && (
+            <div className="field-info-box mt-3 py-2 px-3">
+              {evmAccountAddress && (
+                <p
+                  className="has-text-grey-light has-text-weight-semibold is-clickable"
+                  onKeyDown={handleEditRecipientClick}
+                  onClick={handleEditRecipientClick}
+                >
+                  <span className="mr-2">Address: {evmAccountAddress}</span>
+                  <i className="fas fa-pen-to-square" />
+                </p>
+              )}
+              {evmAccountAddress && !isLoadingEvmBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: {evmBalance}
+                </p>
+              )}
+              {evmAccountAddress && isLoadingEvmBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: <i className="fas fa-spinner fa-pulse" />
+                </p>
+              )}
+            </div>
+          )}
+        {recipientAddressOverride && !isRecipientAddressEditable && (
           <div className="field-info-box mt-3 py-2 px-3">
-            {recipientAddress && (
-              <p className="has-text-grey-light has-text-weight-semibold">
-                Address: {recipientAddress}
-              </p>
+            <p
+              className="has-text-grey-light has-text-weight-semibold is-clickable"
+              onKeyDown={handleEditRecipientClick}
+              onClick={handleEditRecipientClick}
+            >
+              <span className="mr-2">Address: {recipientAddressOverride}</span>
+              <i className="fas fa-pen-to-square" />
+            </p>
+            {!isRecipientAddressValid && hasTouchedForm && (
+              <div className="help is-danger mt-2">
+                Recipient address must be a valid EVM address
+              </div>
             )}
-            {recipientAddress && !isLoadingEvmBalance && (
-              <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                Balance: {evmBalance}
-              </p>
-            )}
-            {recipientAddress && isLoadingEvmBalance && (
-              <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                Balance: <i className="fas fa-spinner fa-pulse" />
-              </p>
-            )}
+            <p className="mt-2 has-text-grey-lighter has-text-weight-semibold is-size-7">
+              Connect via wallet to show balance
+            </p>
+          </div>
+        )}
+        {isRecipientAddressEditable && (
+          <div className="field-info-box mt-3 py-2 px-3">
+            <div className="has-text-grey-light has-text-weight-semibold">
+              <input
+                className="input is-medium is-outlined-white"
+                type="text"
+                placeholder="0x..."
+                onChange={updateRecipientAddressOverride}
+                value={recipientAddressOverride}
+              />
+              <button
+                type="button"
+                className="button is-ghost is-outlined-white mr-2 mt-2"
+                onClick={handleEditRecipientSave}
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                className="button is-ghost is-outlined-white mt-2"
+                onClick={handleEditRecipientClear}
+              >
+                Clear
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -351,15 +490,8 @@ export default function DepositCard(): React.ReactElement {
         <button
           type="button"
           className="button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white"
-          onClick={() => sendBalance()}
-          disabled={
-            !isAmountValid ||
-            !isRecipientAddressValid ||
-            !fromAddress ||
-            !recipientAddress ||
-            selectedIbcCurrency?.coinDenom !==
-              selectedEvmCurrencyOption?.value?.coinDenom
-          }
+          onClick={() => handleDeposit()}
+          disabled={isDepositDisabled}
         >
           {isLoading ? "Processing..." : "Deposit"}
         </button>
