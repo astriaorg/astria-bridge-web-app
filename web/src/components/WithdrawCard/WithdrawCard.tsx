@@ -187,7 +187,7 @@ export default function WithdrawCard(): React.ReactElement {
       });
     } finally {
       setIsLoading(false);
-      setTimeout(() => setIsAnimating(false), 2000);
+      setTimeout(() => setIsAnimating(false), 1000);
     }
   };
 

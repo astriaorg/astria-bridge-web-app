@@ -4,6 +4,10 @@ div.control > input {
   color: $astria-text-light;
 }
 
+input.is-outlined-white {
+  border-color: $astria-white;
+}
+
 .field {
   .label-left {
     margin-right: 1rem;
