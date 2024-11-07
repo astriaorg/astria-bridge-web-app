@@ -116,6 +116,11 @@ export default function DepositCard(): React.ReactElement {
       setIsRecipientAddressValid(false);
       return;
     }
+    // check that address is correct evm address format
+    if (!addressInput.startsWith("0x")) {
+      setIsRecipientAddressValid(false);
+      return;
+    }
 
     const amount = Number.parseFloat(amountInput);
     const amountValid = amount > 0;
@@ -406,6 +411,11 @@ export default function DepositCard(): React.ReactElement {
               <span className="mr-2">Address: {recipientAddressOverride}</span>
               <i className="fas fa-pen-to-square" />
             </p>
+            {!isRecipientAddressValid && hasTouchedForm && (
+              <div className="help is-danger mt-2">
+                Recipient address must be a valid EVM address
+              </div>
+            )}
             <p className="mt-2 has-text-grey-lighter has-text-weight-semibold is-size-7">
               Connect via wallet to show balance
             </p>
