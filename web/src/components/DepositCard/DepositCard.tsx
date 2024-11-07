@@ -29,6 +29,7 @@ export default function DepositCard(): React.ReactElement {
     evmBalance,
     isLoadingEvmBalance,
     connectEVMWallet,
+    resetState: resetEvmWalletState,
   } = useEvmChainSelection(evmChains);
 
   const {
@@ -83,6 +84,8 @@ export default function DepositCard(): React.ReactElement {
   };
   const handleEditRecipientSave = () => {
     setIsRecipientAddressEditable(false);
+    // reset evmWalletState when user manually enters address
+    resetEvmWalletState();
   };
   const handleEditRecipientClear = () => {
     setIsRecipientAddressEditable(false);
