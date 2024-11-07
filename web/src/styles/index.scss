@@ -17,6 +17,7 @@ html, body {
 @import 'footer-overrides';
 @import 'form-overrides';
 @import 'modal-overrides';
+@import 'toast-overrides';
 
 // bulma
 @import '../../node_modules/bulma/bulma';
@@ -38,6 +39,7 @@ html, body {
 @import 'form-customizations';
 @import 'modal-customizations';
 @import 'navbar-customizations';
+@import 'toast-customizations';
 
 
 // body reset
@@ -91,57 +93,6 @@ body {
 
   .label {
     white-space: nowrap;
-  }
-}
-
-.notifications-toast-container {
-  position: fixed;
-  z-index: 9999;
-  padding: 1rem;
-
-  &.mid {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  &.top-left {
-    top: 0;
-    left: 0;
-  }
-
-  &.top-mid {
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  &.top-right {
-    top: 0;
-    right: 0;
-  }
-
-  &.bottom-left {
-    bottom: 0;
-    left: 0;
-    margin-bottom: 30px;
-  }
-
-  &.bottom-mid {
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 30px;
-  }
-
-  &.bottom-right {
-    bottom: 0;
-    right: 0;
-    margin-bottom: 30px;
-  }
-
-  .notification {
-    margin-bottom: 0.5rem;
   }
 }
 

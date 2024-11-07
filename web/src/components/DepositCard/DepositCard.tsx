@@ -156,26 +156,31 @@ export default function DepositCard(): React.ReactElement {
         selectedIbcCurrency,
       );
     } catch (e) {
-      if (e instanceof Error) {
-        if (/failed to get account from keplr wallet/i.test(e.message)) {
-          addNotification({
-            toastOpts: {
-              toastType: NotificationType.DANGER,
-              message:
-                "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
-              onAcknowledge: () => {},
-            },
-          });
-        } else {
-          console.error(e.message);
-          addNotification({
-            toastOpts: {
-              toastType: NotificationType.DANGER,
-              message: "Failed to send IBC transfer",
-              onAcknowledge: () => {},
-            },
-          });
-        }
+      setIsAnimating(false);
+      console.error("IBC transfer failed", e);
+      const message = e instanceof Error ? e.message : "Unknown error.";
+      if (/failed to get account from keplr wallet/i.test(message)) {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            message:
+              "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
+            onAcknowledge: () => {},
+          },
+        });
+      } else {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            component: (
+              <>
+                <p className="mb-1">Failed to send IBC transfer.</p>
+                <p className="message-body-inner">{message}</p>
+              </>
+            ),
+            onAcknowledge: () => {},
+          },
+        });
       }
     } finally {
       setIsLoading(false);
@@ -183,7 +188,6 @@ export default function DepositCard(): React.ReactElement {
     }
   };
 
-  // this additional option is the "Connect Keplr Wallet" button
   const additionalIbcOptions = useMemo(
     () => [
       {
@@ -197,7 +201,6 @@ export default function DepositCard(): React.ReactElement {
     [connectKeplrWallet],
   );
 
-  // this additional option is the "Connect EVM Wallet" button
   const additionalEvmOptions = useMemo(() => {
     return [
       {
