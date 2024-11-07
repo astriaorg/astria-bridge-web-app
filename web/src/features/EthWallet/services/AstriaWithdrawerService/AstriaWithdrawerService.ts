@@ -27,6 +27,7 @@ export class AstriaWithdrawerService extends GenericContractService {
   ): Promise<ethers.ContractTransactionResponse> {
     const amountWei = ethers.parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
+    // need to send enough to cover fees
     const totalAmount = amountWei + feeWei;
     return this.callContractMethod(
       "withdrawToIbcChain",
