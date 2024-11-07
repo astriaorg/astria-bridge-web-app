@@ -355,7 +355,7 @@ export default function DepositCard(): React.ReactElement {
           <div className="label-left">To</div>
           <div className="is-flex-grow-1">
             <Dropdown
-              placeholder="Connect EVM Wallet"
+              placeholder="Connect EVM Wallet or enter address"
               options={evmChainsOptions}
               onSelect={selectEvmChain}
               leftIconClass={"i-wallet"}
