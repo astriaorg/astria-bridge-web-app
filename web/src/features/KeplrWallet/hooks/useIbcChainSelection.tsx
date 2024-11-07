@@ -38,14 +38,13 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   const [isLoadingIbcBalance, setIsLoadingIbcBalance] =
     useState<boolean>(false);
 
-  // ensure we're connected to keplr wallet when selected ibc chain changes.
-  // this is mostly to suggest the chain if it doesn't exist in the user's Keplr wallet yet.
-  useEffect(() => {
-    if (!selectedIbcChain) {
-      return;
-    }
-    connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
+  const resetState = useCallback(() => {
+    setSelectedIbcChain(null);
+    setSelectedIbcCurrency(null);
+    setIbcAccountAddress(null);
+    setIbcBalance(null);
+    setIsLoadingIbcBalance(false);
+  }, []);
 
   useEffect(() => {
     async function getAndSetBalance() {
@@ -218,5 +217,6 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     isLoadingIbcBalance,
 
     connectKeplrWallet,
+    resetState,
   };
 }
