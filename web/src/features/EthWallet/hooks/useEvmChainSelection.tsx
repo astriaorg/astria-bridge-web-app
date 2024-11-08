@@ -41,6 +41,14 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   const [isLoadingEvmBalance, setIsLoadingEvmBalance] =
     useState<boolean>(false);
 
+  const resetState = useCallback(() => {
+    setSelectedEvmChain(null);
+    setSelectedEvmCurrency(null);
+    setEvmAccountAddress(null);
+    setEvmBalance(null);
+    setIsLoadingEvmBalance(false);
+  }, []);
+
   useEffect(() => {
     async function getAndSetBalance() {
       if (
@@ -80,8 +88,8 @@ export function useEvmChainSelection(evmChains: EvmChains) {
           setEvmBalance(balance);
         }
         setIsLoadingEvmBalance(false);
-      } catch (error) {
-        console.error("Failed to get balance from EVM", error);
+      } catch (e) {
+        console.error("Failed to get balance from EVM", e);
         setIsLoadingEvmBalance(false);
       }
     }
@@ -234,5 +242,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     isLoadingEvmBalance,
 
     connectEVMWallet,
+    resetState,
   };
 }

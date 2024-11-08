@@ -38,14 +38,13 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   const [isLoadingIbcBalance, setIsLoadingIbcBalance] =
     useState<boolean>(false);
 
-  // ensure we're connected to keplr wallet when selected ibc chain changes.
-  // this is mostly to suggest the chain if it doesn't exist in the user's Keplr wallet yet.
-  useEffect(() => {
-    if (!selectedIbcChain) {
-      return;
-    }
-    connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
+  const resetState = useCallback(() => {
+    setSelectedIbcChain(null);
+    setSelectedIbcCurrency(null);
+    setIbcAccountAddress(null);
+    setIbcBalance(null);
+    setIsLoadingIbcBalance(false);
+  }, []);
 
   useEffect(() => {
     async function getAndSetBalance() {
@@ -63,8 +62,8 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
         );
         setIbcBalance(balance);
         setIsLoadingIbcBalance(false);
-      } catch (error) {
-        console.error("Failed to get balance from Keplr", error);
+      } catch (e) {
+        console.error("Failed to get balance from Keplr", e);
         setIsLoadingIbcBalance(false);
       }
     }
@@ -80,8 +79,8 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
       try {
         const address = await getAddressFromKeplr(selectedIbcChain.chainId);
         setIbcAccountAddress(address);
-      } catch (error) {
-        console.error("Failed to get address from Keplr", error);
+      } catch (e) {
+        console.error("Failed to get address from Keplr", e);
       }
     }
 
@@ -150,10 +149,10 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     let keplr: Keplr;
     try {
       keplr = getKeplrFromWindow();
-    } catch (err) {
+    } catch (e) {
       addNotification({
         toastOpts: {
-          toastType: NotificationType.DANGER,
+          toastType: NotificationType.WARNING,
           component: (
             <p>
               Keplr wallet extension must be installed! You can find it{" "}
@@ -218,5 +217,6 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     isLoadingIbcBalance,
 
     connectKeplrWallet,
+    resetState,
   };
 }

@@ -47,27 +47,31 @@ export const sendIbcTransfer = async (
   currency: IbcCurrency,
 ) => {
   const keplr = getKeplrFromWindow();
-  const offlineSigner = keplr.getOfflineSigner(selectedIbcChain.chainId);
+  const offlineSigner = keplr.getOfflineSignerOnlyAmino(
+    selectedIbcChain.chainId,
+  );
 
   const client = await SigningStargateClient.connectWithSigner(
     selectedIbcChain.rpc,
     offlineSigner,
   );
 
-  // FIXME - should i check if key.bech32Address matches sender?
   const key = await getKeyFromKeplr(selectedIbcChain.chainId);
-  const account = await client.getAccount(key.bech32Address);
+  if (key.bech32Address !== sender) {
+    throw new Error("Sender address does not match Keplr wallet address.");
+  }
 
   // FIXME - no account here when the address does not have any native tokens for the chain?
   //  e.g. testing w/ Celestia Mocha-4 with an address that doesn't have any TIA on mocha.
+  const account = await client.getAccount(key.bech32Address);
   if (!account) {
     throw new Error("Failed to get account from Keplr wallet.");
   }
 
-  const feeDenom = currency.coinMinimalDenom;
   const memo = JSON.stringify({ rollupDepositAddress: recipient });
 
   // TODO - does the fee need to be configurable in the ui?
+  const feeDenom = currency.coinMinimalDenom;
   const fee = {
     amount: [
       {
@@ -90,10 +94,8 @@ export const sendIbcTransfer = async (
       sender: sender,
       memo: memo,
       receiver: currency.sequencerBridgeAccount,
-      // Timeout is in nanoseconds. Use Long.UZERO for default timeout
-      timeoutTimestamp: Long.fromNumber(Date.now() + 600_000).multiply(
-        1_000_000,
-      ),
+      // 10 minutes from now, in nanoseconds
+      timeoutTimestamp: BigInt(Date.now() + 600_000) * BigInt(1_000_000),
     },
   };
 
