@@ -358,7 +358,7 @@ export default function WithdrawCard(): React.ReactElement {
             <div className="label-left">To</div>
             <div className="is-flex-grow-1">
               <Dropdown
-                placeholder="Select..."
+                placeholder="Connect Keplr Wallet or enter address"
                 options={ibcChainsOptions}
                 onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
