@@ -10,11 +10,10 @@ import { formatBalance } from "features/EthWallet/utils/utils";
 
 export interface EthWalletContextProps {
   providers: EIP6963ProviderDetail[];
-  selectedWallet: EIP6963ProviderDetail | undefined; // TODO - refactor to be an ethers.Provider to make things easier?
+  selectedWallet: EIP6963ProviderDetail | undefined;
+  provider: ethers.BrowserProvider | undefined;
   userAccount: UserAccount | undefined;
   selectedChain: EvmChainInfo | undefined;
-  provider: ethers.BrowserProvider | undefined;
-  signer: ethers.Signer | undefined;
   handleConnect: (
     providerWithInfo: EIP6963ProviderDetail,
     defaultChain: EvmChainInfo,
@@ -32,7 +31,6 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
   const [selectedProvider, setSelectedProvider] =
     useState<ethers.BrowserProvider>();
   const [userAccount, setUserAccount] = useState<UserAccount>();
-  const [signer, setSigner] = useState<ethers.Signer>();
   const providers = useSyncWalletProviders();
   const [selectedChain, setSelectedChain] = useState<
     EvmChainInfo | undefined
@@ -138,13 +136,11 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
         // use first account
         const address = accounts[0];
 
-        // create an ethers provider and signer
+        // create an ethers provider from eip1193 provider
         const ethersProvider = new ethers.BrowserProvider(
           providerWithInfo.provider,
         );
         setSelectedProvider(ethersProvider);
-        const ethersSigner = await ethersProvider.getSigner();
-        setSigner(ethersSigner);
 
         // get balance using ethers
         const balance = await ethersProvider.getBalance(address);
@@ -178,7 +174,6 @@ export const EthWalletContextProvider: React.FC<{ children: ReactNode }> = ({
         selectedWallet,
         userAccount,
         selectedChain,
-        signer,
         handleConnect,
       }}
     >

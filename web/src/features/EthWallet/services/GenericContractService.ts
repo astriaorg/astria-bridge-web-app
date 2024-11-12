@@ -52,7 +52,6 @@ export default class GenericContractService {
     if (!this.contractPromise) {
       this.contractPromise = (async () => {
         try {
-          console.log("get contract", this.walletProvider);
           const signer = await this.walletProvider.getSigner(address);
           return new ethers.Contract(this.contractAddress, this.abi, signer);
         } catch (e) {
