@@ -26,7 +26,7 @@ import { formatBalance } from "features/EthWallet/utils/utils";
 
 export function useEvmChainSelection(evmChains: EvmChains) {
   const { addNotification } = useNotifications();
-  const { selectedWallet, userAccount } = useEthWallet();
+  const { provider, userAccount } = useEthWallet();
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
@@ -52,7 +52,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   useEffect(() => {
     async function getAndSetBalance() {
       if (
-        !selectedWallet ||
+        !provider ||
         !userAccount ||
         !selectedEvmChain ||
         !selectedEvmCurrency ||
@@ -70,7 +70,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
           selectedEvmCurrency.nativeTokenWithdrawerContractAddress ||
           "";
         const withdrawerSvc = getAstriaWithdrawerService(
-          selectedWallet.provider,
+          provider,
           contractAddress,
           Boolean(selectedEvmCurrency.erc20ContractAddress),
         );
@@ -98,7 +98,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   }, [
     selectedEvmChain,
     selectedEvmCurrency,
-    selectedWallet,
+    provider,
     userAccount,
     evmAccountAddress,
   ]);
@@ -175,7 +175,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   // create refs to hold the latest state values
   const latestState = useRef({
     userAccount,
-    selectedWallet,
+    provider,
     evmAccountAddress,
     selectedEvmChain,
   });
@@ -184,11 +184,11 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   useEffect(() => {
     latestState.current = {
       userAccount,
-      selectedWallet,
+      provider,
       evmAccountAddress,
       selectedEvmChain,
     };
-  }, [userAccount, selectedWallet, evmAccountAddress, selectedEvmChain]);
+  }, [userAccount, provider, evmAccountAddress, selectedEvmChain]);
 
   const connectEVMWallet = async () => {
     if (!selectedEvmChain) {
@@ -206,8 +206,8 @@ export function useEvmChainSelection(evmChains: EvmChains) {
           const currentState = latestState.current;
           setEvmAccountAddress("");
           setSelectedEvmChain(null);
-          if (currentState.selectedWallet) {
-            currentState.selectedWallet = undefined;
+          if (currentState.provider) {
+            currentState.provider = undefined;
           }
         },
         onConfirm: () => {

@@ -15,7 +15,7 @@ import { NotificationType, useNotifications } from "features/Notifications";
 export default function WithdrawCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
   const { addNotification } = useNotifications();
-  const { selectedWallet } = useEthWallet();
+  const { provider } = useEthWallet();
 
   const {
     evmAccountAddress: fromAddress,
@@ -163,7 +163,7 @@ export default function WithdrawCard(): React.ReactElement {
     }
 
     const recipientAddress = recipientAddressOverride || ibcAccountAddress;
-    if (!selectedWallet || !fromAddress || !recipientAddress) {
+    if (!provider || !fromAddress || !recipientAddress) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
@@ -194,7 +194,7 @@ export default function WithdrawCard(): React.ReactElement {
         selectedEvmCurrency.nativeTokenWithdrawerContractAddress ||
         "";
       const withdrawerSvc = getAstriaWithdrawerService(
-        selectedWallet.provider,
+        provider,
         contractAddress,
         Boolean(selectedEvmCurrency.erc20ContractAddress),
       );

@@ -9,10 +9,10 @@ export default class GenericContractService {
   protected contractPromise: Promise<ethers.Contract> | null = null;
 
   protected constructor(
-    walletProvider: ethers.Eip1193Provider,
+    walletProvider: ethers.BrowserProvider,
     contractAddress: string,
   ) {
-    this.walletProvider = new ethers.BrowserProvider(walletProvider);
+    this.walletProvider = walletProvider;
     this.contractAddress = contractAddress;
     this.abi = (this.constructor as typeof GenericContractService).ABI;
   }
@@ -23,7 +23,7 @@ export default class GenericContractService {
   }
 
   public static getInstance(
-    provider: ethers.Eip1193Provider,
+    provider: ethers.BrowserProvider,
     contractAddress: string,
   ): GenericContractService {
     /* biome-ignore lint/complexity/noThisInStatic: */
@@ -43,8 +43,8 @@ export default class GenericContractService {
     return instance;
   }
 
-  protected updateProvider(provider: ethers.Eip1193Provider): void {
-    this.walletProvider = new ethers.BrowserProvider(provider);
+  protected updateProvider(provider: ethers.BrowserProvider): void {
+    this.walletProvider = provider;
     this.contractPromise = null;
   }
 
@@ -52,6 +52,7 @@ export default class GenericContractService {
     if (!this.contractPromise) {
       this.contractPromise = (async () => {
         try {
+          console.log("get contract", this.walletProvider);
           const signer = await this.walletProvider.getSigner(address);
           return new ethers.Contract(this.contractAddress, this.abi, signer);
         } catch (e) {

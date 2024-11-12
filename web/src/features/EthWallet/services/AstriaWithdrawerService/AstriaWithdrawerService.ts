@@ -7,7 +7,7 @@ export class AstriaWithdrawerService extends GenericContractService {
   ];
 
   public static override getInstance(
-    provider: ethers.Eip1193Provider,
+    provider: ethers.BrowserProvider,
     contractAddress: string,
   ): AstriaWithdrawerService {
     /* biome-ignore lint/complexity/noThisInStatic: */
@@ -49,7 +49,7 @@ export class AstriaErc20WithdrawerService extends GenericContractService {
   ];
 
   public static override getInstance(
-    provider: ethers.Eip1193Provider,
+    provider: ethers.BrowserProvider,
     contractAddress: string,
   ): AstriaErc20WithdrawerService {
     /* biome-ignore lint/complexity/noThisInStatic: */
@@ -86,7 +86,7 @@ export class AstriaErc20WithdrawerService extends GenericContractService {
 
 // Helper function to get AstriaWithdrawerService instance
 export const getAstriaWithdrawerService = (
-  provider: ethers.Eip1193Provider,
+  provider: ethers.BrowserProvider,
   contractAddress: string,
   isErc20 = false,
 ): AstriaWithdrawerService | AstriaErc20WithdrawerService => {
