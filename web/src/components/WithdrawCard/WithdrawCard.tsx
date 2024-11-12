@@ -5,6 +5,7 @@ import { useConfig } from "config";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
 import {
+  AddERC20ToWalletButton,
   getAstriaWithdrawerService,
   useEthWallet,
   useEvmChainSelection,
@@ -15,7 +16,7 @@ import { NotificationType, useNotifications } from "features/Notifications";
 export default function WithdrawCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
   const { addNotification } = useNotifications();
-  const { selectedWallet } = useEthWallet();
+  const { provider } = useEthWallet();
 
   const {
     evmAccountAddress: fromAddress,
@@ -163,7 +164,7 @@ export default function WithdrawCard(): React.ReactElement {
     }
 
     const recipientAddress = recipientAddressOverride || ibcAccountAddress;
-    if (!selectedWallet || !fromAddress || !recipientAddress) {
+    if (!provider || !fromAddress || !recipientAddress) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
@@ -194,7 +195,7 @@ export default function WithdrawCard(): React.ReactElement {
         selectedEvmCurrency.nativeTokenWithdrawerContractAddress ||
         "";
       const withdrawerSvc = getAstriaWithdrawerService(
-        selectedWallet.provider,
+        provider,
         contractAddress,
         Boolean(selectedEvmCurrency.erc20ContractAddress),
       );
@@ -333,6 +334,9 @@ export default function WithdrawCard(): React.ReactElement {
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
+              )}
+              {selectedEvmCurrency?.erc20ContractAddress && (
+                <AddERC20ToWalletButton evmCurrency={selectedEvmCurrency} />
               )}
             </div>
           )}

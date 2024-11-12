@@ -1,3 +1,4 @@
+import AddERC20ToWalletButton from "./components/AddERC20ToWalletButton/AddERC20ToWalletButton";
 import EthWalletConnector from "./components/EthWalletConnector/EthWalletConnector";
 import { EthWalletContextProvider } from "./contexts/EthWalletContext";
 import { useEthWallet } from "./hooks/useEthWallet";
@@ -6,6 +7,7 @@ import { getAstriaWithdrawerService } from "./services/AstriaWithdrawerService/A
 
 export {
   getAstriaWithdrawerService,
+  AddERC20ToWalletButton,
   EthWalletConnector,
   EthWalletContextProvider,
   useEthWallet,

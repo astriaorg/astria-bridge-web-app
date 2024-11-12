@@ -50,11 +50,11 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
   describe("AstriaWithdrawerService", () => {
     it("should create a singleton instance", () => {
       const service1 = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
+        {} as ethers.BrowserProvider,
         mockContractAddress,
       );
       const service2 = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
+        {} as ethers.BrowserProvider,
         mockContractAddress,
       );
 
@@ -63,8 +63,8 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
     });
 
     it("should update provider when a new one is supplied", () => {
-      const initialProvider = {} as ethers.Eip1193Provider;
-      const newProvider = {} as ethers.Eip1193Provider;
+      const initialProvider = {} as ethers.BrowserProvider;
+      const newProvider = {} as ethers.BrowserProvider;
 
       const service1 = getAstriaWithdrawerService(
         initialProvider,
@@ -76,17 +76,13 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
       );
 
       expect(service1).toBe(service2);
-      expect(ethers.BrowserProvider).toHaveBeenCalledTimes(2);
-      expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(
-        1,
-        initialProvider,
-      );
-      expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(2, newProvider);
     });
 
     it("should call withdrawToIbcChain with correct parameters", async () => {
+      const provider = new ethers.BrowserProvider({} as ethers.Eip1193Provider);
+
       const service = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
+        provider,
         mockContractAddress,
       ) as AstriaWithdrawerService;
 
@@ -113,12 +109,12 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
   describe("AstriaErc20WithdrawerService", () => {
     it("should create a singleton instance", () => {
       const service1 = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
+        {} as ethers.BrowserProvider,
         mockContractAddress,
         true,
       );
       const service2 = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
+        {} as ethers.BrowserProvider,
         mockContractAddress,
         true,
       );
@@ -128,8 +124,8 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
     });
 
     it("should update provider when a new one is supplied", () => {
-      const initialProvider = {} as ethers.Eip1193Provider;
-      const newProvider = {} as ethers.Eip1193Provider;
+      const initialProvider = {} as ethers.BrowserProvider;
+      const newProvider = {} as ethers.BrowserProvider;
 
       const service1 = getAstriaWithdrawerService(
         initialProvider,
@@ -143,17 +139,13 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
       );
 
       expect(service1).toBe(service2);
-      expect(ethers.BrowserProvider).toHaveBeenCalledTimes(2);
-      expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(
-        1,
-        initialProvider,
-      );
-      expect(ethers.BrowserProvider).toHaveBeenNthCalledWith(2, newProvider);
     });
 
-    it("should call withdrawToIbcChain with correct parameters", async () => {
+    it("should call withdrawToIbcChain for erc20 with correct parameters", async () => {
+      const provider = new ethers.BrowserProvider({} as ethers.Eip1193Provider);
+
       const service = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
+        provider,
         mockContractAddress,
         true,
       ) as AstriaErc20WithdrawerService;
@@ -179,7 +171,7 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
   describe("getAstriaWithdrawerService", () => {
     it("should return AstriaWithdrawerService when isErc20 is false", () => {
       const service = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
+        {} as ethers.BrowserProvider,
         mockContractAddress,
         false,
       );
@@ -188,7 +180,7 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
 
     it("should return AstriaErc20WithdrawerService when isErc20 is true", () => {
       const service = getAstriaWithdrawerService(
-        {} as ethers.Eip1193Provider,
+        {} as ethers.BrowserProvider,
         mockContractAddress,
         true,
       );
