@@ -5,6 +5,7 @@ import { useConfig } from "config";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
 import {
+  AddERC20ToWalletButton,
   getAstriaWithdrawerService,
   useEthWallet,
   useEvmChainSelection,
@@ -333,6 +334,9 @@ export default function WithdrawCard(): React.ReactElement {
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
+              )}
+              {selectedEvmCurrency?.erc20ContractAddress && (
+                <AddERC20ToWalletButton evmCurrency={selectedEvmCurrency} />
               )}
             </div>
           )}
