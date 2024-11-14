@@ -4,6 +4,9 @@
   .content {
     a {
       color: $astria-orange-soft;
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 }
