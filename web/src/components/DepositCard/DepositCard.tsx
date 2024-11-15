@@ -5,7 +5,10 @@ import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config";
-import { useEvmChainSelection } from "features/EthWallet";
+import {
+  AddERC20ToWalletButton,
+  useEvmChainSelection,
+} from "features/EthWallet";
 import {
   padDecimal,
   sendIbcTransfer,
@@ -410,6 +413,11 @@ export default function DepositCard(): React.ReactElement {
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
+              )}
+              {selectedEvmCurrencyOption?.value?.erc20ContractAddress && (
+                <AddERC20ToWalletButton
+                  evmCurrency={selectedEvmCurrencyOption.value}
+                />
               )}
             </div>
           )}

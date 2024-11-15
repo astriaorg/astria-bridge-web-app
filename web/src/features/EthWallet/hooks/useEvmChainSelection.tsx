@@ -19,14 +19,15 @@ import { NotificationType, useNotifications } from "features/Notifications";
 import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
 import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import {
-  AstriaErc20WithdrawerService,
+  type AstriaErc20WithdrawerService,
   getAstriaWithdrawerService,
 } from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { formatBalance } from "features/EthWallet/utils/utils";
+import { useBalancePolling } from "features/GetBalancePolling";
 
 export function useEvmChainSelection(evmChains: EvmChains) {
   const { addNotification } = useNotifications();
-  const { selectedWallet, userAccount } = useEthWallet();
+  const { provider, userAccount } = useEthWallet();
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
@@ -37,71 +38,82 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     null,
   );
 
-  const [evmBalance, setEvmBalance] = useState<string | null>(null);
-  const [isLoadingEvmBalance, setIsLoadingEvmBalance] =
-    useState<boolean>(false);
-
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
     setEvmAccountAddress(null);
-    setEvmBalance(null);
-    setIsLoadingEvmBalance(false);
   }, []);
 
-  useEffect(() => {
-    async function getAndSetBalance() {
-      if (
-        !selectedWallet ||
-        !userAccount ||
-        !selectedEvmChain ||
-        !selectedEvmCurrency ||
-        !evmAccountAddress
-      ) {
-        return;
-      }
-      if (!evmCurrencyBelongsToChain(selectedEvmCurrency, selectedEvmChain)) {
-        return;
-      }
-      setIsLoadingEvmBalance(true);
-      try {
-        const contractAddress =
-          selectedEvmCurrency.erc20ContractAddress ||
-          selectedEvmCurrency.nativeTokenWithdrawerContractAddress ||
-          "";
-        const withdrawerSvc = getAstriaWithdrawerService(
-          selectedWallet.provider,
-          contractAddress,
-          Boolean(selectedEvmCurrency.erc20ContractAddress),
-        );
-        if (withdrawerSvc instanceof AstriaErc20WithdrawerService) {
-          const balanceRes = await withdrawerSvc.getBalance(evmAccountAddress);
-          const balanceStr = formatBalance(
-            balanceRes.toString(),
-            selectedEvmCurrency.coinDecimals,
-          );
-          const balance = `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
-          setEvmBalance(balance);
-        } else {
-          // for native token balance
-          const balance = `${userAccount.balance} ${selectedEvmCurrency.coinDenom}`;
-          setEvmBalance(balance);
-        }
-        setIsLoadingEvmBalance(false);
-      } catch (e) {
-        console.error("Failed to get balance from EVM", e);
-        setIsLoadingEvmBalance(false);
-      }
+  const getBalanceCallback = useCallback(async () => {
+    if (
+      !provider ||
+      !userAccount ||
+      !selectedEvmChain ||
+      !selectedEvmCurrency ||
+      !evmAccountAddress
+    ) {
+      console.log(
+        "provider, userAccount, chain, currency, or address is null",
+        {
+          provider,
+          userAccount,
+          selectedEvmChain,
+          selectedEvmCurrency,
+          evmAccountAddress,
+        },
+      );
+      return null;
+    }
+    if (!evmCurrencyBelongsToChain(selectedEvmCurrency, selectedEvmChain)) {
+      return null;
+    }
+    if (selectedEvmCurrency.erc20ContractAddress) {
+      const withdrawerSvc = getAstriaWithdrawerService(
+        provider,
+        selectedEvmCurrency.erc20ContractAddress,
+        true,
+      ) as AstriaErc20WithdrawerService;
+      const balanceRes = await withdrawerSvc.getBalance(evmAccountAddress);
+      const balanceStr = formatBalance(
+        balanceRes.toString(),
+        selectedEvmCurrency.coinDecimals,
+      );
+      return `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
     }
 
-    getAndSetBalance().then((_) => {});
+    return `${userAccount.balance} ${selectedEvmCurrency.coinDenom}`;
   }, [
+    provider,
+    userAccount,
     selectedEvmChain,
     selectedEvmCurrency,
-    selectedWallet,
-    userAccount,
     evmAccountAddress,
   ]);
+
+  const pollingConfig = useMemo(
+    () => ({
+      enabled: Boolean(
+        provider &&
+          userAccount &&
+          selectedEvmChain &&
+          selectedEvmCurrency &&
+          evmAccountAddress,
+      ),
+      intervalMS: 10_000,
+      onError: (error: Error) => {
+        console.error("Failed to get balance from EVM wallet", error);
+      },
+    }),
+    [
+      provider,
+      userAccount,
+      selectedEvmChain,
+      selectedEvmCurrency,
+      evmAccountAddress,
+    ],
+  );
+  const { balance: evmBalance, isLoading: isLoadingEvmBalance } =
+    useBalancePolling(getBalanceCallback, pollingConfig);
 
   const selectedEvmChainNativeToken = useMemo(() => {
     return selectedEvmChain?.currencies[0];
@@ -175,7 +187,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   // create refs to hold the latest state values
   const latestState = useRef({
     userAccount,
-    selectedWallet,
+    provider,
     evmAccountAddress,
     selectedEvmChain,
   });
@@ -184,11 +196,11 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   useEffect(() => {
     latestState.current = {
       userAccount,
-      selectedWallet,
+      provider,
       evmAccountAddress,
       selectedEvmChain,
     };
-  }, [userAccount, selectedWallet, evmAccountAddress, selectedEvmChain]);
+  }, [userAccount, provider, evmAccountAddress, selectedEvmChain]);
 
   const connectEVMWallet = async () => {
     if (!selectedEvmChain) {
@@ -206,8 +218,8 @@ export function useEvmChainSelection(evmChains: EvmChains) {
           const currentState = latestState.current;
           setEvmAccountAddress("");
           setSelectedEvmChain(null);
-          if (currentState.selectedWallet) {
-            currentState.selectedWallet = undefined;
+          if (currentState.provider) {
+            currentState.provider = undefined;
           }
         },
         onConfirm: () => {

@@ -38,7 +38,7 @@ interface DropdownProps<T> {
   valueOverride?: DropdownOption<T> | null;
 }
 
-function Dropdown<T>({
+export default function Dropdown<T>({
   options,
   onSelect,
   placeholder = "Select an option",
@@ -199,5 +199,3 @@ function Dropdown<T>({
     </div>
   );
 }
-
-export default Dropdown;
