@@ -14,6 +14,7 @@ import {
   getBalanceFromKeplr,
   getKeplrFromWindow,
 } from "features/KeplrWallet/services/ibc";
+import { useBalancePolling } from "features/GetBalancePolling";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.
@@ -34,42 +35,34 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     null,
   );
 
-  const [ibcBalance, setIbcBalance] = useState<string | null>(null);
-  const [isLoadingIbcBalance, setIsLoadingIbcBalance] =
-    useState<boolean>(false);
-
   const resetState = useCallback(() => {
     setSelectedIbcChain(null);
     setSelectedIbcCurrency(null);
     setIbcAccountAddress(null);
-    setIbcBalance(null);
-    setIsLoadingIbcBalance(false);
   }, []);
 
-  useEffect(() => {
-    async function getAndSetBalance() {
-      if (!selectedIbcChain || !selectedIbcCurrency) {
-        return;
-      }
-      if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedIbcChain)) {
-        return;
-      }
-      setIsLoadingIbcBalance(true);
-      try {
-        const balance = await getBalanceFromKeplr(
-          selectedIbcChain,
-          selectedIbcCurrency,
-        );
-        setIbcBalance(balance);
-        setIsLoadingIbcBalance(false);
-      } catch (e) {
-        console.error("Failed to get balance from Keplr", e);
-        setIsLoadingIbcBalance(false);
-      }
+  const getBalanceCallback = useCallback(async () => {
+    if (!selectedIbcChain || !selectedIbcCurrency) {
+      return null;
     }
-
-    getAndSetBalance().then((_) => {});
+    if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedIbcChain)) {
+      return null;
+    }
+    return getBalanceFromKeplr(selectedIbcChain, selectedIbcCurrency);
   }, [selectedIbcChain, selectedIbcCurrency]);
+
+  const pollingConfig = useMemo(
+    () => ({
+      enabled: !!selectedIbcChain && !!selectedIbcCurrency,
+      intervalMS: 10_000,
+      onError: (error: Error) => {
+        console.error("Failed to get balance from Keplr", error);
+      },
+    }),
+    [selectedIbcChain, selectedIbcCurrency],
+  );
+  const { balance: ibcBalance, isLoading: isLoadingIbcBalance } =
+    useBalancePolling(getBalanceCallback, pollingConfig);
 
   useEffect(() => {
     async function getAddress() {
