@@ -13,22 +13,26 @@
     "@keplr-wallet/types": "^0.12.22",
     "@keplr-wallet/unit": "^0.12.22",
     "@types/node": "^16.18.56",
-    "@types/react": "^18.2.24",
-    "@types/react-dom": "^18.2.8",
+    "@types/react-dom": "^18.3.1",
     "@types/uuid": "^9.0.8",
     "bulma": "^0.9.4",
     "ethers": "^6.13.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-ga4": "^2.1.0",
     "react-hook-form": "^7.50.0",
     "react-router-dom": "^6.17.0",
     "react-scripts": "5.0.1",
     "sass": "^1.68.0",
-    "typescript": "^4.9.5",
+    "typescript": "^5.7.2",
     "util": "^0.12.5",
     "uuid": "^9.0.1",
     "web-vitals": "^2.1.4"
+  },
+  "overrides": {
+    "react-scripts": {
+      "typescript": "^5"
+    }
   },
   "scripts": {
     "start": "react-app-rewired start",
@@ -42,7 +46,11 @@
     "lint-apply-unsafe": "biome lint --apply-unsafe ./src ./public"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
@@ -52,18 +60,14 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@biomejs/biome": "1.7.3",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^15.0.7",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
+    "@types/react": "^18.3.12",
     "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
-    "https-browserify": "^1.0.0",
-    "os-browserify": "^0.3.0",
-    "process": "^0.11.10",
     "react-app-rewired": "^2.2.1",
-    "stream-browserify": "^3.0.0",
-    "stream-http": "^3.2.0",
-    "vm-browserify": "^1.1.2"
+    "stream-browserify": "^3.0.0"
   }
 }
