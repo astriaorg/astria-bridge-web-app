@@ -6,6 +6,9 @@ import React, {
   useState,
 } from "react";
 import { ethers } from "ethers";
+import {
+  useConnectModal,
+} from '@rainbow-me/rainbowkit';
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
@@ -14,20 +17,23 @@ import {
   type EvmCurrency,
   evmCurrencyBelongsToChain,
 } from "config";
-import { NotificationType, useNotifications } from "features/Notifications";
 
-import { useEthWallet } from "features/EthWallet/hooks/useEthWallet";
-import EthWalletConnector from "features/EthWallet/components/EthWalletConnector/EthWalletConnector";
 import {
   type AstriaErc20WithdrawerService,
   getAstriaWithdrawerService,
 } from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { formatBalance } from "features/EthWallet/utils/utils";
 import { useBalancePolling } from "features/GetBalancePolling";
+import { useAccount, useBalance, useConfig } from "wagmi";
+import { getEthersProvider } from "../../EvmWallet/utils.ts";
 
 export function useEvmChainSelection(evmChains: EvmChains) {
-  const { addNotification } = useNotifications();
-  const { provider, userAccount } = useEthWallet();
+  const { openConnectModal } = useConnectModal();
+  const wagmiConfig = useConfig();
+  const userAccount = useAccount();
+  const nativeTokenBalance = useBalance({
+    address: userAccount.address,
+  });
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
@@ -38,6 +44,12 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     null,
   );
 
+  useEffect(() => {
+    if (userAccount?.address) {
+      setEvmAccountAddress(userAccount.address);
+    }
+  }, [userAccount.address]);
+
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
@@ -45,9 +57,11 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   }, []);
 
   const getBalanceCallback = useCallback(async () => {
+    const provider = await getEthersProvider(wagmiConfig, {
+      chainId: selectedEvmChain?.chainId,
+    });
     if (
       !provider ||
-      !userAccount ||
       !selectedEvmChain ||
       !selectedEvmCurrency ||
       !evmAccountAddress
@@ -56,7 +70,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
         "provider, userAccount, chain, currency, or address is null",
         {
           provider,
-          userAccount,
           selectedEvmChain,
           selectedEvmCurrency,
           evmAccountAddress,
@@ -81,10 +94,10 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       return `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
     }
 
-    return `${userAccount.balance} ${selectedEvmCurrency.coinDenom}`;
+    return `${nativeTokenBalance?.data?.formatted} ${selectedEvmCurrency.coinDenom}`;
   }, [
-    provider,
-    userAccount,
+    wagmiConfig,
+    nativeTokenBalance?.data?.formatted,
     selectedEvmChain,
     selectedEvmCurrency,
     evmAccountAddress,
@@ -93,8 +106,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   const pollingConfig = useMemo(
     () => ({
       enabled: Boolean(
-        provider &&
-          userAccount &&
           selectedEvmChain &&
           selectedEvmCurrency &&
           evmAccountAddress,
@@ -105,8 +116,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       },
     }),
     [
-      provider,
-      userAccount,
       selectedEvmChain,
       selectedEvmCurrency,
       evmAccountAddress,
@@ -187,7 +196,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   // create refs to hold the latest state values
   const latestState = useRef({
     userAccount,
-    provider,
     evmAccountAddress,
     selectedEvmChain,
   });
@@ -196,11 +204,10 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   useEffect(() => {
     latestState.current = {
       userAccount,
-      provider,
       evmAccountAddress,
       selectedEvmChain,
     };
-  }, [userAccount, provider, evmAccountAddress, selectedEvmChain]);
+  }, [userAccount, evmAccountAddress, selectedEvmChain]);
 
   const connectEVMWallet = async () => {
     if (!selectedEvmChain) {
@@ -209,30 +216,9 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       return;
     }
 
-    addNotification({
-      modalOpts: {
-        modalType: NotificationType.INFO,
-        title: "Connect EVM Wallet",
-        component: <EthWalletConnector />,
-        onCancel: () => {
-          const currentState = latestState.current;
-          setEvmAccountAddress("");
-          setSelectedEvmChain(null);
-          if (currentState.provider) {
-            currentState.provider = undefined;
-          }
-        },
-        onConfirm: () => {
-          const currentState = latestState.current;
-          if (!currentState.userAccount) {
-            setEvmAccountAddress("");
-            setSelectedEvmChain(null);
-          } else {
-            setEvmAccountAddress(currentState.userAccount.address);
-          }
-        },
-      },
-    });
+    if (openConnectModal) {
+      openConnectModal();
+    }
   };
 
   return {

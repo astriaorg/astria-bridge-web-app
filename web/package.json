@@ -12,6 +12,8 @@
     "@keplr-wallet/stores": "^0.12.22",
     "@keplr-wallet/types": "^0.12.22",
     "@keplr-wallet/unit": "^0.12.22",
+    "@rainbow-me/rainbowkit": "^2.2.0",
+    "@tanstack/react-query": "^5.61.0",
     "@types/node": "^16.18.56",
     "@types/react-dom": "^18.3.1",
     "@types/uuid": "^9.0.8",
@@ -27,6 +29,8 @@
     "typescript": "^5.7.2",
     "util": "^0.12.5",
     "uuid": "^9.0.1",
+    "viem": "^2.21.49",
+    "wagmi": "^2.13.0",
     "web-vitals": "^2.1.4"
   },
   "overrides": {

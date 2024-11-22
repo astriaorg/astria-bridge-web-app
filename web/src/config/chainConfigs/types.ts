@@ -1,4 +1,5 @@
 import type { ChainInfo } from "@keplr-wallet/types";
+import type { Chain } from "@rainbow-me/rainbowkit";
 
 /**
  * Represents information about an IBC chain.
@@ -51,9 +52,76 @@ export type EvmChainInfo = {
   chainId: number;
   chainName: string;
   currencies: EvmCurrency[];
-  rpcUrls?: string[];
+  rpcUrls: string[];
   iconClass?: string;
+  blockExplorerUrl?: string;
 };
+
+/**
+ * Converts an EvmChainInfo object to a Chain object for use with RainbowKit.
+ * @param evmChain
+ */
+export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
+  const nativeCurrency = evmChain.currencies[0];
+  const chain: Chain = {
+    id: evmChain.chainId,
+    name: evmChain.chainName,
+    rpcUrls: {
+      default: { http: evmChain.rpcUrls},
+    },
+    nativeCurrency: {
+      name: nativeCurrency.coinDenom,
+      symbol: nativeCurrency.coinDenom,
+      decimals: nativeCurrency.coinDecimals,
+    },
+  };
+
+  if (evmChain.blockExplorerUrl) {
+    chain.blockExplorers = {
+      default: {
+        name: evmChain.chainName,
+        url: evmChain.blockExplorerUrl,
+      },
+    };
+  }
+
+  return chain;
+}
+
+/**
+ * Converts a map of EVM chains to an array of Chain objects for use with RainbowKit.
+ * @param evmChains
+ */
+export function evmChainsToRainbowKitChains(
+  evmChains: EvmChains,
+): readonly [Chain, ...Chain[]] {
+  if (!evmChains || Object.keys(evmChains).length === 0) {
+    throw new Error("At least one chain must be provided");
+  }
+  return Object.values(evmChains).map((evmChain) =>
+    evmChainToRainbowKitChain(evmChain)
+  ) as [Chain, ...Chain[]];
+}
+
+/**
+ * RainbowKit doesn't export
+ * This adds RainbowKit's ChainNativeCurrency fields
+ */
+export type EvmNativeCurrency = {
+  name: string;
+  symbol: string;
+  decimals: number;
+} & EvmCurrency;
+
+/**
+ * Represents information about an EVM chain for use with RainbowKit with additional
+ * Astria specific fields to support the ui.
+ */
+export type EvmChainInfoRainbow = {
+  nativeCurrency: EvmNativeCurrency;
+  nonNativeCurrencies: EvmCurrency[];
+  iconClass?: string;
+} & Chain;
 
 /**
  * Represents information about a currency used in an EVM chain.
