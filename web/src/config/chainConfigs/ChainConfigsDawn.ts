@@ -192,7 +192,8 @@ const NeutronChainInfo: IbcChainInfo = {
     // Coin denomination to be displayed to the user.
     coinDenom: "dTIA",
     // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-    coinMinimalDenom: "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
+    coinMinimalDenom:
+      "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
     // # of decimal points to convert minimal denomination to user-facing denomination.
     coinDecimals: 6,
     // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -223,7 +224,8 @@ const NeutronChainInfo: IbcChainInfo = {
       // Coin denomination to be displayed to the user.
       coinDenom: "dTIA",
       // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-      coinMinimalDenom: "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
+      coinMinimalDenom:
+        "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
       // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -240,7 +242,8 @@ const NeutronChainInfo: IbcChainInfo = {
       // Coin denomination to be displayed to the user.
       coinDenom: "dTIA",
       // Actual denom (i.e. nria, uscrt) used by the blockchain.
-      coinMinimalDenom: "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
+      coinMinimalDenom:
+        "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
       // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
       // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -290,12 +293,13 @@ const FlameChainInfo: EvmChainInfo = {
     },
     {
       coinDenom: "dTIA",
-      coinMinimalDenom: "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
+      coinMinimalDenom:
+        "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
       coinDecimals: 18,
       erc20ContractAddress: "0x0F0C3207a9fE9B7e8AaE4bb83E865C91A13Fd8a7",
       ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-celestia",
-    }
+    },
   ],
   iconClass: "i-flame",
 };

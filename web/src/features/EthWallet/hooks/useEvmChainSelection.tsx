@@ -6,9 +6,7 @@ import React, {
   useState,
 } from "react";
 import { ethers } from "ethers";
-import {
-  useConnectModal,
-} from '@rainbow-me/rainbowkit';
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
@@ -106,20 +104,14 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   const pollingConfig = useMemo(
     () => ({
       enabled: Boolean(
-          selectedEvmChain &&
-          selectedEvmCurrency &&
-          evmAccountAddress,
+        selectedEvmChain && selectedEvmCurrency && evmAccountAddress,
       ),
       intervalMS: 10_000,
       onError: (error: Error) => {
         console.error("Failed to get balance from EVM wallet", error);
       },
     }),
-    [
-      selectedEvmChain,
-      selectedEvmCurrency,
-      evmAccountAddress,
-    ],
+    [selectedEvmChain, selectedEvmCurrency, evmAccountAddress],
   );
   const { balance: evmBalance, isLoading: isLoadingEvmBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);

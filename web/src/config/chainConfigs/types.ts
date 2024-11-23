@@ -67,7 +67,7 @@ export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
     id: evmChain.chainId,
     name: evmChain.chainName,
     rpcUrls: {
-      default: { http: evmChain.rpcUrls},
+      default: { http: evmChain.rpcUrls },
     },
     nativeCurrency: {
       name: nativeCurrency.coinDenom,
@@ -99,7 +99,7 @@ export function evmChainsToRainbowKitChains(
     throw new Error("At least one chain must be provided");
   }
   return Object.values(evmChains).map((evmChain) =>
-    evmChainToRainbowKitChain(evmChain)
+    evmChainToRainbowKitChain(evmChain),
   ) as [Chain, ...Chain[]];
 }
 
