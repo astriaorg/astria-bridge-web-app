@@ -104,26 +104,6 @@ export function evmChainsToRainbowKitChains(
 }
 
 /**
- * RainbowKit doesn't export
- * This adds RainbowKit's ChainNativeCurrency fields
- */
-export type EvmNativeCurrency = {
-  name: string;
-  symbol: string;
-  decimals: number;
-} & EvmCurrency;
-
-/**
- * Represents information about an EVM chain for use with RainbowKit with additional
- * Astria specific fields to support the ui.
- */
-export type EvmChainInfoRainbow = {
-  nativeCurrency: EvmNativeCurrency;
-  nonNativeCurrencies: EvmCurrency[];
-  iconClass?: string;
-} & Chain;
-
-/**
  * Represents information about a currency used in an EVM chain.
  */
 export type EvmCurrency = {
