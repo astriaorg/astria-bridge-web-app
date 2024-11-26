@@ -25,13 +25,11 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
   const mockTxHash = "0xabcdef0123456789" as const;
 
   const mockWalletClient = {
-    writeContract: jest
-      .fn()
-      .mockImplementation(() => Promise.resolve(mockTxHash)),
+    writeContract: jest.fn().mockReturnValue(Promise.resolve(mockTxHash)),
   };
 
   const mockPublicClient = {
-    readContract: jest.fn().mockImplementation(() => Promise.resolve(1000000)),
+    readContract: jest.fn().mockReturnValue(Promise.resolve(1000000)),
   };
 
   const mockWagmiConfig = {
@@ -43,6 +41,10 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
+
+    mockWalletClient.writeContract.mockReturnValue(Promise.resolve(mockTxHash));
+    mockPublicClient.readContract.mockReturnValue(Promise.resolve(1000000));
+
     (getWalletClient as jest.Mock).mockResolvedValue(mockWalletClient);
     (getPublicClient as jest.Mock).mockReturnValue(mockPublicClient);
   });
