@@ -1,7 +1,6 @@
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { render } from "@testing-library/react";
 import type React from "react";
-import { EthWalletContextProvider } from "features/EthWallet";
 import { ConfigContextProvider, type EvmChains } from "config";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { evmChainsToRainbowKitChains } from "./config/chainConfigs/types.ts";
@@ -39,11 +38,9 @@ export const renderWithRouter = (element: React.JSX.Element) => {
       <ConfigContextProvider>
         <WagmiProvider config={rainbowKitConfig}>
           <QueryClientProvider client={queryClient}>
-            <EthWalletContextProvider>
-              <Routes>
-                <Route index path={"*"} element={element} />
-              </Routes>
-            </EthWalletContextProvider>
+            <Routes>
+              <Route index path={"*"} element={element} />
+            </Routes>
           </QueryClientProvider>
         </WagmiProvider>
       </ConfigContextProvider>

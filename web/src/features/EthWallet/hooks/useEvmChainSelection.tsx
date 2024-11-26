@@ -1,12 +1,6 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { ethers } from "ethers";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount, useBalance, useConfig, useSwitchChain } from "wagmi";
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
@@ -22,13 +16,14 @@ import {
 } from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { formatBalance } from "features/EthWallet/utils/utils";
 import { useBalancePolling } from "features/GetBalancePolling";
-import { useAccount, useBalance, useConfig } from "wagmi";
-import { getEthersProvider } from "../../EvmWallet/utils.ts";
+import { formatUnits } from "viem";
 
 export function useEvmChainSelection(evmChains: EvmChains) {
   const { openConnectModal } = useConnectModal();
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
+  const { switchChain } = useSwitchChain();
+
   const nativeTokenBalance = useBalance({
     address: userAccount.address,
   });
@@ -48,6 +43,16 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     }
   }, [userAccount.address]);
 
+  // Switch chain when selected chain changes
+  useEffect(() => {
+    if (
+      selectedEvmChain &&
+      userAccount.chain?.id !== selectedEvmChain.chainId
+    ) {
+      switchChain?.(selectedEvmChain);
+    }
+  }, [selectedEvmChain, userAccount.chain?.id, switchChain]);
+
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
@@ -55,24 +60,12 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   }, []);
 
   const getBalanceCallback = useCallback(async () => {
-    const provider = await getEthersProvider(wagmiConfig, {
-      chainId: selectedEvmChain?.chainId,
-    });
     if (
-      !provider ||
+      !wagmiConfig ||
       !selectedEvmChain ||
       !selectedEvmCurrency ||
       !evmAccountAddress
     ) {
-      console.log(
-        "provider, userAccount, chain, currency, or address is null",
-        {
-          provider,
-          selectedEvmChain,
-          selectedEvmCurrency,
-          evmAccountAddress,
-        },
-      );
       return null;
     }
     if (!evmCurrencyBelongsToChain(selectedEvmCurrency, selectedEvmChain)) {
@@ -80,11 +73,14 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     }
     if (selectedEvmCurrency.erc20ContractAddress) {
       const withdrawerSvc = getAstriaWithdrawerService(
-        provider,
+        wagmiConfig,
         selectedEvmCurrency.erc20ContractAddress,
         true,
       ) as AstriaErc20WithdrawerService;
-      const balanceRes = await withdrawerSvc.getBalance(evmAccountAddress);
+      const balanceRes = await withdrawerSvc.getBalance(
+        selectedEvmChain.chainId,
+        evmAccountAddress,
+      );
       const balanceStr = formatBalance(
         balanceRes.toString(),
         selectedEvmCurrency.coinDecimals,
@@ -113,6 +109,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     }),
     [selectedEvmChain, selectedEvmCurrency, evmAccountAddress],
   );
+
   const { balance: evmBalance, isLoading: isLoadingEvmBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);
 
@@ -124,7 +121,11 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     if (!selectedEvmChainNativeToken || !selectedEvmCurrency) {
       return "";
     }
-    const fee = ethers.formatUnits(selectedEvmCurrency.ibcWithdrawalFeeWei, 18);
+
+    const fee = formatUnits(
+      BigInt(selectedEvmCurrency.ibcWithdrawalFeeWei),
+      18,
+    );
     return `${fee} ${selectedEvmChainNativeToken.coinDenom}`;
   }, [selectedEvmChainNativeToken, selectedEvmCurrency]);
 
@@ -138,9 +139,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     );
   }, [evmChains]);
 
-  // selectedEvmChainOption allows us to ensure the label is set properly
-  // in the dropdown when connecting via an "additional option"s action,
-  //  e.g. the "Connect Keplr Wallet" option in the dropdown
   const selectedEvmChainOption = useMemo(() => {
     if (!selectedEvmChain) {
       return null;
@@ -161,7 +159,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       return [];
     }
 
-    // can only withdraw the currency if it has a withdrawer contract address defined
     const withdrawableTokens = selectedEvmChain.currencies?.filter(
       (currency) =>
         currency.erc20ContractAddress ||
@@ -184,22 +181,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   const selectEvmCurrency = useCallback((currency: EvmCurrency) => {
     setSelectedEvmCurrency(currency);
   }, []);
-
-  // create refs to hold the latest state values
-  const latestState = useRef({
-    userAccount,
-    evmAccountAddress,
-    selectedEvmChain,
-  });
-
-  // update the ref whenever the state changes
-  useEffect(() => {
-    latestState.current = {
-      userAccount,
-      evmAccountAddress,
-      selectedEvmChain,
-    };
-  }, [userAccount, evmAccountAddress, selectedEvmChain]);
 
   const connectEVMWallet = async () => {
     if (!selectedEvmChain) {

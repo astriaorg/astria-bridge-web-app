@@ -334,7 +334,7 @@ export default function DepositCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && !isLoadingIbcBalance && (
+              {fromAddress && selectedIbcCurrency && !isLoadingIbcBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: {ibcBalance}
                 </p>
@@ -404,11 +404,13 @@ export default function DepositCard(): React.ReactElement {
                   <i className="fas fa-pen-to-square" />
                 </p>
               )}
-              {evmAccountAddress && !isLoadingEvmBalance && (
-                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {evmBalance}
-                </p>
-              )}
+              {evmAccountAddress &&
+                selectedEvmChain &&
+                !isLoadingEvmBalance && (
+                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                    Balance: {evmBalance}
+                  </p>
+                )}
               {evmAccountAddress && isLoadingEvmBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />

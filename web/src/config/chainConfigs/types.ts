@@ -111,9 +111,9 @@ export type EvmCurrency = {
   coinMinimalDenom: string;
   coinDecimals: number;
   // contract address if this is a ERC20 token
-  erc20ContractAddress?: string;
+  erc20ContractAddress?: `0x${string}`;
   // contract address if this a native token
-  nativeTokenWithdrawerContractAddress?: string;
+  nativeTokenWithdrawerContractAddress?: `0x${string}`;
   // fee needed to pay for the ibc withdrawal, 18 decimals
   ibcWithdrawalFeeWei: string;
   iconClass?: string;

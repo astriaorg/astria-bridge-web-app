@@ -1,37 +1,47 @@
-import { ethers } from "ethers";
 import GenericContractService from "features/EthWallet/services/GenericContractService";
+import type { Config } from "@wagmi/core";
+import { type Abi, type Address, parseUnits } from "viem";
 
 export class AstriaWithdrawerService extends GenericContractService {
-  protected static override ABI: ethers.InterfaceAbi = [
-    "function withdrawToIbcChain(string destinationChainAddress, string memo) payable",
-  ];
+  protected static override ABI = [
+    {
+      type: "function",
+      name: "withdrawToIbcChain",
+      inputs: [
+        { type: "string", name: "destinationChainAddress" },
+        { type: "string", name: "memo" },
+      ],
+      outputs: [],
+      stateMutability: "payable",
+    },
+  ] as const satisfies Abi;
 
   public static override getInstance(
-    provider: ethers.BrowserProvider,
-    contractAddress: string,
+    wagmiConfig: Config,
+    contractAddress: Address,
   ): AstriaWithdrawerService {
     /* biome-ignore lint/complexity/noThisInStatic: */
     return super.getInstance(
-      provider,
+      wagmiConfig,
       contractAddress,
     ) as AstriaWithdrawerService;
   }
 
   async withdrawToIbcChain(
-    fromAddress: string,
+    chainId: number,
     destinationChainAddress: string,
     amount: string,
     amountDenom: number,
     fee: string,
     memo: string,
-  ): Promise<ethers.ContractTransactionResponse> {
-    const amountWei = ethers.parseUnits(amount, amountDenom);
+  ): Promise<`0x${string}`> {
+    const amountWei = parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
     // need to send enough to cover fees
     const totalAmount = amountWei + feeWei;
-    return this.callContractMethod(
+    return this.writeContractMethod(
+      chainId,
       "withdrawToIbcChain",
-      fromAddress,
       [destinationChainAddress, memo],
       totalAmount,
     );
@@ -43,61 +53,75 @@ export class AstriaWithdrawerService extends GenericContractService {
  * This contract extends ERC20, so it has methods like balanceOf
  */
 export class AstriaErc20WithdrawerService extends GenericContractService {
-  protected static override ABI: ethers.InterfaceAbi = [
-    "function withdrawToIbcChain(uint256 amount, string destinationChainAddress, string memo) payable",
-    "function balanceOf(address owner) view returns (uint256)",
-  ];
+  protected static override ABI = [
+    {
+      type: "function",
+      name: "withdrawToIbcChain",
+      inputs: [
+        { type: "uint256", name: "amount" },
+        { type: "string", name: "destinationChainAddress" },
+        { type: "string", name: "memo" },
+      ],
+      outputs: [],
+      stateMutability: "payable",
+    },
+    {
+      type: "function",
+      name: "balanceOf",
+      inputs: [{ type: "address", name: "owner" }],
+      outputs: [{ type: "uint256" }],
+      stateMutability: "view",
+    },
+  ] as const satisfies Abi;
 
   public static override getInstance(
-    provider: ethers.BrowserProvider,
-    contractAddress: string,
+    wagmiConfig: Config,
+    contractAddress: Address,
   ): AstriaErc20WithdrawerService {
     /* biome-ignore lint/complexity/noThisInStatic: */
     return super.getInstance(
-      provider,
+      wagmiConfig,
       contractAddress,
     ) as AstriaErc20WithdrawerService;
   }
 
   async withdrawToIbcChain(
-    fromAddress: string,
+    chainId: number,
     destinationChainAddress: string,
     amount: string,
     amountDenom: number,
     fee: string,
     memo: string,
-  ): Promise<ethers.ContractTransactionResponse> {
-    const amountBaseUnits = ethers.parseUnits(amount, amountDenom);
+  ): Promise<`0x${string}`> {
+    const amountBaseUnits = parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
-    return this.callContractMethod(
+    return this.writeContractMethod(
+      chainId,
       "withdrawToIbcChain",
-      fromAddress,
       [amountBaseUnits, destinationChainAddress, memo],
       feeWei,
     );
   }
 
-  async getBalance(
-    address: string,
-  ): Promise<ethers.ContractTransactionResponse> {
-    return this.callContractMethod("balanceOf", address, [address]);
+  async getBalance(chainId: number, address: string): Promise<bigint> {
+    return this.readContractMethod(chainId, "balanceOf", [address]);
   }
 }
 
 // Helper function to get AstriaWithdrawerService instance
 export const getAstriaWithdrawerService = (
-  provider: ethers.BrowserProvider,
-  contractAddress: string,
+  wagmiConfig: Config,
+  contractAddress: Address,
   isErc20 = false,
 ): AstriaWithdrawerService | AstriaErc20WithdrawerService => {
   if (isErc20) {
     return AstriaErc20WithdrawerService.getInstance(
-      provider,
+      wagmiConfig,
       contractAddress,
     ) as AstriaErc20WithdrawerService;
   }
   return AstriaWithdrawerService.getInstance(
-    provider,
+    wagmiConfig,
     contractAddress,
   ) as AstriaWithdrawerService;
 };

@@ -7,16 +7,16 @@ import Dropdown from "components/Dropdown/Dropdown";
 import {
   AddERC20ToWalletButton,
   getAstriaWithdrawerService,
-  useEthWallet,
   useEvmChainSelection,
 } from "features/EthWallet";
 import { useIbcChainSelection } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
+import { useConfig as useWagmiConfig } from "wagmi";
 
 export default function WithdrawCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
+  const wagmiConfig = useWagmiConfig();
   const { addNotification } = useNotifications();
-  const { provider } = useEthWallet();
 
   const {
     evmAccountAddress: fromAddress,
@@ -164,7 +164,7 @@ export default function WithdrawCard(): React.ReactElement {
     }
 
     const recipientAddress = recipientAddressOverride || ibcAccountAddress;
-    if (!provider || !fromAddress || !recipientAddress) {
+    if (!fromAddress || !recipientAddress) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
@@ -194,13 +194,16 @@ export default function WithdrawCard(): React.ReactElement {
         selectedEvmCurrency.erc20ContractAddress ||
         selectedEvmCurrency.nativeTokenWithdrawerContractAddress ||
         "";
+      if (!contractAddress) {
+        throw new Error("No contract address found");
+      }
       const withdrawerSvc = getAstriaWithdrawerService(
-        provider,
+        wagmiConfig,
         contractAddress,
         Boolean(selectedEvmCurrency.erc20ContractAddress),
       );
       await withdrawerSvc.withdrawToIbcChain(
-        fromAddress,
+        selectedEvmChain.chainId,
         recipientAddress,
         amount,
         selectedEvmCurrency.coinDecimals,
@@ -325,7 +328,7 @@ export default function WithdrawCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && !isLoadingEvmBalance && (
+              {fromAddress && selectedEvmCurrency && !isLoadingEvmBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: {evmBalance}
                 </p>

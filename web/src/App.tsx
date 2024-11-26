@@ -3,7 +3,6 @@ import { Route, Routes } from "react-router-dom";
 import BridgePage from "pages/BridgePage/BridgePage";
 import Layout from "pages/Layout";
 import { useConfig } from "config";
-import { EthWalletContextProvider } from "features/EthWallet";
 import { NotificationsContextProvider } from "features/Notifications";
 
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
@@ -30,13 +29,11 @@ export default function App(): React.ReactElement {
       <WagmiProvider config={rainbowKitConfig}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
-            <EthWalletContextProvider>
-              <Routes>
-                <Route element={<Layout />}>
-                  <Route index element={<BridgePage />} />
-                </Route>
-              </Routes>
-            </EthWalletContextProvider>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route index element={<BridgePage />} />
+              </Route>
+            </Routes>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
