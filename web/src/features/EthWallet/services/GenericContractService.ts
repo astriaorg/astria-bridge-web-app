@@ -19,6 +19,7 @@ export default class GenericContractService {
   }
 
   protected static getInstanceKey(contractAddress: string): string {
+    /* biome-ignore lint/complexity/noThisInStatic: required for proper class initialization */
     return `${this.name}-${contractAddress}`;
   }
 
@@ -26,11 +27,15 @@ export default class GenericContractService {
     wagmiConfig: Config,
     contractAddress: Address,
   ): GenericContractService {
+    /* biome-ignore lint/complexity/noThisInStatic: required for proper class initialization */
     const key = this.getInstanceKey(contractAddress);
+    /* biome-ignore lint/complexity/noThisInStatic: required for proper class initialization */
     let instance = this.instances.get(key);
 
     if (!instance) {
+      /* biome-ignore lint/complexity/noThisInStatic: required for proper class initialization */
       instance = new this(wagmiConfig, contractAddress);
+      /* biome-ignore lint/complexity/noThisInStatic: required for proper class initialization */
       this.instances.set(key, instance);
     }
 
