@@ -214,9 +214,9 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
         true,
       ) as AstriaErc20WithdrawerService;
 
-      await expect(service.getBalance(420, mockContractAddress)).rejects.toThrow(
-        "No public client available",
-      );
+      await expect(
+        service.getBalance(420, mockContractAddress),
+      ).rejects.toThrow("No public client available");
     });
   });
 });
