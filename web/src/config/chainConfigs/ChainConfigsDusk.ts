@@ -202,7 +202,7 @@ const FlameChainInfo: EvmChainInfo = {
       // address of erc20 contract on dusk-11
       erc20ContractAddress: "0xa4f59B3E97EC22a2b949cB5b6E8Cd6135437E857",
       // this value would only exist for native tokens
-      nativeTokenWithdrawerContractAddress: "",
+      // nativeTokenWithdrawerContractAddress: "",
       ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-noble",
     },
@@ -213,7 +213,7 @@ const FlameChainInfo: EvmChainInfo = {
       // NOTE - there is not actually a contract for this fakeTIA.
       //  just using this for testing the UI.
       erc20ContractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
-      nativeTokenWithdrawerContractAddress: "",
+      // nativeTokenWithdrawerContractAddress: "",
       ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-celestia",
     },

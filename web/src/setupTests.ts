@@ -13,6 +13,12 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockedUseNavigate,
 }));
 
+// silence console logs and warnings
+jest.spyOn(console, "debug").mockImplementation(() => {});
+jest.spyOn(console, "log").mockImplementation(() => {});
+jest.spyOn(console, "warn").mockImplementation(() => {});
+jest.spyOn(console, "error").mockImplementation(() => {});
+
 Object.defineProperties(global, {
   TextDecoder: { value: TextDecoder },
   TextEncoder: { value: TextEncoder },
