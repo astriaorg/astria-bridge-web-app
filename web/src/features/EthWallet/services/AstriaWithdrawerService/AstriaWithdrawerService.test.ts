@@ -1,11 +1,8 @@
 import { type Config, getPublicClient, getWalletClient } from "@wagmi/core";
-import { parseUnits } from "viem";
-import {
-  getAstriaWithdrawerService,
-  AstriaWithdrawerService,
-  AstriaErc20WithdrawerService,
-} from "./AstriaWithdrawerService";
+import { parseUnits, type Address, type Hash } from "viem";
 import { sepolia } from "wagmi/chains";
+import { GenericContractService } from "../GenericContractService";
+import { AstriaWithdrawerService, AstriaErc20WithdrawerService, createWithdrawerService } from "./AstriaWithdrawerService";
 
 // Mock wagmi core
 jest.mock("@wagmi/core", () => ({
@@ -13,31 +10,37 @@ jest.mock("@wagmi/core", () => ({
   getPublicClient: jest.fn(),
 }));
 
-describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
-  const mockContractAddress =
-    "0x1234567890123456789012345678901234567890" as const;
-  const mockDestinationAddress =
-    "celestia1m0ksdjl2p5nzhqy3p47fksv52at3ln885xvl96";
-  const mockAmount = "1.0";
-  const mockAmountDenom = 18;
-  const mockFee = "10000000000000000";
-  const mockMemo = "Test memo";
-  const mockTxHash = "0xabcdef0123456789" as const;
+const mockContractAddress = "0x1234567890123456789012345678901234567890" as const;
+const mockDestinationAddress = "celestia1m0ksdjl2p5nzhqy3p47fksv52at3ln885xvl96";
+const mockAmount = "1.0";
+const mockAmountDenom = 18;
+const mockFee = "10000000000000000";
+const mockMemo = "Test memo";
+const mockTxHash = "0xabcdef0123456789" as const;
 
-  const mockWalletClient = {
-    writeContract: jest.fn().mockReturnValue(Promise.resolve(mockTxHash)),
-  };
+const mockWalletClient = {
+  writeContract: jest.fn().mockResolvedValue(mockTxHash),
+};
 
-  const mockPublicClient = {
-    readContract: jest.fn().mockReturnValue(Promise.resolve(1000000)),
-  };
+const mockPublicClient = {
+  readContract: jest.fn().mockResolvedValue(1000000n),
+};
 
-  const mockWagmiConfig = {
-    chains: [sepolia],
-    transports: {
-      [sepolia.id]: "https://sepolia.example.com",
-    },
-  } as unknown as Config;
+const mockWagmiConfig = {
+  chains: [sepolia],
+  transports: {
+    [sepolia.id]: "https://sepolia.example.com",
+  },
+} as unknown as Config;
+
+describe("GenericContractService", () => {
+  const mockAbi = [{
+    type: "function",
+    name: "testMethod",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+    stateMutability: "view"
+  }] as const;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -49,174 +52,231 @@ describe("AstriaWithdrawerService and AstriaErc20WithdrawerService", () => {
     (getPublicClient as jest.Mock).mockReturnValue(mockPublicClient);
   });
 
-  describe("AstriaWithdrawerService", () => {
-    it("should create a singleton instance", () => {
-      const service1 = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-      );
-      const service2 = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-      );
+  describe("readContractMethod", () => {
+    it("should call readContract with correct parameters", async () => {
+      const service = new GenericContractService(mockWagmiConfig, mockContractAddress, mockAbi);
 
-      expect(service1).toBe(service2);
-      expect(service1).toBeInstanceOf(AstriaWithdrawerService);
-    });
-
-    it("should call withdrawToIbcChain with correct parameters", async () => {
-      const service = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-      ) as AstriaWithdrawerService;
-
-      const result = await service.withdrawToIbcChain(
-        420,
-        mockDestinationAddress,
-        mockAmount,
-        mockAmountDenom,
-        mockFee,
-        mockMemo,
-      );
-
-      const totalAmount =
-        parseUnits(mockAmount, mockAmountDenom) + BigInt(mockFee);
-
-      expect(mockWalletClient.writeContract).toHaveBeenCalledWith({
-        address: mockContractAddress,
-        abi: expect.any(Array),
-        functionName: "withdrawToIbcChain",
-        args: [mockDestinationAddress, mockMemo],
-        value: totalAmount,
-      });
-
-      expect(result).toBe(mockTxHash);
-    });
-  });
-
-  describe("AstriaErc20WithdrawerService", () => {
-    it("should create a singleton instance", () => {
-      const service1 = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-        true,
-      );
-      const service2 = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-        true,
-      );
-
-      expect(service1).toBe(service2);
-      expect(service1).toBeInstanceOf(AstriaErc20WithdrawerService);
-    });
-
-    it("should call withdrawToIbcChain for erc20 with correct parameters", async () => {
-      const service = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-        true,
-      ) as AstriaErc20WithdrawerService;
-
-      const result = await service.withdrawToIbcChain(
-        420,
-        mockDestinationAddress,
-        mockAmount,
-        mockAmountDenom,
-        mockFee,
-        mockMemo,
-      );
-
-      expect(mockWalletClient.writeContract).toHaveBeenCalledWith({
-        address: mockContractAddress,
-        abi: expect.any(Array),
-        functionName: "withdrawToIbcChain",
-        args: [
-          parseUnits(mockAmount, mockAmountDenom),
-          mockDestinationAddress,
-          mockMemo,
-        ],
-        value: BigInt(mockFee),
-      });
-
-      expect(result).toBe(mockTxHash);
-    });
-
-    it("should get balance correctly", async () => {
-      const mockAddress = "0x1234567890123456789012345678901234567890";
-
-      const service = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-        true,
-      ) as AstriaErc20WithdrawerService;
-
-      const balance = await service.getBalance(420, mockAddress);
+      // biome-ignore lint/complexity/useLiteralKeys: testing private method
+      await service["readContractMethod"](1, "testMethod", []);
 
       expect(mockPublicClient.readContract).toHaveBeenCalledWith({
         address: mockContractAddress,
-        abi: expect.any(Array),
-        functionName: "balanceOf",
-        args: [mockAddress],
+        abi: mockAbi,
+        functionName: "testMethod",
+        args: [],
       });
-
-      expect(balance).toBe(1000000);
-    });
-  });
-
-  describe("getAstriaWithdrawerService", () => {
-    it("should return AstriaWithdrawerService when isErc20 is false", () => {
-      const service = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-        false,
-      );
-      expect(service).toBeInstanceOf(AstriaWithdrawerService);
-    });
-
-    it("should return AstriaErc20WithdrawerService when isErc20 is true", () => {
-      const service = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-        true,
-      );
-      expect(service).toBeInstanceOf(AstriaErc20WithdrawerService);
-    });
-  });
-
-  describe("error handling", () => {
-    it("should throw when wallet client is not available", async () => {
-      (getWalletClient as jest.Mock).mockResolvedValue(null);
-
-      const service = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-      ) as AstriaWithdrawerService;
-
-      await expect(
-        service.withdrawToIbcChain(
-          420,
-          mockDestinationAddress,
-          mockAmount,
-          mockAmountDenom,
-          mockFee,
-          mockMemo,
-        ),
-      ).rejects.toThrow("No wallet client available");
     });
 
     it("should throw when public client is not available", async () => {
       (getPublicClient as jest.Mock).mockReturnValue(null);
+      const service = new GenericContractService(mockWagmiConfig, mockContractAddress, mockAbi);
 
-      const service = getAstriaWithdrawerService(
-        mockWagmiConfig,
-        mockContractAddress,
-        true,
-      ) as AstriaErc20WithdrawerService;
-
-      await expect(
-        service.getBalance(420, mockContractAddress),
-      ).rejects.toThrow("No public client available");
+      // biome-ignore lint/complexity/useLiteralKeys: testing private method
+      await expect(service["readContractMethod"](1, "testMethod", [])).rejects.toThrow(
+        "No public client available"
+      );
     });
+
+    it("should propagate errors from readContract", async () => {
+      const service = new GenericContractService(mockWagmiConfig, mockContractAddress, mockAbi);
+      const errorMessage = "Read contract error";
+      mockPublicClient.readContract.mockRejectedValue(new Error(errorMessage));
+
+      // biome-ignore lint/complexity/useLiteralKeys: testing private method
+      await expect(service["readContractMethod"](1, "testMethod", [])).rejects.toThrow(
+        errorMessage
+      );
+    });
+  });
+
+  describe("writeContractMethod", () => {
+    it("should call writeContract with correct parameters", async () => {
+      const service = new GenericContractService(mockWagmiConfig, mockContractAddress, mockAbi);
+
+      // biome-ignore lint/complexity/useLiteralKeys: testing private method
+      await service["writeContractMethod"](1, "testMethod", [], 100n);
+
+      expect(mockWalletClient.writeContract).toHaveBeenCalledWith({
+        address: mockContractAddress,
+        abi: mockAbi,
+        functionName: "testMethod",
+        args: [],
+        value: 100n,
+      });
+    });
+
+    it("should throw when wallet client is not available", async () => {
+      (getWalletClient as jest.Mock).mockResolvedValue(null);
+      const service = new GenericContractService(mockWagmiConfig, mockContractAddress, mockAbi);
+
+      // biome-ignore lint/complexity/useLiteralKeys: testing private method
+      await expect(service["writeContractMethod"](1, "testMethod", [])).rejects.toThrow(
+        "No wallet client available"
+      );
+    });
+
+    it("should propagate errors from writeContract", async () => {
+      const service = new GenericContractService(mockWagmiConfig, mockContractAddress, mockAbi);
+      const errorMessage = "Write contract error";
+      mockWalletClient.writeContract.mockRejectedValue(new Error(errorMessage));
+
+      // biome-ignore lint/complexity/useLiteralKeys: testing private method
+      await expect(service["writeContractMethod"](1, "testMethod", [])).rejects.toThrow(
+        errorMessage
+      );
+    });
+  });
+});
+
+describe("AstriaWithdrawerService", () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+
+    mockWalletClient.writeContract.mockReturnValue(Promise.resolve(mockTxHash));
+    mockPublicClient.readContract.mockReturnValue(Promise.resolve(1000000));
+
+    (getWalletClient as jest.Mock).mockResolvedValue(mockWalletClient);
+    (getPublicClient as jest.Mock).mockReturnValue(mockPublicClient);
+  });
+
+  describe("withdrawToIbcChain", () => {
+    it("should call writeContractMethod with correct parameters", async () => {
+      const service = new AstriaWithdrawerService(mockWagmiConfig, mockContractAddress);
+      // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+      const writeContractMethodSpy = jest.spyOn(service as any, "writeContractMethod");
+
+      const result = await service.withdrawToIbcChain(
+        420,
+        mockDestinationAddress,
+        mockAmount,
+        mockAmountDenom,
+        mockFee,
+        mockMemo
+      );
+
+      const totalAmount = parseUnits(mockAmount, mockAmountDenom) + BigInt(mockFee);
+
+      expect(writeContractMethodSpy).toHaveBeenCalledWith(
+        420,
+        "withdrawToIbcChain",
+        [mockDestinationAddress, mockMemo],
+        totalAmount
+      );
+      expect(result).toBe(mockTxHash);
+    });
+
+    it("should handle withdrawal errors", async () => {
+      const service = new AstriaWithdrawerService(mockWagmiConfig, mockContractAddress);
+      const errorMessage = "Withdrawal failed";
+      // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+      jest.spyOn(service as any, "writeContractMethod").mockRejectedValue(new Error(errorMessage));
+
+      await expect(service.withdrawToIbcChain(
+        420,
+        mockDestinationAddress,
+        mockAmount,
+        mockAmountDenom,
+        mockFee,
+        mockMemo
+      )).rejects.toThrow(errorMessage);
+    });
+  });
+});
+
+describe("AstriaErc20WithdrawerService", () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+    mockWalletClient.writeContract.mockReturnValue(Promise.resolve(mockTxHash));
+    mockPublicClient.readContract.mockReturnValue(Promise.resolve(1000000));
+    (getWalletClient as jest.Mock).mockResolvedValue(mockWalletClient);
+    (getPublicClient as jest.Mock).mockReturnValue(mockPublicClient);
+  });
+
+  describe("withdrawToIbcChain", () => {
+    it("should call writeContractMethod with correct parameters", async () => {
+      const service = new AstriaErc20WithdrawerService(mockWagmiConfig, mockContractAddress);
+      // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+      const writeContractMethodSpy = jest.spyOn(service as any, "writeContractMethod");
+
+      const result = await service.withdrawToIbcChain(
+        420,
+        mockDestinationAddress,
+        mockAmount,
+        mockAmountDenom,
+        mockFee,
+        mockMemo
+      );
+
+      const amountBaseUnits = parseUnits(mockAmount, mockAmountDenom);
+      const feeWei = BigInt(mockFee);
+
+      expect(writeContractMethodSpy).toHaveBeenCalledWith(
+        420,
+        "withdrawToIbcChain",
+        [amountBaseUnits, mockDestinationAddress, mockMemo],
+        feeWei
+      );
+      expect(result).toBe(mockTxHash);
+    });
+
+    it("should handle withdrawal errors", async () => {
+      const service = new AstriaErc20WithdrawerService(mockWagmiConfig, mockContractAddress);
+      const errorMessage = "ERC20 withdrawal failed";
+      // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+      jest.spyOn(service as any, "writeContractMethod").mockRejectedValue(new Error(errorMessage));
+
+      await expect(service.withdrawToIbcChain(
+        420,
+        mockDestinationAddress,
+        mockAmount,
+        mockAmountDenom,
+        mockFee,
+        mockMemo
+      )).rejects.toThrow(errorMessage);
+    });
+  });
+
+  describe("getBalance", () => {
+    it("should call readContractMethod with correct parameters", async () => {
+      const service = new AstriaErc20WithdrawerService(mockWagmiConfig, mockContractAddress);
+      // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+      const readContractMethodSpy = jest.spyOn(service as any, "readContractMethod");
+      const mockAddress = "0x1234567890123456789012345678901234567890";
+
+      await service.getBalance(420, mockAddress);
+
+      expect(readContractMethodSpy).toHaveBeenCalledWith(
+        420,
+        "balanceOf",
+        [mockAddress]
+      );
+    });
+
+    it("should handle balance check errors", async () => {
+      const service = new AstriaErc20WithdrawerService(mockWagmiConfig, mockContractAddress);
+      const errorMessage = "Balance check failed";
+      // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+      jest.spyOn(service as any, "readContractMethod").mockRejectedValue(new Error(errorMessage));
+      const mockAddress = "0x1234567890123456789012345678901234567890";
+
+      await expect(service.getBalance(420, mockAddress)).rejects.toThrow(errorMessage);
+    });
+  });
+});
+
+describe("Factory Function", () => {
+  it("should create AstriaWithdrawerService when isErc20 is false", () => {
+    const service = createWithdrawerService(mockWagmiConfig, mockContractAddress, false);
+    expect(service).toBeInstanceOf(AstriaWithdrawerService);
+  });
+
+  it("should create AstriaErc20WithdrawerService when isErc20 is true", () => {
+    const service = createWithdrawerService(mockWagmiConfig, mockContractAddress, true);
+    expect(service).toBeInstanceOf(AstriaErc20WithdrawerService);
+  });
+
+  it("should default to AstriaWithdrawerService when isErc20 is not provided", () => {
+    const service = createWithdrawerService(mockWagmiConfig, mockContractAddress);
+    expect(service).toBeInstanceOf(AstriaWithdrawerService);
   });
 });

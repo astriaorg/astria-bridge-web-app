@@ -1,9 +1,9 @@
 import AddERC20ToWalletButton from "./components/AddERC20ToWalletButton/AddERC20ToWalletButton";
 import { useEvmChainSelection } from "./hooks/useEvmChainSelection";
-import { getAstriaWithdrawerService } from "./services/AstriaWithdrawerService/AstriaWithdrawerService";
+import { createWithdrawerService } from "./services/AstriaWithdrawerService/AstriaWithdrawerService";
 
 export {
-  getAstriaWithdrawerService,
+  createWithdrawerService,
   AddERC20ToWalletButton,
   useEvmChainSelection,
 };

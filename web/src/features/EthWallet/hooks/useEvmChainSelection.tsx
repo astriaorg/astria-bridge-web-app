@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAccount, useBalance, useConfig, useSwitchChain } from "wagmi";
+import { useAccount, useBalance, useConfig } from "wagmi";
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
@@ -12,7 +12,7 @@ import {
 
 import {
   type AstriaErc20WithdrawerService,
-  getAstriaWithdrawerService,
+  createWithdrawerService,
 } from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { formatBalance } from "features/EthWallet/utils/utils";
 import { useBalancePolling } from "features/GetBalancePolling";
@@ -22,7 +22,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   const { openConnectModal } = useConnectModal();
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
-  const { switchChain } = useSwitchChain();
 
   const nativeTokenBalance = useBalance({
     address: userAccount.address,
@@ -43,16 +42,6 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     }
   }, [userAccount.address]);
 
-  // Switch chain when selected chain changes
-  useEffect(() => {
-    if (
-      selectedEvmChain &&
-      userAccount.chain?.id !== selectedEvmChain.chainId
-    ) {
-      switchChain?.(selectedEvmChain);
-    }
-  }, [selectedEvmChain, userAccount.chain?.id, switchChain]);
-
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
@@ -72,7 +61,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       return null;
     }
     if (selectedEvmCurrency.erc20ContractAddress) {
-      const withdrawerSvc = getAstriaWithdrawerService(
+      const withdrawerSvc = createWithdrawerService(
         wagmiConfig,
         selectedEvmCurrency.erc20ContractAddress,
         true,

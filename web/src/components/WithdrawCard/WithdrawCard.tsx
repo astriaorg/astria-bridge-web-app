@@ -6,7 +6,7 @@ import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDown
 import Dropdown from "components/Dropdown/Dropdown";
 import {
   AddERC20ToWalletButton,
-  getAstriaWithdrawerService,
+  createWithdrawerService,
   useEvmChainSelection,
 } from "features/EthWallet";
 import { useIbcChainSelection } from "features/KeplrWallet";
@@ -197,7 +197,7 @@ export default function WithdrawCard(): React.ReactElement {
       if (!contractAddress) {
         throw new Error("No contract address found");
       }
-      const withdrawerSvc = getAstriaWithdrawerService(
+      const withdrawerSvc = createWithdrawerService(
         wagmiConfig,
         contractAddress,
         Boolean(selectedEvmCurrency.erc20ContractAddress),
