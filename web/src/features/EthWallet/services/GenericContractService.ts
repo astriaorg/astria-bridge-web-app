@@ -1,81 +1,54 @@
-import { ethers } from "ethers";
+import type { Abi, Address, Hash } from "viem";
+import { type Config, getPublicClient, getWalletClient } from "@wagmi/core";
 
-export default class GenericContractService {
-  protected static instances: Map<string, GenericContractService> = new Map();
-  protected static ABI: ethers.InterfaceAbi;
-  protected walletProvider: ethers.BrowserProvider;
-  protected readonly contractAddress: string;
-  protected readonly abi: ethers.InterfaceAbi;
-  protected contractPromise: Promise<ethers.Contract> | null = null;
+export class GenericContractService {
+  constructor(
+    protected readonly wagmiConfig: Config,
+    protected readonly contractAddress: Address,
+    protected readonly abi: Abi,
+  ) {}
 
-  protected constructor(
-    walletProvider: ethers.BrowserProvider,
-    contractAddress: string,
-  ) {
-    this.walletProvider = walletProvider;
-    this.contractAddress = contractAddress;
-    this.abi = (this.constructor as typeof GenericContractService).ABI;
-  }
-
-  protected static getInstanceKey(contractAddress: string): string {
-    /* biome-ignore lint/complexity/noThisInStatic: */
-    return `${this.name}-${contractAddress}`;
-  }
-
-  public static getInstance(
-    provider: ethers.BrowserProvider,
-    contractAddress: string,
-  ): GenericContractService {
-    /* biome-ignore lint/complexity/noThisInStatic: */
-    const key = this.getInstanceKey(contractAddress);
-    /* biome-ignore lint/complexity/noThisInStatic: */
-    let instance = this.instances.get(key);
-
-    if (!instance) {
-      /* biome-ignore lint/complexity/noThisInStatic: */
-      instance = new this(provider, contractAddress);
-      /* biome-ignore lint/complexity/noThisInStatic: */
-      this.instances.set(key, instance);
-    } else {
-      instance.updateProvider(provider);
-    }
-
-    return instance;
-  }
-
-  protected updateProvider(provider: ethers.BrowserProvider): void {
-    this.walletProvider = provider;
-    this.contractPromise = null;
-  }
-
-  protected async getContract(address: string): Promise<ethers.Contract> {
-    if (!this.contractPromise) {
-      this.contractPromise = (async () => {
-        try {
-          const signer = await this.walletProvider.getSigner(address);
-          return new ethers.Contract(this.contractAddress, this.abi, signer);
-        } catch (e) {
-          this.contractPromise = null;
-          throw e;
-        }
-      })();
-    }
-    return this.contractPromise;
-  }
-
-  protected async callContractMethod(
+  protected async readContractMethod<T>(
+    chainId: number,
     methodName: string,
-    fromAddress: string,
-    args: unknown[],
-    value?: ethers.BigNumberish,
-  ): Promise<ethers.ContractTransactionResponse> {
+    args: unknown[] = [],
+  ): Promise<T> {
     try {
-      const contract = await this.getContract(fromAddress);
-      const method = contract[methodName];
-      if (!method) {
-        throw new Error(`Method ${methodName} not found in contract`);
+      const publicClient = getPublicClient(this.wagmiConfig, { chainId });
+      if (!publicClient) {
+        throw new Error("No public client available");
       }
-      return method(...args, { value });
+      return (await publicClient.readContract({
+        address: this.contractAddress,
+        abi: this.abi,
+        functionName: methodName,
+        args,
+      })) as T;
+    } catch (e) {
+      console.error(`Error reading contract method ${methodName}:`, e);
+      throw e;
+    }
+  }
+
+  protected async writeContractMethod(
+    chainId: number,
+    methodName: string,
+    args: unknown[] = [],
+    value?: bigint,
+  ): Promise<Hash> {
+    const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
+    if (!walletClient) {
+      throw new Error("No wallet client available");
+    }
+
+    try {
+      return await walletClient.writeContract({
+        address: this.contractAddress,
+        abi: this.abi,
+        functionName: methodName,
+        args,
+        value,
+      });
     } catch (e) {
       console.error(`Error in ${methodName}:`, e);
       throw e;

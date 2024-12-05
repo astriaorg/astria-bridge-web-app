@@ -72,6 +72,7 @@ describe("Chain Configs", () => {
       "Test EVM Chain": {
         chainId: 1234,
         chainName: "Test EVM Chain",
+        rpcUrls: ["https://rpc.test.com"],
         currencies: [
           {
             coinDenom: "TEST",

@@ -180,6 +180,7 @@ export const ibcChains: IbcChains = {
 const FlameChainInfo: EvmChainInfo = {
   chainId: 912559,
   chainName: "Flame (local)",
+  rpcUrls: ["http://localhost:8545"], // TODO
   currencies: [
     {
       coinDenom: "RIA",
@@ -204,6 +205,7 @@ const FlameChainInfo: EvmChainInfo = {
 const FakeChainInfo: EvmChainInfo = {
   chainId: 912559,
   chainName: "FakeChain (local)",
+  rpcUrls: ["http://localhost:8545"], // TODO
   currencies: [
     {
       coinDenom: "FAKE",
