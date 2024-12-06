@@ -6,8 +6,6 @@ import reportWebVitals from "./reportWebVitals";
 import { ConfigContextProvider } from "config";
 
 import App from "./App";
-import "styles/index.scss";
-import "@rainbow-me/rainbowkit/styles.css";
 
 // load ga tracking if id available
 if (process.env.REACT_APP_GA_TRACKING_ID) {

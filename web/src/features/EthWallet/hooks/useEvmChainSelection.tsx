@@ -171,9 +171,14 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     setSelectedEvmCurrency(currency);
   }, []);
 
+  // opens RainbowKit modal for user to connect their EVM wallet
   const connectEVMWallet = async () => {
     if (!selectedEvmChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
+      // FIXME - the fact this function needs to be called again after setting an evm chain
+      //  in the parent component is implicit and should be somehow made explicit. this is
+      //  hard to debug, especially since the parent uses `useEffect` to call this function.
+      // select default chain if none selected, then return.
+      // useEffect in parent component handles recalling this function.
       setSelectedEvmChain(evmChainsOptions[0]?.value);
       return;
     }

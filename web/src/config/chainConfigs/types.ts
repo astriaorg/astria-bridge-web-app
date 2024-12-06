@@ -1,3 +1,4 @@
+import type { Chain as CosmosChain } from "@chain-registry/types";
 import type { ChainInfo } from "@keplr-wallet/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
 
@@ -16,6 +17,35 @@ export type IbcChainInfo = {
 export function toChainInfo(chain: IbcChainInfo): ChainInfo {
   const { iconClass, ...chainInfo } = chain;
   return chainInfo as ChainInfo;
+}
+
+export function cosmosChainNameFromId(chainName: string) {
+  return chainName.split("-")[0];
+}
+
+export function toCosmosChainNames(ibcChains: IbcChains): string[] {
+  return Object.values(ibcChains).map((chain) =>
+    cosmosChainNameFromId(chain.chainId),
+  );
+}
+
+export function ibcChainInfoToCosmosChain(chain: IbcChainInfo): CosmosChain {
+  return {
+    ...chain,
+    chain_name: chain.chainName,
+    chain_id: chain.chainId,
+    chain_type: "cosmos",
+  };
+}
+export function ibcChainInfosToCosmosChains(
+  ibcChains: IbcChains,
+): [CosmosChain, ...CosmosChain[]] {
+  if (!ibcChains || Object.keys(ibcChains).length === 0) {
+    throw new Error("At least one chain must be provided");
+  }
+  return Object.values(ibcChains).map((ibcChain) =>
+    ibcChainInfoToCosmosChain(ibcChain),
+  ) as [CosmosChain, ...CosmosChain[]];
 }
 
 // IbcChains type maps labels to IbcChainInfo objects

@@ -11,10 +11,11 @@ the Astria bridge.
 * `src/index.tsx`
   * React application setup
   * import styles
+  * ConfigContextProvider is here to provide config to App
 * `src/App.tsx`
   * main application component
   * define routes
-  * use context providers
+  * rest of context providers, e.g. notifications, rainbowkit, etc
 * `src/components` - More general React components for the app, e.g. Navbar,
   Dropdown, CopyToClipboardButton, etc
 * `src/config` - Configuration for the web app

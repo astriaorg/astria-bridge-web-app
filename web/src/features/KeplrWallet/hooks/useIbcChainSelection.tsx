@@ -15,6 +15,11 @@ import {
   getKeplrFromWindow,
 } from "features/KeplrWallet/services/ibc";
 import { useBalancePolling } from "features/GetBalancePolling";
+import { useChain, useChains } from "@cosmos-kit/react";
+import {
+  cosmosChainNameFromId,
+  toCosmosChainNames,
+} from "../../../config/chainConfigs/types.ts";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.
@@ -31,6 +36,17 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   );
   const [selectedIbcCurrency, setSelectedIbcCurrency] =
     useState<IbcCurrency | null>(null);
+
+  // const chainNames = toCosmosChainNames(ibcChains);
+  // const chains = useChains(chainNames);
+  // const { address } = chains.celestia;
+  // console.log({ chainNames, address });
+  // FIXME - there has to be a better way to do this?
+  const chainName = cosmosChainNameFromId(
+    selectedIbcChain?.chainId || "celestia",
+  );
+  const { address } = useChain(chainName);
+
   const [ibcAccountAddress, setIbcAccountAddress] = useState<string | null>(
     null,
   );
@@ -65,20 +81,10 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     useBalancePolling(getBalanceCallback, pollingConfig);
 
   useEffect(() => {
-    async function getAddress() {
-      if (!selectedIbcChain) {
-        return;
-      }
-      try {
-        const address = await getAddressFromKeplr(selectedIbcChain.chainId);
-        setIbcAccountAddress(address);
-      } catch (e) {
-        console.error("Failed to get address from Keplr", e);
-      }
+    if (address) {
+      setIbcAccountAddress(address);
     }
-
-    getAddress().then((_) => {});
-  }, [selectedIbcChain]);
+  }, [address]);
 
   const ibcChainsOptions = useMemo(() => {
     return Object.entries(ibcChains).map(
