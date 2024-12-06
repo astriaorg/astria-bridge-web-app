@@ -10,6 +10,7 @@ import {
   type IbcCurrency,
   ibcCurrencyBelongsToChain,
   toChainInfo,
+  cosmosChainNameFromId,
 } from "./chainConfigs/types";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
@@ -48,6 +49,7 @@ export {
   ibcCurrencyBelongsToChain,
   ibcChainInfosToCosmosChains,
   toChainInfo,
+  cosmosChainNameFromId,
   evmChainsToRainbowKitChains,
   useConfig,
 };

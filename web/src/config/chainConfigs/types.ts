@@ -19,8 +19,8 @@ export function toChainInfo(chain: IbcChainInfo): ChainInfo {
   return chainInfo as ChainInfo;
 }
 
-export function cosmosChainNameFromId(chainName: string) {
-  return chainName.split("-")[0];
+export function cosmosChainNameFromId(chainId: string) {
+  return chainId.split("-")[0];
 }
 
 export function toCosmosChainNames(ibcChains: IbcChains): string[] {

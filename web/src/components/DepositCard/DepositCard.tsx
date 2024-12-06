@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig } from "config";
+import { useConfig, cosmosChainNameFromId } from "config";
 import {
   AddERC20ToWalletButton,
   useEvmChainSelection,
@@ -16,10 +16,6 @@ import {
 } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 import { useChain, useChains } from "@cosmos-kit/react";
-import {
-  cosmosChainNameFromId,
-  toCosmosChainNames,
-} from "../../config/chainConfigs/types.ts";
 
 export default function DepositCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
