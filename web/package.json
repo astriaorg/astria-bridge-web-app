@@ -41,6 +41,9 @@
       "typescript": "^5"
     }
   },
+  "jest": {
+    "resetMocks": false
+  },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
