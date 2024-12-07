@@ -1,5 +1,6 @@
 // mock @interchain-ui/react's core functionality for cosmos-kit
 jest.mock('@interchain-ui/react', () => ({
+  // biome-ignore lint/suspicious/noExplicitAny: idc b/c it's for testing
   ThemeProvider: ({ children }: { children: any }) => children,
   useTheme: () => ({
     themeMode: 'dark',
@@ -25,8 +26,9 @@ Object.defineProperty(window, 'matchMedia', {
   }))
 });
 
-// TODO - mock WalletModal from cosmos-kit?
+// TODO - mock WalletModal from cosmos-kit
 
+// TODO - bring this mock back and remove providers in testHelpers.tsx
 // And ensure wagmi mock is complete
 // jest.mock('wagmi', () => {
 //   return {
