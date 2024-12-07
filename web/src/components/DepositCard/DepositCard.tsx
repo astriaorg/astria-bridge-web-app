@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig } from "config";
+import { useConfig, cosmosChainNameFromId } from "config";
 import {
   AddERC20ToWalletButton,
   useEvmChainSelection,
@@ -15,6 +15,7 @@ import {
   useIbcChainSelection,
 } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
+import { useChain, useChains } from "@cosmos-kit/react";
 
 export default function DepositCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
@@ -49,6 +50,27 @@ export default function DepositCard(): React.ReactElement {
     isLoadingIbcBalance,
     connectKeplrWallet,
   } = useIbcChainSelection(ibcChains);
+
+  // FIXME - there has to be a better way to do this?
+  //         maybe it's okay to use "celestia" as a default,
+  //         but the default should be programmatically determined and not hardcoded here
+  //  - problem: the selectedIbcChain is not set initially.
+  //  - also can't call a hook in useEffect so can't create `openView` in the useEffect
+  //    that is triggered when selectedIbcChain changes
+  const chainName = cosmosChainNameFromId(
+    selectedIbcChain?.chainId || "celestia",
+  );
+  const { openView } = useChain(chainName);
+
+  // FIXME - why does useChains throw an error?
+  //  - `Uncaught TypeError: Cannot read properties of undefined (reading 'chain_id')`
+  //  - if it wasn't broken, i think i could do the following:
+  //  `const chains = useChains(['cosmoshub', 'osmosis', 'stargaze', 'juno', 'akash']);`
+  //  and in the useEffect, `const { openView } = chains[selectedIbcChain.chainId]`.
+  // const chainNames = toCosmosChainNames(ibcChains);
+  // console.log({ chainNames });
+  // const chains = useChains(['cosmoshub']);
+  // const { openView } = chains[0];
 
   // the evm currency selection is controlled by the sender's chosen ibc currency,
   // and should be updated when an ibc currency or evm chain is selected
@@ -137,6 +159,7 @@ export default function DepositCard(): React.ReactElement {
   };
 
   const handleConnectEVMWallet = async () => {
+    // clear recipient address override values when user attempts to connect evm wallet
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
     await connectEVMWallet();
@@ -148,16 +171,22 @@ export default function DepositCard(): React.ReactElement {
     if (!selectedEvmChain) {
       return;
     }
+    // FIXME - there is a bad implicit loop of logic here.
+    //  - see comment in `features/EthWallet/hooks/useEvmChainSelection.tsx`
+    //  1. user can click "Connect EVM Wallet", which calls `connectEVMWallet`, before selecting a chain
+    //  2. `connectEVMWallet` will set the selected evm chain if it's not set
+    //  3. this `useEffect` is then triggered, which ultimately calls `connectEVMWallet`,
+    //     but now a chain is set so it will open the connect modal
     handleConnectEVMWallet().then((_) => {});
   }, [selectedEvmChain]);
 
   // ensure keplr wallet connection when selected ibc chain changes
-  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
   useEffect(() => {
     if (!selectedIbcChain) {
       return;
     }
-    connectKeplrWallet().then((_) => {});
+    // TODO - do we need to call openView here?
+    // connectKeplrWallet().then((_) => {});
   }, [selectedIbcChain]);
 
   const handleDeposit = async () => {
@@ -273,14 +302,14 @@ export default function DepositCard(): React.ReactElement {
   const additionalIbcOptions = useMemo(
     () => [
       {
-        label: "Connect Keplr Wallet",
-        action: connectKeplrWallet,
+        label: "Connect Cosmos Wallet",
+        action: openView,
         className: "has-text-primary",
-        leftIconClass: "i-keplr",
+        leftIconClass: "i-keplr", // TODO - replace icon?
         rightIconClass: "fas fa-plus",
       },
     ],
-    [connectKeplrWallet],
+    [openView],
   );
 
   const additionalEvmOptions = useMemo(() => {

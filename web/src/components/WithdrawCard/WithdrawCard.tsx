@@ -104,7 +104,8 @@ export default function WithdrawCard(): React.ReactElement {
     if (amount || ibcAccountAddress || recipientAddressOverride) {
       setHasTouchedForm(true);
     }
-    const recipientAddress = recipientAddressOverride || ibcAccountAddress;
+    const recipientAddress =
+      recipientAddressOverride || ibcAccountAddress || null;
     checkIsFormValid(recipientAddress, amount);
   }, [amount, ibcAccountAddress, recipientAddressOverride]);
 
