@@ -5,6 +5,8 @@ the Astria bridge.
 
 ## `web` application directory structure
 
+* `config-overrides.js` - used by `react-app-rewired` to override CRA's default
+  webpack config
 * `public/index.html`
   * html meta stuff, import styles and fonts
   * define React root element
@@ -16,6 +18,10 @@ the Astria bridge.
   * main application component
   * define routes
   * rest of context providers, e.g. notifications, rainbowkit, etc
+* `src/setupTests.tsx`
+  * most jest mocks defined here (some mocks defined in individual test files)
+  * browser global mocks defined here
+* `src/testHelpers.tsx` - helper functions for testing
 * `src/components` - More general React components for the app, e.g. Navbar,
   Dropdown, CopyToClipboardButton, etc
 * `src/config` - Configuration for the web app
