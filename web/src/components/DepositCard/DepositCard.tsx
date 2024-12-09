@@ -48,19 +48,13 @@ export default function DepositCard(): React.ReactElement {
     ibcCurrencyOptions,
     ibcBalance,
     isLoadingIbcBalance,
-    connectKeplrWallet,
   } = useIbcChainSelection(ibcChains);
 
-  // FIXME - there has to be a better way to do this?
-  //         maybe it's okay to use "celestia" as a default,
-  //         but the default should be programmatically determined and not hardcoded here
-  //  - problem: the selectedIbcChain is not set initially.
-  //  - also can't call a hook in useEffect so can't create `openView` in the useEffect
-  //    that is triggered when selectedIbcChain changes
-  const chainName = cosmosChainNameFromId(
-    selectedIbcChain?.chainId || "celestia",
-  );
-  const { openView } = useChain(chainName);
+  // FIXME - i think `useChains` would be better, but it's broken. see comment below.
+  const selectedChainId =
+    selectedIbcChain?.chainId || Object.values(ibcChains)[0].chainId;
+  const chainName = cosmosChainNameFromId(selectedChainId);
+  const { openView: openCosmosWalletModal } = useChain(chainName);
 
   // FIXME - why does useChains throw an error?
   //  - `Uncaught TypeError: Cannot read properties of undefined (reading 'chain_id')`
@@ -180,15 +174,6 @@ export default function DepositCard(): React.ReactElement {
     handleConnectEVMWallet().then((_) => {});
   }, [selectedEvmChain]);
 
-  // ensure keplr wallet connection when selected ibc chain changes
-  useEffect(() => {
-    if (!selectedIbcChain) {
-      return;
-    }
-    // TODO - do we need to call openView here?
-    // connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
-
   const handleDeposit = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
       addNotification({
@@ -303,13 +288,13 @@ export default function DepositCard(): React.ReactElement {
     () => [
       {
         label: "Connect Cosmos Wallet",
-        action: openView,
+        action: openCosmosWalletModal,
         className: "has-text-primary",
-        leftIconClass: "i-keplr", // TODO - replace icon?
+        leftIconClass: "i-cosmos",
         rightIconClass: "fas fa-plus",
       },
     ],
-    [openView],
+    [openCosmosWalletModal],
   );
 
   const additionalEvmOptions = useMemo(() => {
