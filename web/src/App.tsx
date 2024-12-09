@@ -1,13 +1,18 @@
 import type React from "react";
 import { Route, Routes } from "react-router-dom";
 import { ChainProvider } from "@cosmos-kit/react";
-import { assets } from "chain-registry";
+import { assets, chains } from "chain-registry";
 import { wallets } from "@cosmos-kit/keplr";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 
-import { evmChainsToRainbowKitChains, useConfig } from "config";
+import {
+  evmChainsToRainbowKitChains,
+  ibcChainInfosToCosmosChains,
+  ibcChainInfosToCosmosKitAssetLists,
+  useConfig,
+} from "config";
 import { NotificationsContextProvider } from "features/Notifications";
 import BridgePage from "pages/BridgePage/BridgePage";
 import Layout from "pages/Layout";
@@ -17,7 +22,6 @@ import "styles/index.scss";
 // contrib styles
 import "@rainbow-me/rainbowkit/styles.css";
 import "@interchain-ui/react/styles";
-import { toCosmosChainNames } from "./config/chainConfigs/types.ts";
 
 /**
  * App component with routes.
@@ -40,14 +44,17 @@ export default function App(): React.ReactElement {
     },
   };
 
+  const cosmosChains = ibcChainInfosToCosmosChains(ibcChains);
+  const assetLists = ibcChainInfosToCosmosKitAssetLists(ibcChains);
+
   return (
     <NotificationsContextProvider>
       <WagmiProvider config={rainbowKitConfig}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
             <ChainProvider
-              chains={toCosmosChainNames(ibcChains)} // supported chains
-              assetLists={assets} // supported asset lists
+              assetLists={[...assets, ...assetLists]} // supported asset lists
+              chains={[...chains, ...cosmosChains]} // supported chains
               wallets={wallets} // supported wallets
               walletConnectOptions={cosmosWalletConnectOptions} // required if `wallets` contains mobile wallets
             >
