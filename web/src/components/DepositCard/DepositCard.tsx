@@ -1,10 +1,11 @@
 import type React from "react";
+import { useCallback } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { cosmosChainNameFromId, useConfig } from "config";
+import { useConfig, cosmosChainNameFromId } from "config";
 import {
   AddERC20ToWalletButton,
   useEvmChainSelection,
@@ -15,7 +16,6 @@ import {
   useIbcChainSelection,
 } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
-import { useChain } from "@cosmos-kit/react";
 
 export default function DepositCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
@@ -48,24 +48,16 @@ export default function DepositCard(): React.ReactElement {
     ibcCurrencyOptions,
     ibcBalance,
     isLoadingIbcBalance,
+    connectCosmosWallet,
   } = useIbcChainSelection(ibcChains);
 
-  // FIXME - i think `useChains` would be better, but it's broken. see comment below.
-  const defaultChainId = Object.values(ibcChains)[0].chainId;
-  const chainName = cosmosChainNameFromId(
-    selectedIbcChain?.chainId || defaultChainId,
-  );
-  const { openView: openCosmosWalletModal } = useChain(chainName);
-
-  // FIXME - why does useChains throw an error?
-  //  - `Uncaught TypeError: Cannot read properties of undefined (reading 'chain_id')`
-  //  - if it wasn't broken, i think i could do the following:
-  //  `const chains = useChains(['cosmoshub', 'osmosis', 'stargaze', 'juno', 'akash']);`
-  //  and in the useEffect, `const { openView } = chains[selectedIbcChain.chainId]`.
-  // const chainNames = toCosmosChainNames(ibcChains);
-  // console.log({ chainNames });
-  // const chains = useChains(['cosmoshub']);
-  // const { openView } = chains[0];
+  // ensure cosmos wallet connection when selected ibc chain changes
+  useEffect(() => {
+    if (!selectedIbcChain) {
+      return;
+    }
+    connectCosmosWallet();
+  }, [selectedIbcChain, connectCosmosWallet]);
 
   // the evm currency selection is controlled by the sender's chosen ibc currency,
   // and should be updated when an ibc currency or evm chain is selected
@@ -153,15 +145,14 @@ export default function DepositCard(): React.ReactElement {
     setIsRecipientAddressValid(addressValid);
   };
 
-  const handleConnectEVMWallet = async () => {
+  const handleConnectEVMWallet = useCallback(() => {
     // clear recipient address override values when user attempts to connect evm wallet
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-    await connectEVMWallet();
-  };
+    connectEVMWallet();
+  }, [connectEVMWallet]);
 
   // ensure evm wallet connection when selected EVM chain changes
-  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
   useEffect(() => {
     if (!selectedEvmChain) {
       return;
@@ -172,8 +163,8 @@ export default function DepositCard(): React.ReactElement {
     //  2. `connectEVMWallet` will set the selected evm chain if it's not set
     //  3. this `useEffect` is then triggered, which ultimately calls `connectEVMWallet`,
     //     but now a chain is set so it will open the connect modal
-    handleConnectEVMWallet().then((_) => {});
-  }, [selectedEvmChain]);
+    handleConnectEVMWallet();
+  }, [selectedEvmChain, handleConnectEVMWallet]);
 
   const handleDeposit = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
@@ -285,20 +276,20 @@ export default function DepositCard(): React.ReactElement {
     selectedEvmCurrencyOption,
   ]);
 
-  const additionalIbcOptions = useMemo(
+  const additionalIbcChainOptions = useMemo(
     () => [
       {
         label: "Connect Cosmos Wallet",
-        action: openCosmosWalletModal,
+        action: connectCosmosWallet,
         className: "has-text-primary",
         leftIconClass: "i-cosmos",
         rightIconClass: "fas fa-plus",
       },
     ],
-    [openCosmosWalletModal],
+    [connectCosmosWallet],
   );
 
-  const additionalEvmOptions = useMemo(() => {
+  const additionalEvmChainOptions = useMemo(() => {
     return [
       {
         label: "Connect EVM Wallet",
@@ -327,7 +318,7 @@ export default function DepositCard(): React.ReactElement {
                 options={ibcChainsOptions}
                 onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
-                additionalOptions={additionalIbcOptions}
+                additionalOptions={additionalIbcChainOptions}
                 valueOverride={selectedIbcChainOption}
               />
             </div>
@@ -386,7 +377,7 @@ export default function DepositCard(): React.ReactElement {
               options={evmChainsOptions}
               onSelect={selectEvmChain}
               leftIconClass={"i-wallet"}
-              additionalOptions={additionalEvmOptions}
+              additionalOptions={additionalEvmChainOptions}
               valueOverride={selectedEvmChainOption}
             />
           </div>

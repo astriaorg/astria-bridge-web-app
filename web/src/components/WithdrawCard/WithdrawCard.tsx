@@ -1,4 +1,5 @@
 import type React from "react";
+import { useCallback } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useConfig } from "config";
@@ -45,8 +46,8 @@ export default function WithdrawCard(): React.ReactElement {
     ibcCurrencyOptions,
     ibcBalance,
     isLoadingIbcBalance,
-    connectKeplrWallet,
     resetState: resetIbcWalletState,
+    connectCosmosWallet,
   } = useIbcChainSelection(ibcChains);
 
   // the ibc currency selection is controlled by the sender's chosen evm currency,
@@ -128,11 +129,11 @@ export default function WithdrawCard(): React.ReactElement {
     setIsRecipientAddressValid(isRecipientAddressValid);
   };
 
-  const handleConnectKeplrWallet = async () => {
+  const handleConnectCosmosWallet = useCallback(() => {
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-    await connectKeplrWallet();
-  };
+    connectCosmosWallet();
+  }, [connectCosmosWallet]);
 
   // ensure evm wallet connection when selected EVM chain changes
   /* biome-ignore lint/correctness/useExhaustiveDependencies: */
@@ -140,17 +141,16 @@ export default function WithdrawCard(): React.ReactElement {
     if (!selectedEvmChain) {
       return;
     }
-    connectEVMWallet().then((_) => {});
+    connectEVMWallet();
   }, [selectedEvmChain]);
 
-  // ensure keplr wallet connection when selected ibc chain changes
-  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
+  // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {
     if (!selectedIbcChain) {
       return;
     }
-    handleConnectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
+    handleConnectCosmosWallet();
+  }, [selectedIbcChain, handleConnectCosmosWallet]);
 
   const handleWithdraw = async () => {
     if (!selectedEvmChain || !selectedEvmCurrency) {
@@ -269,9 +269,9 @@ export default function WithdrawCard(): React.ReactElement {
     () => [
       {
         label: "Connect Keplr Wallet",
-        action: handleConnectKeplrWallet,
+        action: handleConnectCosmosWallet,
         className: "has-text-primary",
-        leftIconClass: "i-keplr",
+        leftIconClass: "i-cosmos",
         rightIconClass: "fas fa-plus",
       },
       {
@@ -281,7 +281,7 @@ export default function WithdrawCard(): React.ReactElement {
         rightIconClass: "fas fa-pen-to-square",
       },
     ],
-    [handleConnectKeplrWallet, handleEditRecipientClick],
+    [handleConnectCosmosWallet, handleEditRecipientClick],
   );
 
   const additionalEvmOptions = useMemo(() => {

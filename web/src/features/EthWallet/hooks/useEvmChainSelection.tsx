@@ -32,10 +32,10 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   );
   const [selectedEvmCurrency, setSelectedEvmCurrency] =
     useState<EvmCurrency | null>(null);
+  // track address in hook state. this supports ux where we can clear the address
   const [evmAccountAddress, setEvmAccountAddress] = useState<string | null>(
     null,
   );
-
   useEffect(() => {
     if (userAccount?.address) {
       setEvmAccountAddress(userAccount.address);
@@ -172,7 +172,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   }, []);
 
   // opens RainbowKit modal for user to connect their EVM wallet
-  const connectEVMWallet = async () => {
+  const connectEVMWallet = useCallback(() => {
     if (!selectedEvmChain) {
       // FIXME - the fact this function needs to be called again after setting an evm chain
       //  in the parent component is implicit and should be somehow made explicit. this is
@@ -186,7 +186,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     if (openConnectModal) {
       openConnectModal();
     }
-  };
+  }, [selectedEvmChain, openConnectModal, evmChainsOptions]);
 
   return {
     evmChainsOptions,
