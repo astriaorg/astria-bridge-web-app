@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig, cosmosChainNameFromId } from "config";
+import { cosmosChainNameFromId, useConfig } from "config";
 import {
   AddERC20ToWalletButton,
   useEvmChainSelection,
@@ -15,7 +15,7 @@ import {
   useIbcChainSelection,
 } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
-import { useChain, useChains } from "@cosmos-kit/react";
+import { useChain } from "@cosmos-kit/react";
 
 export default function DepositCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
@@ -51,9 +51,10 @@ export default function DepositCard(): React.ReactElement {
   } = useIbcChainSelection(ibcChains);
 
   // FIXME - i think `useChains` would be better, but it's broken. see comment below.
-  const selectedChainId =
-    selectedIbcChain?.chainId || Object.values(ibcChains)[0].chainId;
-  const chainName = cosmosChainNameFromId(selectedChainId);
+  const defaultChainId = Object.values(ibcChains)[0].chainId;
+  const chainName = cosmosChainNameFromId(
+    selectedIbcChain?.chainId || defaultChainId,
+  );
   const { openView: openCosmosWalletModal } = useChain(chainName);
 
   // FIXME - why does useChains throw an error?

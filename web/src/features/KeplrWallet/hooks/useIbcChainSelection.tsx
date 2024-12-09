@@ -2,24 +2,20 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Keplr } from "@keplr-wallet/types";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
-  ibcCurrencyBelongsToChain,
-  toChainInfo,
   type IbcChainInfo,
   type IbcChains,
   type IbcCurrency,
+  ibcCurrencyBelongsToChain,
+  toChainInfo,
+  cosmosChainNameFromId,
 } from "config";
-import { useNotifications, NotificationType } from "features/Notifications";
+import { NotificationType, useNotifications } from "features/Notifications";
 import {
-  getAddressFromKeplr,
   getBalanceFromKeplr,
   getKeplrFromWindow,
 } from "features/KeplrWallet/services/ibc";
 import { useBalancePolling } from "features/GetBalancePolling";
-import { useChain, useChains } from "@cosmos-kit/react";
-import {
-  cosmosChainNameFromId,
-  toCosmosChainNames,
-} from "../../../config/chainConfigs/types.ts";
+import { useChain } from "@cosmos-kit/react";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.
@@ -37,13 +33,9 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   const [selectedIbcCurrency, setSelectedIbcCurrency] =
     useState<IbcCurrency | null>(null);
 
-  // const chainNames = toCosmosChainNames(ibcChains);
-  // const chains = useChains(chainNames);
-  // const { address } = chains.celestia;
-  // console.log({ chainNames, address });
-  // FIXME - there has to be a better way to do this?
+  const defaultChainId = Object.values(ibcChains)[0].chainId;
   const chainName = cosmosChainNameFromId(
-    selectedIbcChain?.chainId || "celestia",
+    selectedIbcChain?.chainId || defaultChainId,
   );
   const { address } = useChain(chainName);
 
