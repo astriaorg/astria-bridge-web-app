@@ -204,6 +204,7 @@ export default function DepositCard(): React.ReactElement {
         .truncate()
         .toString();
 
+      // TODO - replace w/ cosmoskit functionality
       await sendIbcTransfer(
         selectedIbcChain,
         fromAddress,

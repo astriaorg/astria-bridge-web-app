@@ -91,14 +91,17 @@ export function ibcCurrenciesToCosmosKitAssetList(
 ): AssetList {
   return {
     chain_name: chainName,
-    assets: currencies.map(ibcCurrencyToCosmosKitAsset)
+    assets: currencies.map((currency, index) => {
+      const isNativeAsset = index === 0;
+      return ibcCurrencyToCosmosKitAsset(currency, isNativeAsset);
+    })
   };
 }
 
 /**
  * Converts an IbcCurrency object to an Asset object for use with CosmosKit.
  */
-function ibcCurrencyToCosmosKitAsset(currency: IbcCurrency): Asset {
+function ibcCurrencyToCosmosKitAsset(currency: IbcCurrency, isNativeAsset: boolean = false): Asset {
   // create denomination units - one for the base denom and one for the display denom
   const denomUnits: DenomUnit[] = [
     {
@@ -111,9 +114,11 @@ function ibcCurrencyToCosmosKitAsset(currency: IbcCurrency): Asset {
     }
   ];
 
+  // sdk.coin for native assets, ics20 for IBC tokens
+  const typeAsset = isNativeAsset ? "sdk.coin" : "ics20";
   const asset: Asset = {
     denom_units: denomUnits,
-    type_asset: "sdk.coin",
+    type_asset: typeAsset,
     base: currency.coinMinimalDenom,
     name: currency.coinDenom,
     display: currency.coinDenom,
@@ -125,7 +130,7 @@ function ibcCurrencyToCosmosKitAsset(currency: IbcCurrency): Asset {
     // TODO - where is this used by cosmoskit?
     asset.ibc = {
       source_channel: currency.ibcChannel,
-      // These would need to be provided if known
+      // TODO
       dst_channel: "",
       source_denom: currency.coinMinimalDenom
     };
