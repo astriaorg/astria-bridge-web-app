@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
@@ -47,8 +47,17 @@ export default function DepositCard(): React.ReactElement {
     ibcCurrencyOptions,
     ibcBalance,
     isLoadingIbcBalance,
-    connectKeplrWallet,
+    connectCosmosWallet,
+    getCosmosSigningClient,
   } = useIbcChainSelection(ibcChains);
+
+  // ensure cosmos wallet connection when selected ibc chain changes
+  useEffect(() => {
+    if (!selectedIbcChain) {
+      return;
+    }
+    connectCosmosWallet();
+  }, [selectedIbcChain, connectCosmosWallet]);
 
   // the evm currency selection is controlled by the sender's chosen ibc currency,
   // and should be updated when an ibc currency or evm chain is selected
@@ -136,29 +145,26 @@ export default function DepositCard(): React.ReactElement {
     setIsRecipientAddressValid(addressValid);
   };
 
-  const handleConnectEVMWallet = async () => {
+  const handleConnectEVMWallet = useCallback(() => {
+    // clear recipient address override values when user attempts to connect evm wallet
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-    await connectEVMWallet();
-  };
+    connectEVMWallet();
+  }, [connectEVMWallet]);
 
   // ensure evm wallet connection when selected EVM chain changes
-  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
   useEffect(() => {
     if (!selectedEvmChain) {
       return;
     }
-    handleConnectEVMWallet().then((_) => {});
-  }, [selectedEvmChain]);
-
-  // ensure keplr wallet connection when selected ibc chain changes
-  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
-  useEffect(() => {
-    if (!selectedIbcChain) {
-      return;
-    }
-    connectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
+    // FIXME - there is a bad implicit loop of logic here.
+    //  - see comment in `features/EthWallet/hooks/useEvmChainSelection.tsx`
+    //  1. user can click "Connect EVM Wallet", which calls `connectEVMWallet`, before selecting a chain
+    //  2. `connectEVMWallet` will set the selected evm chain if it's not set
+    //  3. this `useEffect` is then triggered, which ultimately calls `connectEVMWallet`,
+    //     but now a chain is set so it will open the connect modal
+    handleConnectEVMWallet();
+  }, [selectedEvmChain, handleConnectEVMWallet]);
 
   const handleDeposit = async () => {
     if (!selectedIbcChain || !selectedIbcCurrency) {
@@ -198,8 +204,9 @@ export default function DepositCard(): React.ReactElement {
         .truncate()
         .toString();
 
+      const signer = await getCosmosSigningClient();
       await sendIbcTransfer(
-        selectedIbcChain,
+        signer,
         fromAddress,
         recipientAddress,
         formattedAmount,
@@ -270,20 +277,20 @@ export default function DepositCard(): React.ReactElement {
     selectedEvmCurrencyOption,
   ]);
 
-  const additionalIbcOptions = useMemo(
+  const additionalIbcChainOptions = useMemo(
     () => [
       {
-        label: "Connect Keplr Wallet",
-        action: connectKeplrWallet,
+        label: "Connect Cosmos Wallet",
+        action: connectCosmosWallet,
         className: "has-text-primary",
-        leftIconClass: "i-keplr",
+        leftIconClass: "i-cosmos",
         rightIconClass: "fas fa-plus",
       },
     ],
-    [connectKeplrWallet],
+    [connectCosmosWallet],
   );
 
-  const additionalEvmOptions = useMemo(() => {
+  const additionalEvmChainOptions = useMemo(() => {
     return [
       {
         label: "Connect EVM Wallet",
@@ -312,7 +319,7 @@ export default function DepositCard(): React.ReactElement {
                 options={ibcChainsOptions}
                 onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
-                additionalOptions={additionalIbcOptions}
+                additionalOptions={additionalIbcChainOptions}
                 valueOverride={selectedIbcChainOption}
               />
             </div>
@@ -371,7 +378,7 @@ export default function DepositCard(): React.ReactElement {
               options={evmChainsOptions}
               onSelect={selectEvmChain}
               leftIconClass={"i-wallet"}
-              additionalOptions={additionalEvmOptions}
+              additionalOptions={additionalEvmChainOptions}
               valueOverride={selectedEvmChainOption}
             />
           </div>

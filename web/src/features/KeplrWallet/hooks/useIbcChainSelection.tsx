@@ -1,20 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Keplr } from "@keplr-wallet/types";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
-  ibcCurrencyBelongsToChain,
-  toChainInfo,
+  cosmosChainNameFromId,
   type IbcChainInfo,
   type IbcChains,
   type IbcCurrency,
+  ibcCurrencyBelongsToChain,
 } from "config";
-import { useNotifications, NotificationType } from "features/Notifications";
-import {
-  getAddressFromKeplr,
-  getBalanceFromKeplr,
-  getKeplrFromWindow,
-} from "features/KeplrWallet/services/ibc";
+import { useNotifications } from "features/Notifications";
+import { getBalanceFromChain } from "features/KeplrWallet/services/ibc";
 import { useBalancePolling } from "features/GetBalancePolling";
+import { useChain } from "@cosmos-kit/react";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.
@@ -31,10 +27,33 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   );
   const [selectedIbcCurrency, setSelectedIbcCurrency] =
     useState<IbcCurrency | null>(null);
+
+  // use first chain as default chain
+  const defaultChainId = Object.values(ibcChains)[0].chainId;
+  const chainName = cosmosChainNameFromId(
+    selectedIbcChain?.chainId || defaultChainId,
+  );
+  const {
+    address,
+    openView: openCosmosWalletModal,
+    getSigningStargateClient,
+  } = useChain(chainName);
+
+  // we are keeping track of the address ourselves so that we can clear it if needed,
+  // e.g. to allow for manual address entry
+  // FIXME - is this still needed?
   const [ibcAccountAddress, setIbcAccountAddress] = useState<string | null>(
     null,
   );
 
+  // FIXME - is this still needed?
+  useEffect(() => {
+    if (address) {
+      setIbcAccountAddress(address);
+    }
+  }, [address]);
+
+  // FIXME - is this still needed?
   const resetState = useCallback(() => {
     setSelectedIbcChain(null);
     setSelectedIbcCurrency(null);
@@ -42,14 +61,18 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   }, []);
 
   const getBalanceCallback = useCallback(async () => {
-    if (!selectedIbcChain || !selectedIbcCurrency) {
+    if (!selectedIbcChain || !selectedIbcCurrency || !ibcAccountAddress) {
       return null;
     }
     if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedIbcChain)) {
       return null;
     }
-    return getBalanceFromKeplr(selectedIbcChain, selectedIbcCurrency);
-  }, [selectedIbcChain, selectedIbcCurrency]);
+    return getBalanceFromChain(
+      selectedIbcChain,
+      selectedIbcCurrency,
+      ibcAccountAddress,
+    );
+  }, [selectedIbcChain, selectedIbcCurrency, ibcAccountAddress]);
 
   const pollingConfig = useMemo(
     () => ({
@@ -63,22 +86,6 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   );
   const { balance: ibcBalance, isLoading: isLoadingIbcBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);
-
-  useEffect(() => {
-    async function getAddress() {
-      if (!selectedIbcChain) {
-        return;
-      }
-      try {
-        const address = await getAddressFromKeplr(selectedIbcChain.chainId);
-        setIbcAccountAddress(address);
-      } catch (e) {
-        console.error("Failed to get address from Keplr", e);
-      }
-    }
-
-    getAddress().then((_) => {});
-  }, [selectedIbcChain]);
 
   const ibcChainsOptions = useMemo(() => {
     return Object.entries(ibcChains).map(
@@ -129,69 +136,21 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     setSelectedIbcCurrency(currency);
   }, []);
 
-  // ensures Keplr wallet extension is installed.
-  // suggests the chain if it doesn't exist in Keplr.
-  const connectKeplrWallet = async () => {
+  // opens CosmosKit modal for user to connect their Cosmos wallet
+  const connectCosmosWallet = useCallback(() => {
     // if there is no selected chain, select the first one
     if (!selectedIbcChain) {
       selectIbcChain(ibcChainsOptions[0]?.value);
       return;
     }
 
-    // show a notification if the Keplr wallet is not installed
-    let keplr: Keplr;
-    try {
-      keplr = getKeplrFromWindow();
-    } catch (e) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          component: (
-            <p>
-              Keplr wallet extension must be installed! You can find it{" "}
-              <a
-                target="_blank"
-                href="https://www.keplr.app/download"
-                rel="noreferrer"
-              >
-                here
-              </a>
-              .
-            </p>
-          ),
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    // suggest the chain if it doesn't exist in Keplr
-    try {
-      await keplr.getKey(selectedIbcChain.chainId);
-    } catch (e) {
-      if (
-        e instanceof Error &&
-        (e.message.startsWith("There is no chain info") ||
-          e.message.startsWith("There is no modular chain info"))
-      ) {
-        try {
-          await keplr.experimentalSuggestChain(toChainInfo(selectedIbcChain));
-        } catch (e) {
-          if (e instanceof Error) {
-            selectIbcChain(null);
-          }
-        }
-      } else {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message: "Failed to get key from Keplr wallet.",
-            onAcknowledge: () => {},
-          },
-        });
-      }
-    }
-  };
+    openCosmosWalletModal();
+  }, [
+    selectIbcChain,
+    selectedIbcChain,
+    ibcChainsOptions,
+    openCosmosWalletModal,
+  ]);
 
   return {
     ibcChainsOptions,
@@ -209,7 +168,8 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     ibcBalance,
     isLoadingIbcBalance,
 
-    connectKeplrWallet,
+    connectCosmosWallet,
+    getCosmosSigningClient: getSigningStargateClient,
     resetState,
   };
 }

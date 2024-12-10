@@ -1,3 +1,9 @@
+import type {
+  Asset,
+  AssetList,
+  Chain as CosmosChain,
+  DenomUnit,
+} from "@chain-registry/types";
 import type { ChainInfo } from "@keplr-wallet/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
 
@@ -18,6 +24,40 @@ export function toChainInfo(chain: IbcChainInfo): ChainInfo {
   return chainInfo as ChainInfo;
 }
 
+/**
+ * Returns the chain name from the chain ID.
+ */
+export function cosmosChainNameFromId(chainId: string) {
+  return chainId.split("-")[0];
+}
+
+/**
+ * Converts an IbcChainInfo object to a CosmosChain object for use with CosmosKit.
+ */
+function ibcChainInfoToCosmosChain(chain: IbcChainInfo): CosmosChain {
+  const chainId = cosmosChainNameFromId(chain.chainId);
+  return {
+    ...chain,
+    chain_name: chainId,
+    chain_id: chainId,
+    chain_type: "cosmos",
+  };
+}
+
+/**
+ * Converts a map of IBC chains to an array of CosmosChain objects for use with CosmosKit.
+ */
+export function ibcChainInfosToCosmosChains(
+  ibcChains: IbcChains,
+): [CosmosChain, ...CosmosChain[]] {
+  if (!ibcChains || Object.keys(ibcChains).length === 0) {
+    throw new Error("At least one chain must be provided");
+  }
+  return Object.values(ibcChains).map((ibcChain) =>
+    ibcChainInfoToCosmosChain(ibcChain),
+  ) as [CosmosChain, ...CosmosChain[]];
+}
+
 // IbcChains type maps labels to IbcChainInfo objects
 export type IbcChains = {
   [label: string]: IbcChainInfo;
@@ -34,6 +74,77 @@ export type IbcCurrency = {
   sequencerBridgeAccount?: string;
   iconClass?: string;
 };
+
+/**
+ * Converts a map of IBC chains to an array of AssetList objects for use with CosmosKit.
+ */
+export function ibcChainInfosToCosmosKitAssetLists(
+  ibcChains: IbcChains,
+): AssetList[] {
+  return Object.values(ibcChains).map((chain) => {
+    const chainId = cosmosChainNameFromId(chain.chainId);
+    return ibcCurrenciesToCosmosKitAssetList(chainId, chain.currencies);
+  });
+}
+
+/**
+ * Converts a list of IBC currencies to an AssetList object for use with CosmosKit.
+ */
+export function ibcCurrenciesToCosmosKitAssetList(
+  chainName: string,
+  currencies: IbcCurrency[],
+): AssetList {
+  return {
+    chain_name: chainName,
+    assets: currencies.map((currency, index) => {
+      const isNativeAsset = index === 0;
+      return ibcCurrencyToCosmosKitAsset(currency, isNativeAsset);
+    }),
+  };
+}
+
+/**
+ * Converts an IbcCurrency object to an Asset object for use with CosmosKit.
+ */
+function ibcCurrencyToCosmosKitAsset(
+  currency: IbcCurrency,
+  isNativeAsset = false,
+): Asset {
+  // create denomination units - one for the base denom and one for the display denom
+  const denomUnits: DenomUnit[] = [
+    {
+      denom: currency.coinMinimalDenom,
+      exponent: 0,
+    },
+    {
+      denom: currency.coinDenom,
+      exponent: currency.coinDecimals,
+    },
+  ];
+
+  // sdk.coin for native assets, ics20 for IBC tokens
+  const typeAsset = isNativeAsset ? "sdk.coin" : "ics20";
+  const asset: Asset = {
+    denom_units: denomUnits,
+    type_asset: typeAsset,
+    base: currency.coinMinimalDenom,
+    name: currency.coinDenom,
+    display: currency.coinDenom,
+    symbol: currency.coinDenom,
+  };
+
+  // add IBC info if channel exists
+  // TODO - where is this used by cosmoskit?
+  if (currency.ibcChannel) {
+    asset.ibc = {
+      source_channel: currency.ibcChannel,
+      dst_channel: "", // TODO
+      source_denom: currency.coinMinimalDenom,
+    };
+  }
+
+  return asset;
+}
 
 /**
  * Returns true if the given currency belongs to the given chain.
