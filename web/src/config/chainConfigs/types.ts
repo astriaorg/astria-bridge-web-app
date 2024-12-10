@@ -1,4 +1,9 @@
-import type { Asset, AssetList, Chain as CosmosChain, DenomUnit } from "@chain-registry/types";
+import type {
+  Asset,
+  AssetList,
+  Chain as CosmosChain,
+  DenomUnit,
+} from "@chain-registry/types";
 import type { ChainInfo } from "@keplr-wallet/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
 
@@ -74,7 +79,7 @@ export type IbcCurrency = {
  * Converts a map of IBC chains to an array of AssetList objects for use with CosmosKit.
  */
 export function ibcChainInfosToCosmosKitAssetLists(
-  ibcChains: IbcChains
+  ibcChains: IbcChains,
 ): AssetList[] {
   return Object.values(ibcChains).map((chain) => {
     const chainId = cosmosChainNameFromId(chain.chainId);
@@ -87,21 +92,24 @@ export function ibcChainInfosToCosmosKitAssetLists(
  */
 export function ibcCurrenciesToCosmosKitAssetList(
   chainName: string,
-  currencies: IbcCurrency[]
+  currencies: IbcCurrency[],
 ): AssetList {
   return {
     chain_name: chainName,
     assets: currencies.map((currency, index) => {
       const isNativeAsset = index === 0;
       return ibcCurrencyToCosmosKitAsset(currency, isNativeAsset);
-    })
+    }),
   };
 }
 
 /**
  * Converts an IbcCurrency object to an Asset object for use with CosmosKit.
  */
-function ibcCurrencyToCosmosKitAsset(currency: IbcCurrency, isNativeAsset: boolean = false): Asset {
+function ibcCurrencyToCosmosKitAsset(
+  currency: IbcCurrency,
+  isNativeAsset = false,
+): Asset {
   // create denomination units - one for the base denom and one for the display denom
   const denomUnits: DenomUnit[] = [
     {
@@ -111,7 +119,7 @@ function ibcCurrencyToCosmosKitAsset(currency: IbcCurrency, isNativeAsset: boole
     {
       denom: currency.coinDenom,
       exponent: currency.coinDecimals,
-    }
+    },
   ];
 
   // sdk.coin for native assets, ics20 for IBC tokens
@@ -122,17 +130,16 @@ function ibcCurrencyToCosmosKitAsset(currency: IbcCurrency, isNativeAsset: boole
     base: currency.coinMinimalDenom,
     name: currency.coinDenom,
     display: currency.coinDenom,
-    symbol: currency.coinDenom
+    symbol: currency.coinDenom,
   };
 
   // add IBC info if channel exists
+  // TODO - where is this used by cosmoskit?
   if (currency.ibcChannel) {
-    // TODO - where is this used by cosmoskit?
     asset.ibc = {
       source_channel: currency.ibcChannel,
-      // TODO
-      dst_channel: "",
-      source_denom: currency.coinMinimalDenom
+      dst_channel: "", // TODO
+      source_denom: currency.coinMinimalDenom,
     };
   }
 
