@@ -1,19 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Keplr } from "@keplr-wallet/types";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
+  cosmosChainNameFromId,
   type IbcChainInfo,
   type IbcChains,
   type IbcCurrency,
   ibcCurrencyBelongsToChain,
-  toChainInfo,
-  cosmosChainNameFromId,
 } from "config";
-import { NotificationType, useNotifications } from "features/Notifications";
-import {
-  getBalanceFromKeplr,
-  getKeplrFromWindow,
-} from "features/KeplrWallet/services/ibc";
+import { useNotifications } from "features/Notifications";
+import { getBalanceFromKeplr } from "features/KeplrWallet/services/ibc";
 import { useBalancePolling } from "features/GetBalancePolling";
 import { useChain } from "@cosmos-kit/react";
 

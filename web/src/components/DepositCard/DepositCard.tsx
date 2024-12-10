@@ -1,11 +1,10 @@
 import type React from "react";
-import { useCallback } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig, cosmosChainNameFromId } from "config";
+import { useConfig } from "config";
 import {
   AddERC20ToWalletButton,
   useEvmChainSelection,
