@@ -38,7 +38,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   const chainName = cosmosChainNameFromId(
     selectedIbcChain?.chainId || defaultChainId,
   );
-  const { address, openView: openCosmosWalletModal } = useChain(chainName);
+  const { address, openView: openCosmosWalletModal, getSigningStargateClient } = useChain(chainName);
 
   // we are keeping track of the address ourselves so that we can clear it if needed,
   // e.g. to allow for manual address entry
@@ -166,6 +166,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     isLoadingIbcBalance,
 
     connectCosmosWallet,
+    getCosmosSigningClient: getSigningStargateClient,
     resetState,
   };
 }

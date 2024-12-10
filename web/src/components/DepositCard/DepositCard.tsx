@@ -49,6 +49,7 @@ export default function DepositCard(): React.ReactElement {
     ibcBalance,
     isLoadingIbcBalance,
     connectCosmosWallet,
+    getCosmosSigningClient,
   } = useIbcChainSelection(ibcChains);
 
   // ensure cosmos wallet connection when selected ibc chain changes
@@ -204,9 +205,9 @@ export default function DepositCard(): React.ReactElement {
         .truncate()
         .toString();
 
-      // TODO - replace w/ cosmoskit functionality
+      const signer = await getCosmosSigningClient();
       await sendIbcTransfer(
-        selectedIbcChain,
+        signer,
         fromAddress,
         recipientAddress,
         formattedAmount,

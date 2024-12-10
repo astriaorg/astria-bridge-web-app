@@ -2,7 +2,7 @@ import Long from "long";
 import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
 import type { IbcChainInfo, IbcCurrency } from "config";
-import type { Keplr } from "@keplr-wallet/types";
+import type { Keplr, OfflineAminoSigner } from "@keplr-wallet/types";
 import type { Key } from "@keplr-wallet/types/src/wallet/keplr";
 
 /**
@@ -33,37 +33,17 @@ async function getKeyFromKeplr(chainId: string): Promise<Key> {
 /**
  * Send an IBC transfer from the selected chain to the recipient address.
  * Set `memo` on the tx so the sequencer knows to bridge to an EVM chain.
- * @param selectedIbcChain
- * @param sender
- * @param recipient
- * @param amount
- * @param currency
  */
 export const sendIbcTransfer = async (
-  selectedIbcChain: IbcChainInfo,
+  client: SigningStargateClient,
   sender: string,
   recipient: string,
   amount: string,
   currency: IbcCurrency,
 ) => {
-  const keplr = getKeplrFromWindow();
-  const offlineSigner = keplr.getOfflineSignerOnlyAmino(
-    selectedIbcChain.chainId,
-  );
-
-  const client = await SigningStargateClient.connectWithSigner(
-    selectedIbcChain.rpc,
-    offlineSigner,
-  );
-
-  const key = await getKeyFromKeplr(selectedIbcChain.chainId);
-  if (key.bech32Address !== sender) {
-    throw new Error("Sender address does not match Keplr wallet address.");
-  }
-
   // FIXME - no account here when the address does not have any native tokens for the chain?
   //  e.g. testing w/ Celestia Mocha-4 with an address that doesn't have any TIA on mocha.
-  const account = await client.getAccount(key.bech32Address);
+  const account = await client.getAccount(sender);
   if (!account) {
     throw new Error("Failed to get account from Keplr wallet.");
   }
@@ -110,8 +90,8 @@ export const sendIbcTransfer = async (
 
 /**
  * Get the balance of the selected currency from the Keplr wallet.
- * @param selectedIbcChain
- * @param selectedCurrency
+ *
+ * TODO - refactor to use cosmoskit
  */
 export const getBalanceFromKeplr = async (
   selectedIbcChain: IbcChainInfo,
@@ -133,13 +113,4 @@ export const getBalanceFromKeplr = async (
 
   const amount = new Dec(balance.amount, coinDecimals);
   return `${amount.toString(2)} ${coinDenom}`;
-};
-
-/**
- * Get the address from the Keplr wallet for the selected chain.
- * @param chainId
- */
-export const getAddressFromKeplr = async (chainId: string): Promise<string> => {
-  const key = await getKeyFromKeplr(chainId);
-  return key.bech32Address;
 };

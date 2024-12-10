@@ -4,6 +4,7 @@ import { ChainProvider } from "@cosmos-kit/react";
 import { assets, chains } from "chain-registry";
 import { wallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
+import { Chain } from "@chain-registry/types";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
@@ -45,6 +46,8 @@ export default function App(): React.ReactElement {
       projectId: "YOUR_PROJECT_ID", // TODO
     },
   };
+  // TODO - should i handle this so that for prod we rely on chain-registry?
+  //  could do it lazily, https://cosmology.zone/learn/frontend/how-get-token-and-asset-information-in-the-interchain
   const cosmosChains = ibcChainInfosToCosmosChains(ibcChains);
   const cosmosAssetLists = ibcChainInfosToCosmosKitAssetLists(ibcChains);
 
@@ -58,6 +61,16 @@ export default function App(): React.ReactElement {
               chains={[...chains, ...cosmosChains]} // supported chains
               wallets={[...wallets, ...leapWallets]} // supported wallets
               walletConnectOptions={cosmosWalletConnectOptions} // required if `wallets` contains mobile wallets
+              signerOptions={{
+                preferredSignType: (chain: string | Chain) => {
+                  // NOTE - to support cosmos on ledger, from the keplr team:
+                  // > it seems like the webapp enforces SIGN_MODE_DIRECT
+                  // > for all transaction signing, but unfortunately due
+                  // > to a weird cosmos history where Ledger isn’t able
+                  // > to sign SIGN_MODE_DIRECT but only legacy amino messages
+                  return "amino";
+                }
+              }}
             >
               <Routes>
                 <Route element={<Layout />}>
