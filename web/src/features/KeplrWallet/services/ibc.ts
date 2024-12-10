@@ -1,34 +1,7 @@
-import Long from "long";
-import { type SigningStargateClient, StargateClient } from "@cosmjs/stargate";
+import type { SigningStargateClient } from "@cosmjs/stargate";
 import { Dec } from "@keplr-wallet/unit";
 import type { IbcChainInfo, IbcCurrency } from "config";
-import type { Keplr, OfflineAminoSigner } from "@keplr-wallet/types";
-import type { Key } from "@keplr-wallet/types/src/wallet/keplr";
-
-/**
- * Get the Keplr wallet object from the browser window.
- * Requires the Keplr extension to be installed.
- */
-export function getKeplrFromWindow(): Keplr {
-  const keplr = window.keplr;
-  if (!keplr) {
-    throw new Error("Keplr extension not installed");
-  }
-  return keplr;
-}
-
-/**
- * Get the key from the Keplr wallet for the selected chain.
- * @param {string} chainId - The chain ID to get the key for.
- */
-async function getKeyFromKeplr(chainId: string): Promise<Key> {
-  const keplr = getKeplrFromWindow();
-  const key = await keplr.getKey(chainId);
-  if (!key) {
-    throw new Error("Failed to get key from Keplr wallet.");
-  }
-  return key;
-}
+import { osmosis } from "osmojs";
 
 /**
  * Send an IBC transfer from the selected chain to the recipient address.
@@ -89,28 +62,37 @@ export const sendIbcTransfer = async (
 };
 
 /**
- * Get the balance of the selected currency from the Keplr wallet.
- *
- * TODO - refactor to use cosmoskit
+ * Gets the balance for a given address and currency on an IBC chain using Cosmos SDK client.
  */
-export const getBalanceFromKeplr = async (
-  selectedIbcChain: IbcChainInfo,
-  selectedCurrency: IbcCurrency,
+export const getBalanceFromChain = async (
+  chainInfo: IbcChainInfo,
+  currency: IbcCurrency,
+  address: string,
 ): Promise<string> => {
-  const key = await getKeyFromKeplr(selectedIbcChain.chainId);
-  const client = await StargateClient.connect(selectedIbcChain.rpc);
-
-  const balance = await client.getBalance(
-    key.bech32Address,
-    selectedCurrency.coinMinimalDenom,
-  );
-
-  const { coinDenom, coinDecimals } = selectedCurrency;
-
-  if (!balance) {
-    return `0 ${coinDenom}`;
+  if (!address) {
+    return `0 ${currency.coinDenom}`;
   }
 
-  const amount = new Dec(balance.amount, coinDecimals);
-  return `${amount.toString(2)} ${coinDenom}`;
+  const client = await osmosis.ClientFactory.createRPCQueryClient({
+    rpcEndpoint: chainInfo.rpc,
+  });
+
+  try {
+    // query balance using bank module
+    const balance = await client.cosmos.bank.v1beta1.balance({
+      address,
+      denom: currency.coinMinimalDenom,
+    });
+
+    if (!balance?.balance) {
+      return `0 ${currency.coinDenom}`;
+    }
+
+    // Convert to display amount using decimal places
+    const amount = new Dec(balance.balance.amount, currency.coinDecimals);
+    return `${amount.toString(2)} ${currency.coinDenom}`;
+  } catch (error) {
+    console.error("Failed to fetch balance:", error);
+    throw error;
+  }
 };

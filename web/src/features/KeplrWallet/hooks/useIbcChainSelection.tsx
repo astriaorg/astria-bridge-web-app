@@ -8,7 +8,7 @@ import {
   ibcCurrencyBelongsToChain,
 } from "config";
 import { useNotifications } from "features/Notifications";
-import { getBalanceFromKeplr } from "features/KeplrWallet/services/ibc";
+import { getBalanceFromChain } from "features/KeplrWallet/services/ibc";
 import { useBalancePolling } from "features/GetBalancePolling";
 import { useChain } from "@cosmos-kit/react";
 
@@ -61,14 +61,18 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   }, []);
 
   const getBalanceCallback = useCallback(async () => {
-    if (!selectedIbcChain || !selectedIbcCurrency) {
+    if (!selectedIbcChain || !selectedIbcCurrency || !ibcAccountAddress) {
       return null;
     }
     if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedIbcChain)) {
       return null;
     }
-    return getBalanceFromKeplr(selectedIbcChain, selectedIbcCurrency);
-  }, [selectedIbcChain, selectedIbcCurrency]);
+    return getBalanceFromChain(
+      selectedIbcChain,
+      selectedIbcCurrency,
+      ibcAccountAddress,
+    );
+  }, [selectedIbcChain, selectedIbcCurrency, ibcAccountAddress]);
 
   const pollingConfig = useMemo(
     () => ({
