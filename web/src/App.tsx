@@ -4,7 +4,7 @@ import { ChainProvider } from "@cosmos-kit/react";
 import { assets, chains } from "chain-registry";
 import { wallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
-import { Chain } from "@chain-registry/types";
+import type { Chain } from "@chain-registry/types";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
@@ -69,7 +69,7 @@ export default function App(): React.ReactElement {
                   // > to a weird cosmos history where Ledger isn’t able
                   // > to sign SIGN_MODE_DIRECT but only legacy amino messages
                   return "amino";
-                }
+                },
               }}
             >
               <Routes>
