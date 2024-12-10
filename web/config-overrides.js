@@ -55,7 +55,7 @@ module.exports = function override(config) {
         },
         // Bundle for wallet-related packages
         wallets: {
-          test: /[\\/]node_modules[\\/](@cosmjs|@keplr-wallet|@rainbow-me)[\\/]/,
+          test: /[\\/]node_modules[\\/](@cosmjs|@keplr-wallet|@rainbow-me|osmojs|@cosmos-kit|chain-registry|ethers|viem|wagmi)[\\/]/,
           name: "wallet-vendor",
           chunks: "all",
           priority: 15,

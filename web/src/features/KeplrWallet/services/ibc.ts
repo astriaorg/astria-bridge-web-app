@@ -69,10 +69,6 @@ export const getBalanceFromChain = async (
   currency: IbcCurrency,
   address: string,
 ): Promise<string> => {
-  if (!address) {
-    return `0 ${currency.coinDenom}`;
-  }
-
   const client = await osmosis.ClientFactory.createRPCQueryClient({
     rpcEndpoint: chainInfo.rpc,
   });
@@ -88,7 +84,7 @@ export const getBalanceFromChain = async (
       return `0 ${currency.coinDenom}`;
     }
 
-    // Convert to display amount using decimal places
+    // convert to display amount using decimal places
     const amount = new Dec(balance.balance.amount, currency.coinDecimals);
     return `${amount.toString(2)} ${currency.coinDenom}`;
   } catch (error) {
