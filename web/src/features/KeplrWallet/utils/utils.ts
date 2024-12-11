@@ -1,7 +1,6 @@
 /**
- * Pad decimal with 0 if it starts with a dot
- * @param str
+ * Returns now plus the given minutes, in nanoseconds
  */
-export function padDecimal(str: string) {
-  return str.startsWith(".") ? `0${str}` : str;
+export function nowPlusMinutesInNano(minutes: number): bigint {
+  return BigInt(Date.now() + minutes * 60 * 1000) * BigInt(1_000_000);
 }

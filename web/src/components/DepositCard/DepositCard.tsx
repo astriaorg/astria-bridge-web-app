@@ -1,7 +1,6 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config";
@@ -9,12 +8,9 @@ import {
   AddERC20ToWalletButton,
   useEvmChainSelection,
 } from "features/EthWallet";
-import {
-  padDecimal,
-  sendIbcTransfer,
-  useIbcChainSelection,
-} from "features/KeplrWallet";
+import { sendIbcTransfer, useIbcChainSelection } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
+import { Decimal } from "@cosmjs/math";
 
 export default function DepositCard(): React.ReactElement {
   const { evmChains, ibcChains } = useConfig();
@@ -194,15 +190,10 @@ export default function DepositCard(): React.ReactElement {
     setIsAnimating(true);
 
     try {
-      // must left pad the amount with 0 if it starts with a dot because
-      // keplr's regex for a decimal is ^-?\d+.?\d*$ so it requires a leading digit
-      const amountStrPadded = padDecimal(amount);
-      const formattedAmount = DecUtils.getTenExponentN(
+      const formattedAmount = Decimal.fromUserInput(
+        amount,
         selectedIbcCurrency.coinDecimals,
-      )
-        .mul(new Dec(amountStrPadded))
-        .truncate()
-        .toString();
+      ).atomics;
 
       const signer = await getCosmosSigningClient();
       await sendIbcTransfer(

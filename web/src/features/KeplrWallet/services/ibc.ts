@@ -1,7 +1,8 @@
 import type { SigningStargateClient } from "@cosmjs/stargate";
-import { Dec } from "@keplr-wallet/unit";
-import type { IbcChainInfo, IbcCurrency } from "config";
+import { Decimal } from "@cosmjs/math";
 import { osmosis } from "osmojs";
+import type { IbcChainInfo, IbcCurrency } from "config";
+import { nowPlusMinutesInNano } from "../utils/utils.ts";
 
 /**
  * Send an IBC transfer from the selected chain to the recipient address.
@@ -47,8 +48,7 @@ export const sendIbcTransfer = async (
       sender: sender,
       memo: memo,
       receiver: currency.sequencerBridgeAccount,
-      // 10 minutes from now, in nanoseconds
-      timeoutTimestamp: BigInt(Date.now() + 600_000) * BigInt(1_000_000),
+      timeoutTimestamp: nowPlusMinutesInNano(10),
     },
   };
 
@@ -85,8 +85,11 @@ export const getBalanceFromChain = async (
     }
 
     // convert to display amount using decimal places
-    const amount = new Dec(balance.balance.amount, currency.coinDecimals);
-    return `${amount.toString(2)} ${currency.coinDenom}`;
+    const amount = Decimal.fromAtomics(
+      balance.balance.amount,
+      currency.coinDecimals,
+    );
+    return `${amount.toString()} ${currency.coinDenom}`;
   } catch (error) {
     console.error("Failed to fetch balance:", error);
     throw error;
