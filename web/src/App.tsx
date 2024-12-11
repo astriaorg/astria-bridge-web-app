@@ -2,7 +2,7 @@ import type React from "react";
 import { Route, Routes } from "react-router-dom";
 import { ChainProvider } from "@cosmos-kit/react";
 import { assets, chains } from "chain-registry";
-import { wallets } from "@cosmos-kit/keplr";
+import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
 import type { Chain } from "@chain-registry/types";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
@@ -57,9 +57,9 @@ export default function App(): React.ReactElement {
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
             <ChainProvider
-              assetLists={[...assets, ...cosmosAssetLists]} // supported asset lists
-              chains={[...chains, ...cosmosChains]} // supported chains
-              wallets={[...wallets, ...leapWallets]} // supported wallets
+              assetLists={[...assets, ...cosmosAssetLists]}
+              chains={[...chains, ...cosmosChains]}
+              wallets={[...keplrWallets, ...leapWallets]}
               walletConnectOptions={cosmosWalletConnectOptions} // required if `wallets` contains mobile wallets
               signerOptions={{
                 preferredSignType: (chain: string | Chain) => {

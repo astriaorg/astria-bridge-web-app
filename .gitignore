@@ -31,5 +31,5 @@ web/build
 # gcloud
 gsa-key.json
 
-# ai digest
+# ai digest for feeding to LLMs
 codebase.md

@@ -50,7 +50,7 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "test": "react-app-rewired test --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi)/)\"",
+    "test": "react-app-rewired test --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\"",
     "test-cov": "CI=true react-scripts test --coverage",
     "eject": "react-scripts eject",
     "format": "biome format --write .",

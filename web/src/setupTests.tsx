@@ -91,3 +91,45 @@ jest.mock("wagmi", () => {
     })),
   };
 });
+
+// mock osmojs
+jest.mock("osmojs", () => ({
+  osmosis: {
+    ClientFactory: {
+      createRPCQueryClient: jest.fn(() => ({
+        cosmos: {
+          bank: {
+            v1beta1: {
+              balance: jest.fn(() => ({
+                balance: { amount: "1000000", denom: "utia" }
+              }))
+            }
+          }
+        }
+      }))
+    }
+  }
+}));
+
+// mock chain-registry
+jest.mock("chain-registry", () => ({
+  assets: [],
+  chains: []
+}));
+
+// mock all cosmos-kit related packages
+jest.mock("@cosmos-kit/keplr", () => ({
+  wallets: [{
+    name: "keplr",
+    prettyName: "Keplr",
+    mode: "extension"
+  }]
+}));
+
+jest.mock("@cosmos-kit/leap", () => ({
+  wallets: [{
+    name: "leap",
+    prettyName: "Leap",
+    mode: "extension"
+  }]
+}));
