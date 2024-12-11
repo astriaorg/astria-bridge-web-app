@@ -44,7 +44,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   useEffect(() => {
     // make sure the address is set when
     // the address, chain, or currency change
-    if (selectedIbcChain && cosmosAddressFromWallet) {
+    if (selectedIbcChain && selectedIbcCurrency && cosmosAddressFromWallet) {
       setIbcAccountAddress(cosmosAddressFromWallet);
     }
   }, [cosmosAddressFromWallet, selectedIbcChain, selectedIbcCurrency]);

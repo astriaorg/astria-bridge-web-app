@@ -37,7 +37,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     null,
   );
   useEffect(() => {
-    if (selectedEvmChain && userAccount?.address) {
+    if (selectedEvmChain && selectedEvmCurrency && userAccount?.address) {
       setEvmAccountAddress(userAccount.address);
     }
   }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
