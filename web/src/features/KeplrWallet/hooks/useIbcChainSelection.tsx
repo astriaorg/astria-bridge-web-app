@@ -31,26 +31,23 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     selectedIbcChain?.chainId || defaultChainId,
   );
   const {
-    address,
+    address: cosmosAddressFromWallet,
     openView: openCosmosWalletModal,
-    getSigningStargateClient,
+    getSigningStargateClient: getCosmosSigningClient,
   } = useChain(chainName);
 
   // we are keeping track of the address ourselves so that we can clear it if needed,
   // e.g. to allow for manual address entry
-  // FIXME - is this still needed?
   const [ibcAccountAddress, setIbcAccountAddress] = useState<string | null>(
     null,
   );
-
-  // FIXME - is this still needed?
   useEffect(() => {
-    if (address) {
-      setIbcAccountAddress(address);
+    // make sure the address is set when
+    // the address, chain, or currency change
+    if (selectedIbcChain && cosmosAddressFromWallet) {
+      setIbcAccountAddress(cosmosAddressFromWallet);
     }
-  }, [address]);
-
-  // FIXME - is this still needed?
+  }, [cosmosAddressFromWallet, selectedIbcChain, selectedIbcCurrency]);
   const resetState = useCallback(() => {
     setSelectedIbcChain(null);
     setSelectedIbcCurrency(null);
@@ -166,7 +163,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     isLoadingIbcBalance,
 
     connectCosmosWallet,
-    getCosmosSigningClient: getSigningStargateClient,
+    getCosmosSigningClient,
     resetState,
   };
 }

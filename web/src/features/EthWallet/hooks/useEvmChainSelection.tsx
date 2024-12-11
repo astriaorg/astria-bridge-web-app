@@ -37,11 +37,10 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     null,
   );
   useEffect(() => {
-    if (userAccount?.address) {
+    if (selectedEvmChain && userAccount?.address) {
       setEvmAccountAddress(userAccount.address);
     }
-  }, [userAccount.address]);
-
+  }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
