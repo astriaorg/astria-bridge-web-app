@@ -1,45 +1,35 @@
-import { padDecimal } from "./utils"; // adjust import path as needed
+import { nowPlusMinutesInNano } from "./utils";
 
-describe("padDecimal", () => {
-  test("adds leading zero to strings starting with decimal point", () => {
-    expect(padDecimal(".5")).toBe("0.5");
-    expect(padDecimal(".123")).toBe("0.123");
-    expect(padDecimal(".0")).toBe("0.0");
+describe("nowPlusMinutesInNano", () => {
+  beforeEach(() => {
+    jest.spyOn(Date, "now").mockImplementation(() => 1600000000000); // 2020-09-13T12:26:40.000Z
   });
 
-  test("does not modify strings that do not start with decimal point", () => {
-    expect(padDecimal("1.5")).toBe("1.5");
-    expect(padDecimal("10.123")).toBe("10.123");
-    expect(padDecimal("0.5")).toBe("0.5");
-    expect(padDecimal("123")).toBe("123");
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
-  test("handles edge cases", () => {
-    // Empty string
-    expect(padDecimal("")).toBe("");
+  test("converts 5 minutes to expected nanoseconds from now", () => {
+    const result = nowPlusMinutesInNano(5);
 
-    // Just a decimal point
-    expect(padDecimal(".")).toBe("0.");
+    // assert the result is a BigInt
+    expect(typeof result).toBe("bigint");
 
-    // Multiple decimal points
-    expect(padDecimal(".1.2")).toBe("0.1.2");
-
-    // Leading zeros
-    expect(padDecimal("00.5")).toBe("00.5");
-
-    // Negative numbers
-    expect(padDecimal("-.5")).toBe("-.5");
-    expect(padDecimal("-0.5")).toBe("-0.5");
+    // convert result back to milliseconds and check the time difference
+    const resultInMs = Number(result / BigInt(1_000_000));
+    const expectedMs = Date.now() + 5 * 60 * 1000;
+    expect(resultInMs).toBe(expectedMs);
   });
 
-  test("preserves string format without modifying actual numbers", () => {
-    // Scientific notation
-    expect(padDecimal("1e-10")).toBe("1e-10");
+  test("maintains millisecond precision when converting to nanoseconds", () => {
+    const result = nowPlusMinutesInNano(1);
+    // check that the last 6 digits (nanosecond portion) are zeros
+    expect(result % BigInt(1_000_000)).toBe(BigInt(0));
+  });
 
-    // Very long decimals
-    expect(padDecimal(".12345678901234567890")).toBe("0.12345678901234567890");
-
-    // Trailing zeros
-    expect(padDecimal(".500")).toBe("0.500");
+  test("handles zero minutes", () => {
+    const result = nowPlusMinutesInNano(0);
+    const expectedMs = Date.now();
+    expect(Number(result / BigInt(1_000_000))).toBe(expectedMs);
   });
 });
