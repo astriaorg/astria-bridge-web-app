@@ -35,11 +35,10 @@ export function cosmosChainNameFromId(chainId: string) {
  * Converts an IbcChainInfo object to a CosmosChain object for use with CosmosKit.
  */
 function ibcChainInfoToCosmosChain(chain: IbcChainInfo): CosmosChain {
-  const chainId = cosmosChainNameFromId(chain.chainId);
   return {
     ...chain,
-    chain_name: chainId,
-    chain_id: chainId,
+    chain_name: cosmosChainNameFromId(chain.chainId),
+    chain_id: chain.chainId,
     chain_type: "cosmos",
   };
 }
@@ -82,8 +81,10 @@ export function ibcChainInfosToCosmosKitAssetLists(
   ibcChains: IbcChains,
 ): AssetList[] {
   return Object.values(ibcChains).map((chain) => {
-    const chainId = cosmosChainNameFromId(chain.chainId);
-    return ibcCurrenciesToCosmosKitAssetList(chainId, chain.currencies);
+    return ibcCurrenciesToCosmosKitAssetList(
+      cosmosChainNameFromId(chain.chainId),
+      chain.currencies,
+    );
   });
 }
 
