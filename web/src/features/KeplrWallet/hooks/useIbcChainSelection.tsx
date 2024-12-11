@@ -7,7 +7,6 @@ import {
   type IbcCurrency,
   ibcCurrencyBelongsToChain,
 } from "config";
-import { useNotifications } from "features/Notifications";
 import { getBalanceFromChain } from "features/KeplrWallet/services/ibc";
 import { useBalancePolling } from "features/GetBalancePolling";
 import { useChain } from "@cosmos-kit/react";
@@ -20,8 +19,6 @@ import { useChain } from "@cosmos-kit/react";
  * @param ibcChains - The possible IBC chains to select from.
  */
 export function useIbcChainSelection(ibcChains: IbcChains) {
-  const { addNotification } = useNotifications();
-
   const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
     null,
   );

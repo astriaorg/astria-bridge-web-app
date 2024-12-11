@@ -78,6 +78,7 @@
     "buffer": "^6.0.3",
     "react-app-rewired": "^2.2.1",
     "source-map-explorer": "^2.5.3",
-    "stream-browserify": "^3.0.0"
+    "stream-browserify": "^3.0.0",
+    "webpack": "^5.97.1"
   }
 }

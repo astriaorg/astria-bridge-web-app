@@ -1,10 +1,10 @@
 import { type Config, getPublicClient, getWalletClient } from "@wagmi/core";
-import { parseUnits, type Address, type Hash } from "viem";
+import { parseUnits } from "viem";
 import { sepolia } from "wagmi/chains";
 import { GenericContractService } from "../GenericContractService";
 import {
-  AstriaWithdrawerService,
   AstriaErc20WithdrawerService,
+  AstriaWithdrawerService,
   createWithdrawerService,
 } from "./AstriaWithdrawerService";
 
