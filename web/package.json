@@ -47,7 +47,7 @@
     "resetMocks": false
   },
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "WEBPACK_OPTIMIZE_FOR_BUILD=false react-app-rewired start --progress",
     "build": "react-app-rewired build",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "test": "react-app-rewired test --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\"",

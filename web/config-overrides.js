@@ -25,69 +25,72 @@ module.exports = function override(config) {
     },
   ];
 
-  // Enhanced optimization configuration with safer chunking
-  config.optimization = {
-    ...config.optimization,
-    usedExports: true,
-    providedExports: true,
-    sideEffects: true,
-    minimize: true,
-    splitChunks: {
-      chunks: "all",
-      maxInitialRequests: 25,
-      minSize: 20000,
-      maxSize: 244000,
-      cacheGroups: {
-        // Main vendor bundle for larger modules
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: "vendor",
-          chunks: "all",
-          priority: 10,
-          enforce: true,
-        },
-        // Separate bundle for react and related packages
-        react: {
-          test: /[\\/]node_modules[\\/](react|react-dom|react-router)[\\/]/,
-          name: "react-vendor",
-          chunks: "all",
-          priority: 20,
-        },
-        // Bundle for wallet-related packages
-        wallets: {
-          test: /[\\/]node_modules[\\/](@cosmjs|@keplr-wallet|@rainbow-me|osmojs|@cosmos-kit|chain-registry|ethers|viem|wagmi)[\\/]/,
-          name: "wallet-vendor",
-          chunks: "all",
-          priority: 15,
-        },
-        // Common code used across multiple components
-        common: {
-          name: "common",
-          minChunks: 2,
-          chunks: "all",
-          priority: 5,
-          reuseExistingChunk: true,
-          enforce: true,
+  // optimize for build by default but not for local dev server
+  if (process.env.WEBPACK_OPTIMIZE_FOR_BUILD !== "false") {
+    // optimization configuration with safer chunking
+    config.optimization = {
+      ...config.optimization,
+      usedExports: true,
+      providedExports: true,
+      sideEffects: true,
+      minimize: true,
+      splitChunks: {
+        chunks: "all",
+        maxInitialRequests: 25,
+        minSize: 20000,
+        maxSize: 244000,
+        cacheGroups: {
+          // main vendor bundle for larger modules
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: "vendor",
+            chunks: "all",
+            priority: 10,
+            enforce: true,
+          },
+          // separate bundle for react and related packages
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom|react-router)[\\/]/,
+            name: "react-vendor",
+            chunks: "all",
+            priority: 20,
+          },
+          // bundle for wallet-related packages
+          wallets: {
+            test: /[\\/]node_modules[\\/](@cosmjs|@rainbow-me|osmojs|@cosmos-kit|chain-registry|ethers|viem|wagmi)[\\/]/,
+            name: "wallet-vendor",
+            chunks: "all",
+            priority: 15,
+          },
+          // common code used across multiple components
+          common: {
+            name: "common",
+            minChunks: 2,
+            chunks: "all",
+            priority: 5,
+            reuseExistingChunk: true,
+            enforce: true,
+          },
         },
       },
-    },
-  };
+    };
 
-  config.module.rules.push({
-    test: /\.js$/,
-    include: /node_modules/,
-    sideEffects: false,
-  });
+    config.module.rules.push({
+      test: /\.js$/,
+      include: /node_modules/,
+      sideEffects: false,
+    });
 
-  config.optimization.concatenateModules = true;
+    config.optimization.concatenateModules = true;
 
-  config.cache = {
-    type: "filesystem",
-    allowCollectingMemory: true,
-    buildDependencies: {
-      config: [__filename],
-    },
-  };
+    config.cache = {
+      type: "filesystem",
+      allowCollectingMemory: true,
+      buildDependencies: {
+        config: [__filename],
+      },
+    };
+  }
 
   return config;
 };
