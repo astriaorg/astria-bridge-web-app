@@ -47,7 +47,7 @@ export interface CosmosChainInfo {
    * This indicates which coin or token can be used for fee to send transaction.
    * You can get actual currency information from Currencies.
    */
-  readonly feeCurrencies: FeeCurrency[];
+  readonly feeCurrencies: CosmosFeeCurrency[];
 
   // The icon to use for this chain in the ui
   readonly iconClass?: string;
@@ -131,7 +131,7 @@ export interface CosmosCurrency {
 }
 
 // Represents information about a currency used for fees.
-export type FeeCurrency = WithGasPriceStep<CosmosCurrency>;
+export type CosmosFeeCurrency = WithGasPriceStep<CosmosCurrency>;
 
 /**
  * Represents information about a currency that uses IBC.
@@ -146,7 +146,7 @@ export interface IbcCurrency extends CosmosCurrency {
 }
 
 /**
- * Converts a map of IBC chains to an array of AssetList objects for use with CosmosKit.
+ * Converts a map of cosmos chains to an array of AssetList objects for use with CosmosKit.
  */
 export function cosmosChainInfosToCosmosKitAssetLists(
   cosmosChains: CosmosChains,
