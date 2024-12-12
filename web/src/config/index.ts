@@ -4,14 +4,13 @@ import {
   evmChainsToRainbowKitChains,
   type EvmCurrency,
   evmCurrencyBelongsToChain,
-  type IbcChainInfo,
-  ibcChainInfosToCosmosChains,
-  type IbcChains,
+  type CosmosChainInfo,
+  cosmosChainInfosToCosmosKitChains,
+  type CosmosChains,
   type IbcCurrency,
   ibcCurrencyBelongsToChain,
-  toChainInfo,
   cosmosChainNameFromId,
-  ibcChainInfosToCosmosKitAssetLists,
+  cosmosChainInfosToCosmosKitAssetLists,
 } from "./chainConfigs/types";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
@@ -22,7 +21,7 @@ import { useConfig } from "./hooks/useConfig";
  */
 export interface AppConfig {
   // The configurations for IBC chains.
-  ibcChains: IbcChains;
+  ibcChains: CosmosChains;
   // The configurations for EVM chains.
   evmChains: EvmChains;
   // The URL for the brand link in the navbar.
@@ -44,13 +43,12 @@ export {
   type EvmCurrency,
   evmCurrencyBelongsToChain,
   getEnvVariable,
-  type IbcChainInfo,
-  type IbcChains,
+  type CosmosChainInfo,
+  type CosmosChains,
   type IbcCurrency,
   ibcCurrencyBelongsToChain,
-  ibcChainInfosToCosmosChains,
-  ibcChainInfosToCosmosKitAssetLists,
-  toChainInfo,
+  cosmosChainInfosToCosmosKitChains,
+  cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainNameFromId,
   evmChainsToRainbowKitChains,
   useConfig,

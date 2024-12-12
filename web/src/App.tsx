@@ -11,8 +11,8 @@ import { WagmiProvider } from "wagmi";
 
 import {
   evmChainsToRainbowKitChains,
-  ibcChainInfosToCosmosChains,
-  ibcChainInfosToCosmosKitAssetLists,
+  cosmosChainInfosToCosmosKitChains,
+  cosmosChainInfosToCosmosKitAssetLists,
   useConfig,
 } from "config";
 import { NotificationsContextProvider } from "features/Notifications";
@@ -48,8 +48,8 @@ export default function App(): React.ReactElement {
   };
   // TODO - should i handle this so that for prod we rely on chain-registry?
   //  could do it lazily, https://cosmology.zone/learn/frontend/how-get-token-and-asset-information-in-the-interchain
-  const cosmosChains = ibcChainInfosToCosmosChains(ibcChains);
-  const cosmosAssetLists = ibcChainInfosToCosmosKitAssetLists(ibcChains);
+  const cosmosChains = cosmosChainInfosToCosmosKitChains(ibcChains);
+  const cosmosAssetLists = cosmosChainInfosToCosmosKitAssetLists(ibcChains);
 
   return (
     <NotificationsContextProvider>

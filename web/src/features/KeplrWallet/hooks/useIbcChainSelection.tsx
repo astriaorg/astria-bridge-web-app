@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
   cosmosChainNameFromId,
-  type IbcChainInfo,
-  type IbcChains,
+  type CosmosChainInfo,
+  type CosmosChains,
   type IbcCurrency,
   ibcCurrencyBelongsToChain,
 } from "config";
@@ -18,10 +18,9 @@ import { useChain } from "@cosmos-kit/react";
  * Updates the address when the selected chain changes.
  * @param ibcChains - The possible IBC chains to select from.
  */
-export function useIbcChainSelection(ibcChains: IbcChains) {
-  const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
-    null,
-  );
+export function useIbcChainSelection(ibcChains: CosmosChains) {
+  const [selectedIbcChain, setSelectedIbcChain] =
+    useState<CosmosChainInfo | null>(null);
   const [selectedIbcCurrency, setSelectedIbcCurrency] =
     useState<IbcCurrency | null>(null);
 
@@ -83,7 +82,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
 
   const ibcChainsOptions = useMemo(() => {
     return Object.entries(ibcChains).map(
-      ([chainLabel, chain]): DropdownOption<IbcChainInfo> => ({
+      ([chainLabel, chain]): DropdownOption<CosmosChainInfo> => ({
         label: chainLabel,
         value: chain,
         leftIconClass: chain.iconClass,
@@ -91,7 +90,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     );
   }, [ibcChains]);
 
-  const selectIbcChain = useCallback((chain: IbcChainInfo | null) => {
+  const selectIbcChain = useCallback((chain: CosmosChainInfo | null) => {
     setSelectedIbcChain(chain);
   }, []);
 
@@ -123,7 +122,7 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
       label: selectedIbcChain?.chainName || "",
       value: selectedIbcChain,
       leftIconClass: selectedIbcChain?.iconClass || "",
-    } as DropdownOption<IbcChainInfo>;
+    } as DropdownOption<CosmosChainInfo>;
   }, [selectedIbcChain]);
 
   const selectIbcCurrency = useCallback((currency: IbcCurrency) => {

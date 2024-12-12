@@ -1,7 +1,7 @@
 import type { SigningStargateClient } from "@cosmjs/stargate";
 import { Decimal } from "@cosmjs/math";
 import { osmosis } from "osmojs";
-import type { IbcChainInfo, IbcCurrency } from "config";
+import type { CosmosChainInfo, IbcCurrency } from "config";
 import { nowPlusMinutesInNano } from "../utils/utils.ts";
 
 /**
@@ -65,7 +65,7 @@ export const sendIbcTransfer = async (
  * Gets the balance for a given address and currency on an IBC chain using Cosmos SDK client.
  */
 export const getBalanceFromChain = async (
-  chainInfo: IbcChainInfo,
+  chainInfo: CosmosChainInfo,
   currency: IbcCurrency,
   address: string,
 ): Promise<string> => {

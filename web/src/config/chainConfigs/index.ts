@@ -1,4 +1,4 @@
-import { type EvmChains, getEnvVariable, type IbcChains } from "config";
+import { type EvmChains, getEnvVariable, type CosmosChains } from "config";
 
 import {
   evmChains as localEvmChains,
@@ -29,7 +29,7 @@ type Environment = keyof typeof ENV_CHAIN_CONFIGS;
 
 type ChainConfigs = {
   evm: EvmChains;
-  ibc: IbcChains;
+  ibc: CosmosChains;
 };
 
 /**

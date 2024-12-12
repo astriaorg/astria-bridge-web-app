@@ -1,5 +1,5 @@
 import { getEnvChainConfigs } from "./chainConfigs";
-import type { IbcChains, EvmChains } from "./chainConfigs/types";
+import type { CosmosChains, EvmChains } from "./chainConfigs/types";
 
 // mock the config import to control getEnvVariable
 jest.mock("config", () => ({
@@ -31,7 +31,7 @@ describe("Chain Configs", () => {
   });
 
   describe("getEnvChainConfigs", () => {
-    const mockIbcChains: IbcChains = {
+    const mockIbcChains: CosmosChains = {
       "Test Chain": {
         chainId: "test-1",
         chainName: "Test Chain",

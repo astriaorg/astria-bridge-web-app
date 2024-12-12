@@ -1,6 +1,11 @@
-import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from "./types";
+import type {
+  EvmChainInfo,
+  EvmChains,
+  CosmosChainInfo,
+  CosmosChains,
+} from "./types";
 
-const CelestiaChainInfo: IbcChainInfo = {
+const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.
   chainId: "mocha-4",
   // The name of the chain to be displayed to the user.
@@ -96,7 +101,7 @@ const CelestiaChainInfo: IbcChainInfo = {
   iconClass: "i-celestia",
 };
 
-const NobleChainInfo: IbcChainInfo = {
+const NobleChainInfo: CosmosChainInfo = {
   chainId: "grand-1",
   chainName: "Noble Testnet",
   // RPC endpoint of the chain
@@ -178,7 +183,7 @@ const NobleChainInfo: IbcChainInfo = {
   iconClass: "i-noble",
 };
 
-export const ibcChains: IbcChains = {
+export const ibcChains: CosmosChains = {
   "Celestia Mocha-4": CelestiaChainInfo,
   "Noble Testnet": NobleChainInfo,
 };
