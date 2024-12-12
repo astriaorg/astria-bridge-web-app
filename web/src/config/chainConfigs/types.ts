@@ -55,6 +55,7 @@ export interface CosmosChainInfo {
 
 /**
  * Returns the chain name from the chain ID.
+ * e.g. "noble" from "noble-1"
  */
 export function cosmosChainNameFromId(chainId: string) {
   return chainId.split("-")[0];
