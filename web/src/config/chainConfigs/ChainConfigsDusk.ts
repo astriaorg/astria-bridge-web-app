@@ -1,8 +1,8 @@
 import type {
-  EvmChainInfo,
-  EvmChains,
   CosmosChainInfo,
   CosmosChains,
+  EvmChainInfo,
+  EvmChains,
 } from "./types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
@@ -183,7 +183,7 @@ const NobleChainInfo: CosmosChainInfo = {
   iconClass: "i-noble",
 };
 
-export const ibcChains: CosmosChains = {
+export const cosmosChains: CosmosChains = {
   "Celestia Mocha-4": CelestiaChainInfo,
   "Noble Testnet": NobleChainInfo,
 };

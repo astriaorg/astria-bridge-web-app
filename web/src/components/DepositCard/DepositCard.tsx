@@ -1,3 +1,4 @@
+import { Decimal } from "@cosmjs/math";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -10,10 +11,9 @@ import {
 } from "features/EthWallet";
 import { sendIbcTransfer, useIbcChainSelection } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
-import { Decimal } from "@cosmjs/math";
 
 export default function DepositCard(): React.ReactElement {
-  const { evmChains, ibcChains } = useConfig();
+  const { evmChains, cosmosChains } = useConfig();
   const { addNotification } = useNotifications();
 
   const {
@@ -45,7 +45,7 @@ export default function DepositCard(): React.ReactElement {
     isLoadingIbcBalance,
     connectCosmosWallet,
     getCosmosSigningClient,
-  } = useIbcChainSelection(ibcChains);
+  } = useIbcChainSelection(cosmosChains);
 
   // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {
@@ -87,9 +87,9 @@ export default function DepositCard(): React.ReactElement {
     useState<string>("");
   const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
     useState<boolean>(false);
-  const handleEditRecipientClick = () => {
+  const handleEditRecipientClick = useCallback(() => {
     setIsRecipientAddressEditable(!isRecipientAddressEditable);
-  };
+  }, [isRecipientAddressEditable]);
   const handleEditRecipientSave = () => {
     setIsRecipientAddressEditable(false);
     // reset evmWalletState when user manually enters address

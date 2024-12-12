@@ -4,6 +4,8 @@
 export const ENV = {
   REACT_APP_ENV: process.env.REACT_APP_ENV,
   REACT_APP_VERSION: process.env.REACT_APP_VERSION,
+  // FIXME - should be renamed to REACT_APP_COSMOS_CHAINS,
+  //  but requires updates to envars in Vercel. note for self to update.
   REACT_APP_IBC_CHAINS: process.env.REACT_APP_IBC_CHAINS,
   REACT_APP_EVM_CHAINS: process.env.REACT_APP_EVM_CHAINS,
   REACT_APP_BRAND_URL: process.env.REACT_APP_BRAND_URL,

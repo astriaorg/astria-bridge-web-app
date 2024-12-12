@@ -1,9 +1,10 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useConfig as useWagmiConfig } from "wagmi";
 
-import { useConfig } from "config";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
+import { useConfig } from "config";
 import {
   AddERC20ToWalletButton,
   createWithdrawerService,
@@ -11,10 +12,9 @@ import {
 } from "features/EthWallet";
 import { useIbcChainSelection } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
-import { useConfig as useWagmiConfig } from "wagmi";
 
 export default function WithdrawCard(): React.ReactElement {
-  const { evmChains, ibcChains } = useConfig();
+  const { evmChains, cosmosChains } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const { addNotification } = useNotifications();
 
@@ -47,7 +47,7 @@ export default function WithdrawCard(): React.ReactElement {
     isLoadingIbcBalance,
     resetState: resetIbcWalletState,
     connectCosmosWallet,
-  } = useIbcChainSelection(ibcChains);
+  } = useIbcChainSelection(cosmosChains);
 
   // the ibc currency selection is controlled by the sender's chosen evm currency,
   // and should be updated when an ibc currency or ibc chain is selected
@@ -82,9 +82,9 @@ export default function WithdrawCard(): React.ReactElement {
     useState<string>("");
   const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
     useState<boolean>(false);
-  const handleEditRecipientClick = () => {
+  const handleEditRecipientClick = useCallback(() => {
     setIsRecipientAddressEditable(!isRecipientAddressEditable);
-  };
+  }, [isRecipientAddressEditable]);
   const handleEditRecipientSave = () => {
     setIsRecipientAddressEditable(false);
     // reset ibcWalletState when user manually enters address

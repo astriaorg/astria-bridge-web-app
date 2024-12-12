@@ -1,18 +1,18 @@
-import type React from "react";
-import { Route, Routes } from "react-router-dom";
-import { ChainProvider } from "@cosmos-kit/react";
-import { assets, chains } from "chain-registry";
+import type { Chain } from "@chain-registry/types";
 import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
-import type { Chain } from "@chain-registry/types";
-import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { ChainProvider } from "@cosmos-kit/react";
+import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { assets, chains } from "chain-registry";
+import type React from "react";
+import { Route, Routes } from "react-router-dom";
 import { WagmiProvider } from "wagmi";
 
 import {
-  evmChainsToRainbowKitChains,
-  cosmosChainInfosToCosmosKitChains,
   cosmosChainInfosToCosmosKitAssetLists,
+  cosmosChainInfosToCosmosKitChains,
+  evmChainsToRainbowKitChains,
   useConfig,
 } from "config";
 import { NotificationsContextProvider } from "features/Notifications";
@@ -30,7 +30,7 @@ import "@interchain-ui/react/styles";
  * Sets up the RainbowKitProvider and QueryClientProvider for tanstack/react-query.
  */
 export default function App(): React.ReactElement {
-  const { evmChains, ibcChains } = useConfig();
+  const { evmChains, cosmosChains } = useConfig();
 
   // wagmi and rainbowkit config
   const rainbowKitConfig = getDefaultConfig({
@@ -48,8 +48,9 @@ export default function App(): React.ReactElement {
   };
   // TODO - should i handle this so that for prod we rely on chain-registry?
   //  could do it lazily, https://cosmology.zone/learn/frontend/how-get-token-and-asset-information-in-the-interchain
-  const cosmosChains = cosmosChainInfosToCosmosKitChains(ibcChains);
-  const cosmosAssetLists = cosmosChainInfosToCosmosKitAssetLists(ibcChains);
+  const cosmosKitChains = cosmosChainInfosToCosmosKitChains(cosmosChains);
+  const cosmosKitAssetLists =
+    cosmosChainInfosToCosmosKitAssetLists(cosmosChains);
 
   return (
     <NotificationsContextProvider>
@@ -57,8 +58,8 @@ export default function App(): React.ReactElement {
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
             <ChainProvider
-              assetLists={[...assets, ...cosmosAssetLists]}
-              chains={[...chains, ...cosmosChains]}
+              assetLists={[...assets, ...cosmosKitAssetLists]}
+              chains={[...chains, ...cosmosKitChains]}
               wallets={[...keplrWallets, ...leapWallets]}
               walletConnectOptions={cosmosWalletConnectOptions} // required if `wallets` contains mobile wallets
               signerOptions={{

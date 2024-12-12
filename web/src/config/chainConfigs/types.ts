@@ -134,7 +134,7 @@ export interface CosmosCurrency {
 export type FeeCurrency = WithGasPriceStep<CosmosCurrency>;
 
 /**
- * Represents information about a currency used in an IBC chain.
+ * Represents information about a currency that uses IBC.
  */
 export interface IbcCurrency extends CosmosCurrency {
   // The ibc channel used to send this currency

@@ -1,16 +1,16 @@
 import {
+  type CosmosChainInfo,
+  type CosmosChains,
   type EvmChainInfo,
   type EvmChains,
-  evmChainsToRainbowKitChains,
   type EvmCurrency,
-  evmCurrencyBelongsToChain,
-  type CosmosChainInfo,
-  cosmosChainInfosToCosmosKitChains,
-  type CosmosChains,
   type IbcCurrency,
-  ibcCurrencyBelongsToChain,
-  cosmosChainNameFromId,
   cosmosChainInfosToCosmosKitAssetLists,
+  cosmosChainInfosToCosmosKitChains,
+  cosmosChainNameFromId,
+  evmChainsToRainbowKitChains,
+  evmCurrencyBelongsToChain,
+  ibcCurrencyBelongsToChain,
 } from "./chainConfigs/types";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
@@ -20,8 +20,8 @@ import { useConfig } from "./hooks/useConfig";
  * Represents the configuration object for the application.
  */
 export interface AppConfig {
-  // The configurations for IBC chains.
-  ibcChains: CosmosChains;
+  // The configurations for Cosmos chains.
+  cosmosChains: CosmosChains;
   // The configurations for EVM chains.
   evmChains: EvmChains;
   // The URL for the brand link in the navbar.
