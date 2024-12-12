@@ -1,7 +1,7 @@
-import type { SigningStargateClient } from "@cosmjs/stargate";
 import { Decimal } from "@cosmjs/math";
-import { osmosis } from "osmojs";
+import type { SigningStargateClient } from "@cosmjs/stargate";
 import type { CosmosChainInfo, IbcCurrency } from "config";
+import { osmosis } from "osmojs";
 import { nowPlusMinutesInNano } from "../utils/utils.ts";
 
 /**

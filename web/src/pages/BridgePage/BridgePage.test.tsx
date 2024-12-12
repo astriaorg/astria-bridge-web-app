@@ -1,5 +1,5 @@
-import type React from "react";
 import { screen } from "@testing-library/react";
+import type React from "react";
 
 import { renderWithRouter } from "testHelpers";
 import BridgePage from "./BridgePage";

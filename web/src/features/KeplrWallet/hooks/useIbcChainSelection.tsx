@@ -1,15 +1,16 @@
+import { useChain } from "@cosmos-kit/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
-  cosmosChainNameFromId,
   type CosmosChainInfo,
   type CosmosChains,
   type IbcCurrency,
+  cosmosChainNameFromId,
   ibcCurrencyBelongsToChain,
 } from "config";
-import { getBalanceFromChain } from "features/KeplrWallet/services/ibc";
 import { useBalancePolling } from "features/GetBalancePolling";
-import { useChain } from "@cosmos-kit/react";
+import { getBalanceFromChain } from "features/KeplrWallet/services/ibc";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount, useBalance, useConfig } from "wagmi";
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";

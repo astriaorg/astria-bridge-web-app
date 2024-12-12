@@ -1,8 +1,8 @@
 import type React from "react";
 import { Outlet } from "react-router-dom";
 
-import Navbar from "components/Navbar/Navbar";
 import Footer from "components/Footer/Footer";
+import Navbar from "components/Navbar/Navbar";
 import SideTag from "components/SideTag/SideTag";
 import { useConfig } from "config";
 import { Notification, useNotifications } from "features/Notifications";

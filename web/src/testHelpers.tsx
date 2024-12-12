@@ -1,7 +1,7 @@
-import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { render } from "@testing-library/react";
-import type React from "react";
 import { ConfigContextProvider } from "config";
+import type React from "react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 
 export const renderWithRouter = (element: React.JSX.Element) => {
   render(

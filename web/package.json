@@ -50,12 +50,19 @@
     "test-cov": "CI=true react-app-rewired test --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\" --coverage",
     "eject": "react-scripts eject",
     "format": "biome format --write ./src ./public",
+    "check": "biome check ./src ./public",
+    "check-apply": "biome check --write ./src ./public",
+    "check-apply-unsafe": "biome check --write --unsafe ./src ./public",
     "lint": "biome lint ./src ./public",
-    "lint-apply": "biome lint --apply ./src ./public",
-    "lint-apply-unsafe": "biome lint --apply-unsafe ./src ./public"
+    "lint-apply": "biome lint --write ./src ./public",
+    "lint-apply-unsafe": "biome lint --write --unsafe ./src ./public"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
@@ -64,7 +71,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@biomejs/biome": "1.7.3",
+    "@biomejs/biome": "1.9.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
