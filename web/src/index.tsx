@@ -3,11 +3,9 @@ import ReactDOM from "react-dom/client";
 import ReactGA from "react-ga4";
 import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
-import { ConfigContextProvider } from "config";
 
+import { ConfigContextProvider } from "config";
 import App from "./App";
-import "styles/index.scss";
-import "@rainbow-me/rainbowkit/styles.css";
 
 // load ga tracking if id available
 if (process.env.REACT_APP_GA_TRACKING_ID) {

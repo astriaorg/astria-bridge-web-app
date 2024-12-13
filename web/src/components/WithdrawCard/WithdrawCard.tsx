@@ -1,20 +1,20 @@
 import type React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useConfig as useWagmiConfig } from "wagmi";
 
-import { useConfig } from "config";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
+import { useConfig } from "config";
+import { useCosmosChainSelection } from "features/CosmosWallet";
 import {
   AddERC20ToWalletButton,
   createWithdrawerService,
   useEvmChainSelection,
 } from "features/EthWallet";
-import { useIbcChainSelection } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
-import { useConfig as useWagmiConfig } from "wagmi";
 
 export default function WithdrawCard(): React.ReactElement {
-  const { evmChains, ibcChains } = useConfig();
+  const { evmChains, cosmosChains } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const { addNotification } = useNotifications();
 
@@ -35,19 +35,19 @@ export default function WithdrawCard(): React.ReactElement {
   } = useEvmChainSelection(evmChains);
 
   const {
-    ibcAccountAddress,
-    selectIbcChain,
-    ibcChainsOptions,
-    selectedIbcChain,
-    selectedIbcChainOption,
+    cosmosAccountAddress,
+    selectCosmosChain,
+    cosmosChainsOptions,
+    selectedCosmosChain,
+    selectedCosmosChainOption,
     defaultIbcCurrencyOption,
     selectIbcCurrency,
     ibcCurrencyOptions,
-    ibcBalance,
-    isLoadingIbcBalance,
-    connectKeplrWallet,
+    cosmosBalance,
+    isLoadingCosmosBalance,
     resetState: resetIbcWalletState,
-  } = useIbcChainSelection(ibcChains);
+    connectCosmosWallet,
+  } = useCosmosChainSelection(cosmosChains);
 
   // the ibc currency selection is controlled by the sender's chosen evm currency,
   // and should be updated when an ibc currency or ibc chain is selected
@@ -55,7 +55,7 @@ export default function WithdrawCard(): React.ReactElement {
     if (!selectedEvmCurrency) {
       return defaultIbcCurrencyOption;
     }
-    const matchingIbcCurrency = selectedIbcChain?.currencies.find(
+    const matchingIbcCurrency = selectedCosmosChain?.currencies.find(
       (currency) => currency.coinDenom === selectedEvmCurrency.coinDenom,
     );
     if (!matchingIbcCurrency) {
@@ -66,7 +66,7 @@ export default function WithdrawCard(): React.ReactElement {
       value: matchingIbcCurrency,
       leftIconClass: matchingIbcCurrency.iconClass,
     };
-  }, [selectedEvmCurrency, selectedIbcChain, defaultIbcCurrencyOption]);
+  }, [selectedEvmCurrency, selectedCosmosChain, defaultIbcCurrencyOption]);
 
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
@@ -82,9 +82,9 @@ export default function WithdrawCard(): React.ReactElement {
     useState<string>("");
   const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
     useState<boolean>(false);
-  const handleEditRecipientClick = () => {
+  const handleEditRecipientClick = useCallback(() => {
     setIsRecipientAddressEditable(!isRecipientAddressEditable);
-  };
+  }, [isRecipientAddressEditable]);
   const handleEditRecipientSave = () => {
     setIsRecipientAddressEditable(false);
     // reset ibcWalletState when user manually enters address
@@ -101,12 +101,13 @@ export default function WithdrawCard(): React.ReactElement {
   };
 
   useEffect(() => {
-    if (amount || ibcAccountAddress || recipientAddressOverride) {
+    if (amount || cosmosAccountAddress || recipientAddressOverride) {
       setHasTouchedForm(true);
     }
-    const recipientAddress = recipientAddressOverride || ibcAccountAddress;
+    const recipientAddress =
+      recipientAddressOverride || cosmosAccountAddress || null;
     checkIsFormValid(recipientAddress, amount);
-  }, [amount, ibcAccountAddress, recipientAddressOverride]);
+  }, [amount, cosmosAccountAddress, recipientAddressOverride]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
@@ -127,11 +128,11 @@ export default function WithdrawCard(): React.ReactElement {
     setIsRecipientAddressValid(isRecipientAddressValid);
   };
 
-  const handleConnectKeplrWallet = async () => {
+  const handleConnectCosmosWallet = useCallback(() => {
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-    await connectKeplrWallet();
-  };
+    connectCosmosWallet();
+  }, [connectCosmosWallet]);
 
   // ensure evm wallet connection when selected EVM chain changes
   /* biome-ignore lint/correctness/useExhaustiveDependencies: */
@@ -139,17 +140,16 @@ export default function WithdrawCard(): React.ReactElement {
     if (!selectedEvmChain) {
       return;
     }
-    connectEVMWallet().then((_) => {});
+    connectEVMWallet();
   }, [selectedEvmChain]);
 
-  // ensure keplr wallet connection when selected ibc chain changes
-  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
+  // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {
-    if (!selectedIbcChain) {
+    if (!selectedCosmosChain) {
       return;
     }
-    handleConnectKeplrWallet().then((_) => {});
-  }, [selectedIbcChain]);
+    handleConnectCosmosWallet();
+  }, [selectedCosmosChain, handleConnectCosmosWallet]);
 
   const handleWithdraw = async () => {
     if (!selectedEvmChain || !selectedEvmCurrency) {
@@ -163,7 +163,7 @@ export default function WithdrawCard(): React.ReactElement {
       return;
     }
 
-    const recipientAddress = recipientAddressOverride || ibcAccountAddress;
+    const recipientAddress = recipientAddressOverride || cosmosAccountAddress;
     if (!fromAddress || !recipientAddress) {
       addNotification({
         toastOpts: {
@@ -247,7 +247,7 @@ export default function WithdrawCard(): React.ReactElement {
       return !(isAmountValid && isRecipientAddressValid && fromAddress);
     }
     return !(
-      ibcAccountAddress &&
+      cosmosAccountAddress &&
       isAmountValid &&
       isRecipientAddressValid &&
       fromAddress &&
@@ -256,7 +256,7 @@ export default function WithdrawCard(): React.ReactElement {
     );
   }, [
     recipientAddressOverride,
-    ibcAccountAddress,
+    cosmosAccountAddress,
     isAmountValid,
     isRecipientAddressValid,
     fromAddress,
@@ -268,9 +268,9 @@ export default function WithdrawCard(): React.ReactElement {
     () => [
       {
         label: "Connect Keplr Wallet",
-        action: handleConnectKeplrWallet,
+        action: handleConnectCosmosWallet,
         className: "has-text-primary",
-        leftIconClass: "i-keplr",
+        leftIconClass: "i-cosmos",
         rightIconClass: "fas fa-plus",
       },
       {
@@ -280,7 +280,7 @@ export default function WithdrawCard(): React.ReactElement {
         rightIconClass: "fas fa-pen-to-square",
       },
     ],
-    [handleConnectKeplrWallet, handleEditRecipientClick],
+    [handleConnectCosmosWallet, handleEditRecipientClick],
   );
 
   const additionalEvmOptions = useMemo(() => {
@@ -366,14 +366,14 @@ export default function WithdrawCard(): React.ReactElement {
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Connect Keplr Wallet or enter address"
-                options={ibcChainsOptions}
-                onSelect={selectIbcChain}
+                options={cosmosChainsOptions}
+                onSelect={selectCosmosChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
-                valueOverride={selectedIbcChainOption}
+                valueOverride={selectedCosmosChainOption}
               />
             </div>
-            {selectedIbcChain && ibcCurrencyOptions && (
+            {selectedCosmosChain && ibcCurrencyOptions && (
               <div className="ml-3">
                 <Dropdown
                   placeholder="No matching token"
@@ -386,26 +386,28 @@ export default function WithdrawCard(): React.ReactElement {
               </div>
             )}
           </div>
-          {ibcAccountAddress &&
+          {cosmosAccountAddress &&
             !isRecipientAddressEditable &&
             !recipientAddressOverride && (
               <div className="field-info-box mt-3 py-2 px-3">
-                {ibcAccountAddress && (
+                {cosmosAccountAddress && (
                   <p
                     className="has-text-grey-light has-text-weight-semibold is-clickable"
                     onKeyDown={handleEditRecipientClick}
                     onClick={handleEditRecipientClick}
                   >
-                    <span className="mr-2">Address: {ibcAccountAddress}</span>
+                    <span className="mr-2">
+                      Address: {cosmosAccountAddress}
+                    </span>
                     <i className="fas fa-pen-to-square" />
                   </p>
                 )}
-                {ibcAccountAddress && !isLoadingIbcBalance && (
+                {cosmosAccountAddress && !isLoadingCosmosBalance && (
                   <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                    Balance: {ibcBalance}
+                    Balance: {cosmosBalance}
                   </p>
                 )}
-                {ibcAccountAddress && isLoadingIbcBalance && (
+                {cosmosAccountAddress && isLoadingCosmosBalance && (
                   <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                     Balance: <i className="fas fa-spinner fa-pulse" />
                   </p>

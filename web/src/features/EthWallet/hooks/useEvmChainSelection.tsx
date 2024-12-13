@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount, useBalance, useConfig } from "wagmi";
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";
@@ -32,16 +32,15 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   );
   const [selectedEvmCurrency, setSelectedEvmCurrency] =
     useState<EvmCurrency | null>(null);
+  // track address in hook state. this supports ux where we can clear the address
   const [evmAccountAddress, setEvmAccountAddress] = useState<string | null>(
     null,
   );
-
   useEffect(() => {
-    if (userAccount?.address) {
+    if (selectedEvmChain && selectedEvmCurrency && userAccount?.address) {
       setEvmAccountAddress(userAccount.address);
     }
-  }, [userAccount.address]);
-
+  }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
@@ -171,9 +170,14 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     setSelectedEvmCurrency(currency);
   }, []);
 
-  const connectEVMWallet = async () => {
+  // opens RainbowKit modal for user to connect their EVM wallet
+  const connectEVMWallet = useCallback(() => {
     if (!selectedEvmChain) {
-      // select default chain if none selected, then return. effect handles retriggering.
+      // FIXME - the fact this function needs to be called again after setting an evm chain
+      //  in the parent component is implicit and should be somehow made explicit. this is
+      //  hard to debug, especially since the parent uses `useEffect` to call this function.
+      // select default chain if none selected, then return.
+      // useEffect in parent component handles recalling this function.
       setSelectedEvmChain(evmChainsOptions[0]?.value);
       return;
     }
@@ -181,7 +185,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     if (openConnectModal) {
       openConnectModal();
     }
-  };
+  }, [selectedEvmChain, openConnectModal, evmChainsOptions]);
 
   return {
     evmChainsOptions,

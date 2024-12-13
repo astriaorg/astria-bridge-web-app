@@ -1,35 +1,35 @@
-import { type EvmChains, getEnvVariable, type IbcChains } from "config";
+import { type CosmosChains, type EvmChains, getEnvVariable } from "config";
 
 import {
-  evmChains as localEvmChains,
-  ibcChains as localIbcChains,
-} from "./ChainConfigsLocal";
-import {
-  evmChains as duskEvmChains,
-  ibcChains as duskIbcChains,
-} from "./ChainConfigsDusk";
-import {
+  cosmosChains as dawnCosmosChains,
   evmChains as dawnEvmChains,
-  ibcChains as dawnIbcChains,
 } from "./ChainConfigsDawn";
 import {
+  cosmosChains as duskCosmosChains,
+  evmChains as duskEvmChains,
+} from "./ChainConfigsDusk";
+import {
+  cosmosChains as localCosmosChains,
+  evmChains as localEvmChains,
+} from "./ChainConfigsLocal";
+import {
+  cosmosChains as mainnetCosmosChains,
   evmChains as mainnetEvmChains,
-  ibcChains as mainnetIbcChains,
 } from "./ChainConfigsMainnet";
 
 // Map of environment labels to their chain configurations
 const ENV_CHAIN_CONFIGS = {
-  local: { evm: localEvmChains, ibc: localIbcChains },
-  dusk: { evm: duskEvmChains, ibc: duskIbcChains },
-  dawn: { evm: dawnEvmChains, ibc: dawnIbcChains },
-  mainnet: { evm: mainnetEvmChains, ibc: mainnetIbcChains },
+  local: { evm: localEvmChains, cosmos: localCosmosChains },
+  dusk: { evm: duskEvmChains, cosmos: duskCosmosChains },
+  dawn: { evm: dawnEvmChains, cosmos: dawnCosmosChains },
+  mainnet: { evm: mainnetEvmChains, cosmos: mainnetCosmosChains },
 } as const;
 
 type Environment = keyof typeof ENV_CHAIN_CONFIGS;
 
 type ChainConfigs = {
   evm: EvmChains;
-  ibc: IbcChains;
+  cosmos: CosmosChains;
 };
 
 /**
@@ -45,11 +45,11 @@ export function getEnvChainConfigs(): ChainConfigs {
   // copy baseConfig to result
   const result = { ...baseConfig };
 
-  // try to get IBC chains override
+  // try to get cosmos chains override
   try {
-    const ibcChainsOverride = getEnvVariable("REACT_APP_IBC_CHAINS");
-    if (ibcChainsOverride) {
-      result.ibc = JSON.parse(ibcChainsOverride);
+    const cosmosChainsOverride = getEnvVariable("REACT_APP_IBC_CHAINS");
+    if (cosmosChainsOverride) {
+      result.cosmos = JSON.parse(cosmosChainsOverride);
       console.debug("Using IBC chains override from environment");
     }
   } catch (e) {
