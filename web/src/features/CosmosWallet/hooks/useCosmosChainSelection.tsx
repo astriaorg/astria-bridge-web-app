@@ -17,18 +17,17 @@ import { getBalanceFromChain } from "../services/cosmos";
  * Calculates the balance whenever the address, selected chain,
  *   or selected currency changes.
  * Updates the address when the selected chain changes.
- * @param ibcChains - The possible IBC chains to select from.
  */
-export function useCosmosChainSelection(ibcChains: CosmosChains) {
-  const [selectedIbcChain, setSelectedIbcChain] =
+export function useCosmosChainSelection(cosmosChains: CosmosChains) {
+  const [selectedCosmosChain, setSelectedCosmosChain] =
     useState<CosmosChainInfo | null>(null);
   const [selectedIbcCurrency, setSelectedIbcCurrency] =
     useState<IbcCurrency | null>(null);
 
   // use first chain as default chain
-  const defaultChainId = Object.values(ibcChains)[0].chainId;
+  const defaultChainId = Object.values(cosmosChains)[0].chainId;
   const chainName = cosmosChainNameFromId(
-    selectedIbcChain?.chainId || defaultChainId,
+    selectedCosmosChain?.chainId || defaultChainId,
   );
   const {
     address: cosmosAddressFromWallet,
@@ -38,93 +37,93 @@ export function useCosmosChainSelection(ibcChains: CosmosChains) {
 
   // we are keeping track of the address ourselves so that we can clear it if needed,
   // e.g. to allow for manual address entry
-  const [ibcAccountAddress, setIbcAccountAddress] = useState<string | null>(
-    null,
-  );
+  const [cosmosAccountAddress, setCosmosAccountAddress] = useState<
+    string | null
+  >(null);
   useEffect(() => {
     // make sure the address is set when
     // the address, chain, or currency change
-    if (selectedIbcChain && selectedIbcCurrency && cosmosAddressFromWallet) {
-      setIbcAccountAddress(cosmosAddressFromWallet);
+    if (selectedCosmosChain && selectedIbcCurrency && cosmosAddressFromWallet) {
+      setCosmosAccountAddress(cosmosAddressFromWallet);
     }
-  }, [cosmosAddressFromWallet, selectedIbcChain, selectedIbcCurrency]);
+  }, [cosmosAddressFromWallet, selectedCosmosChain, selectedIbcCurrency]);
   const resetState = useCallback(() => {
-    setSelectedIbcChain(null);
+    setSelectedCosmosChain(null);
     setSelectedIbcCurrency(null);
-    setIbcAccountAddress(null);
+    setCosmosAccountAddress(null);
   }, []);
 
   const getBalanceCallback = useCallback(async () => {
-    if (!selectedIbcChain || !selectedIbcCurrency || !ibcAccountAddress) {
+    if (!selectedCosmosChain || !selectedIbcCurrency || !cosmosAccountAddress) {
       return null;
     }
-    if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedIbcChain)) {
+    if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedCosmosChain)) {
       return null;
     }
     return getBalanceFromChain(
-      selectedIbcChain,
+      selectedCosmosChain,
       selectedIbcCurrency,
-      ibcAccountAddress,
+      cosmosAccountAddress,
     );
-  }, [selectedIbcChain, selectedIbcCurrency, ibcAccountAddress]);
+  }, [selectedCosmosChain, selectedIbcCurrency, cosmosAccountAddress]);
 
   const pollingConfig = useMemo(
     () => ({
-      enabled: !!selectedIbcChain && !!selectedIbcCurrency,
+      enabled: !!selectedCosmosChain && !!selectedIbcCurrency,
       intervalMS: 10_000,
       onError: (error: Error) => {
         console.error("Failed to get balance from Keplr", error);
       },
     }),
-    [selectedIbcChain, selectedIbcCurrency],
+    [selectedCosmosChain, selectedIbcCurrency],
   );
-  const { balance: ibcBalance, isLoading: isLoadingIbcBalance } =
+  const { balance: cosmosBalance, isLoading: isLoadingCosmosBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);
 
-  const ibcChainsOptions = useMemo(() => {
-    return Object.entries(ibcChains).map(
+  const cosmosChainsOptions = useMemo(() => {
+    return Object.entries(cosmosChains).map(
       ([chainLabel, chain]): DropdownOption<CosmosChainInfo> => ({
         label: chainLabel,
         value: chain,
         leftIconClass: chain.iconClass,
       }),
     );
-  }, [ibcChains]);
+  }, [cosmosChains]);
 
-  const selectIbcChain = useCallback((chain: CosmosChainInfo | null) => {
-    setSelectedIbcChain(chain);
+  const selectCosmosChain = useCallback((chain: CosmosChainInfo | null) => {
+    setSelectedCosmosChain(chain);
   }, []);
 
   const ibcCurrencyOptions = useMemo(() => {
-    if (!selectedIbcChain) {
+    if (!selectedCosmosChain) {
       return [];
     }
-    return selectedIbcChain.currencies?.map(
+    return selectedCosmosChain.currencies?.map(
       (currency): DropdownOption<IbcCurrency> => ({
         label: currency.coinDenom,
         value: currency,
         leftIconClass: currency.iconClass,
       }),
     );
-  }, [selectedIbcChain]);
+  }, [selectedCosmosChain]);
 
   const defaultIbcCurrencyOption = useMemo(() => {
     return ibcCurrencyOptions[0] || null;
   }, [ibcCurrencyOptions]);
 
-  // selectedIbcChainOption allows us to ensure the label is set properly
+  // selectedCosmosChainOption allows us to ensure the label is set properly
   // in the dropdown when connecting via an "additional option"s action,
   //  e.g. the "Connect Keplr Wallet" option in the dropdown
-  const selectedIbcChainOption = useMemo(() => {
-    if (!selectedIbcChain) {
+  const selectedCosmosChainOption = useMemo(() => {
+    if (!selectedCosmosChain) {
       return null;
     }
     return {
-      label: selectedIbcChain?.chainName || "",
-      value: selectedIbcChain,
-      leftIconClass: selectedIbcChain?.iconClass || "",
+      label: selectedCosmosChain?.chainName || "",
+      value: selectedCosmosChain,
+      leftIconClass: selectedCosmosChain?.iconClass || "",
     } as DropdownOption<CosmosChainInfo>;
-  }, [selectedIbcChain]);
+  }, [selectedCosmosChain]);
 
   const selectIbcCurrency = useCallback((currency: IbcCurrency) => {
     setSelectedIbcCurrency(currency);
@@ -133,34 +132,33 @@ export function useCosmosChainSelection(ibcChains: CosmosChains) {
   // opens CosmosKit modal for user to connect their Cosmos wallet
   const connectCosmosWallet = useCallback(() => {
     // if there is no selected chain, select the first one
-    if (!selectedIbcChain) {
-      selectIbcChain(ibcChainsOptions[0]?.value);
+    if (!selectedCosmosChain) {
+      selectCosmosChain(cosmosChainsOptions[0]?.value);
       return;
     }
 
     openCosmosWalletModal();
   }, [
-    selectIbcChain,
-    selectedIbcChain,
-    ibcChainsOptions,
+    selectCosmosChain,
+    selectedCosmosChain,
+    cosmosChainsOptions,
     openCosmosWalletModal,
   ]);
 
   return {
-    ibcChainsOptions,
-    ibcCurrencyOptions,
-
-    selectIbcChain,
-    selectIbcCurrency,
-
-    selectedIbcChain,
-    selectedIbcCurrency,
+    cosmosChainsOptions,
+    selectedCosmosChain,
+    selectedCosmosChainOption,
     defaultIbcCurrencyOption,
-    selectedIbcChainOption,
 
-    ibcAccountAddress,
-    ibcBalance,
-    isLoadingIbcBalance,
+    ibcCurrencyOptions,
+    selectCosmosChain,
+    selectIbcCurrency,
+    selectedIbcCurrency,
+
+    cosmosAccountAddress,
+    cosmosBalance,
+    isLoadingCosmosBalance,
 
     connectCosmosWallet,
     getCosmosSigningClient,

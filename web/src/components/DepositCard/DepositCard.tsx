@@ -35,28 +35,28 @@ export default function DepositCard(): React.ReactElement {
   } = useEvmChainSelection(evmChains);
 
   const {
-    ibcAccountAddress: fromAddress,
-    selectIbcChain,
-    ibcChainsOptions,
-    selectedIbcChain,
-    selectedIbcChainOption,
+    cosmosAccountAddress: fromAddress,
+    selectCosmosChain,
+    cosmosChainsOptions,
+    selectedCosmosChain,
+    selectedCosmosChainOption,
     defaultIbcCurrencyOption,
     selectIbcCurrency,
     selectedIbcCurrency,
     ibcCurrencyOptions,
-    ibcBalance,
-    isLoadingIbcBalance,
+    cosmosBalance,
+    isLoadingCosmosBalance,
     connectCosmosWallet,
     getCosmosSigningClient,
   } = useCosmosChainSelection(cosmosChains);
 
   // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {
-    if (!selectedIbcChain) {
+    if (!selectedCosmosChain) {
       return;
     }
     connectCosmosWallet();
-  }, [selectedIbcChain, connectCosmosWallet]);
+  }, [selectedCosmosChain, connectCosmosWallet]);
 
   // the evm currency selection is controlled by the sender's chosen ibc currency,
   // and should be updated when an ibc currency or evm chain is selected
@@ -166,7 +166,7 @@ export default function DepositCard(): React.ReactElement {
   }, [selectedEvmChain, handleConnectEVMWallet]);
 
   const handleDeposit = async () => {
-    if (!selectedIbcChain || !selectedIbcCurrency) {
+    if (!selectedCosmosChain || !selectedIbcCurrency) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
@@ -310,14 +310,14 @@ export default function DepositCard(): React.ReactElement {
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Select..."
-                options={ibcChainsOptions}
-                onSelect={selectIbcChain}
+                options={cosmosChainsOptions}
+                onSelect={selectCosmosChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcChainOptions}
-                valueOverride={selectedIbcChainOption}
+                valueOverride={selectedCosmosChainOption}
               />
             </div>
-            {selectedIbcChain && ibcCurrencyOptions && (
+            {selectedCosmosChain && ibcCurrencyOptions && (
               <div className="ml-3">
                 <Dropdown
                   placeholder="Select a token"
@@ -335,12 +335,14 @@ export default function DepositCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && selectedIbcCurrency && !isLoadingIbcBalance && (
-                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {ibcBalance}
-                </p>
-              )}
-              {fromAddress && isLoadingIbcBalance && (
+              {fromAddress &&
+                selectedIbcCurrency &&
+                !isLoadingCosmosBalance && (
+                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                    Balance: {cosmosBalance}
+                  </p>
+                )}
+              {fromAddress && isLoadingCosmosBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>

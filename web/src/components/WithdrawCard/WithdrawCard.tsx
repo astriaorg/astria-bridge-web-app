@@ -35,16 +35,16 @@ export default function WithdrawCard(): React.ReactElement {
   } = useEvmChainSelection(evmChains);
 
   const {
-    ibcAccountAddress,
-    selectIbcChain,
-    ibcChainsOptions,
-    selectedIbcChain,
-    selectedIbcChainOption,
+    cosmosAccountAddress,
+    selectCosmosChain,
+    cosmosChainsOptions,
+    selectedCosmosChain,
+    selectedCosmosChainOption,
     defaultIbcCurrencyOption,
     selectIbcCurrency,
     ibcCurrencyOptions,
-    ibcBalance,
-    isLoadingIbcBalance,
+    cosmosBalance,
+    isLoadingCosmosBalance,
     resetState: resetIbcWalletState,
     connectCosmosWallet,
   } = useCosmosChainSelection(cosmosChains);
@@ -55,7 +55,7 @@ export default function WithdrawCard(): React.ReactElement {
     if (!selectedEvmCurrency) {
       return defaultIbcCurrencyOption;
     }
-    const matchingIbcCurrency = selectedIbcChain?.currencies.find(
+    const matchingIbcCurrency = selectedCosmosChain?.currencies.find(
       (currency) => currency.coinDenom === selectedEvmCurrency.coinDenom,
     );
     if (!matchingIbcCurrency) {
@@ -66,7 +66,7 @@ export default function WithdrawCard(): React.ReactElement {
       value: matchingIbcCurrency,
       leftIconClass: matchingIbcCurrency.iconClass,
     };
-  }, [selectedEvmCurrency, selectedIbcChain, defaultIbcCurrencyOption]);
+  }, [selectedEvmCurrency, selectedCosmosChain, defaultIbcCurrencyOption]);
 
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
@@ -101,13 +101,13 @@ export default function WithdrawCard(): React.ReactElement {
   };
 
   useEffect(() => {
-    if (amount || ibcAccountAddress || recipientAddressOverride) {
+    if (amount || cosmosAccountAddress || recipientAddressOverride) {
       setHasTouchedForm(true);
     }
     const recipientAddress =
-      recipientAddressOverride || ibcAccountAddress || null;
+      recipientAddressOverride || cosmosAccountAddress || null;
     checkIsFormValid(recipientAddress, amount);
-  }, [amount, ibcAccountAddress, recipientAddressOverride]);
+  }, [amount, cosmosAccountAddress, recipientAddressOverride]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
@@ -145,11 +145,11 @@ export default function WithdrawCard(): React.ReactElement {
 
   // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {
-    if (!selectedIbcChain) {
+    if (!selectedCosmosChain) {
       return;
     }
     handleConnectCosmosWallet();
-  }, [selectedIbcChain, handleConnectCosmosWallet]);
+  }, [selectedCosmosChain, handleConnectCosmosWallet]);
 
   const handleWithdraw = async () => {
     if (!selectedEvmChain || !selectedEvmCurrency) {
@@ -163,7 +163,7 @@ export default function WithdrawCard(): React.ReactElement {
       return;
     }
 
-    const recipientAddress = recipientAddressOverride || ibcAccountAddress;
+    const recipientAddress = recipientAddressOverride || cosmosAccountAddress;
     if (!fromAddress || !recipientAddress) {
       addNotification({
         toastOpts: {
@@ -247,7 +247,7 @@ export default function WithdrawCard(): React.ReactElement {
       return !(isAmountValid && isRecipientAddressValid && fromAddress);
     }
     return !(
-      ibcAccountAddress &&
+      cosmosAccountAddress &&
       isAmountValid &&
       isRecipientAddressValid &&
       fromAddress &&
@@ -256,7 +256,7 @@ export default function WithdrawCard(): React.ReactElement {
     );
   }, [
     recipientAddressOverride,
-    ibcAccountAddress,
+    cosmosAccountAddress,
     isAmountValid,
     isRecipientAddressValid,
     fromAddress,
@@ -366,14 +366,14 @@ export default function WithdrawCard(): React.ReactElement {
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Connect Keplr Wallet or enter address"
-                options={ibcChainsOptions}
-                onSelect={selectIbcChain}
+                options={cosmosChainsOptions}
+                onSelect={selectCosmosChain}
                 leftIconClass={"i-wallet"}
                 additionalOptions={additionalIbcOptions}
-                valueOverride={selectedIbcChainOption}
+                valueOverride={selectedCosmosChainOption}
               />
             </div>
-            {selectedIbcChain && ibcCurrencyOptions && (
+            {selectedCosmosChain && ibcCurrencyOptions && (
               <div className="ml-3">
                 <Dropdown
                   placeholder="No matching token"
@@ -386,26 +386,28 @@ export default function WithdrawCard(): React.ReactElement {
               </div>
             )}
           </div>
-          {ibcAccountAddress &&
+          {cosmosAccountAddress &&
             !isRecipientAddressEditable &&
             !recipientAddressOverride && (
               <div className="field-info-box mt-3 py-2 px-3">
-                {ibcAccountAddress && (
+                {cosmosAccountAddress && (
                   <p
                     className="has-text-grey-light has-text-weight-semibold is-clickable"
                     onKeyDown={handleEditRecipientClick}
                     onClick={handleEditRecipientClick}
                   >
-                    <span className="mr-2">Address: {ibcAccountAddress}</span>
+                    <span className="mr-2">
+                      Address: {cosmosAccountAddress}
+                    </span>
                     <i className="fas fa-pen-to-square" />
                   </p>
                 )}
-                {ibcAccountAddress && !isLoadingIbcBalance && (
+                {cosmosAccountAddress && !isLoadingCosmosBalance && (
                   <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                    Balance: {ibcBalance}
+                    Balance: {cosmosBalance}
                   </p>
                 )}
-                {ibcAccountAddress && isLoadingIbcBalance && (
+                {cosmosAccountAddress && isLoadingCosmosBalance && (
                   <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                     Balance: <i className="fas fa-spinner fa-pulse" />
                   </p>
