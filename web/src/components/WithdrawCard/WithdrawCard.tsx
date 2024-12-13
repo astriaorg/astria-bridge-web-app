@@ -5,12 +5,12 @@ import { useConfig as useWagmiConfig } from "wagmi";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config";
+import { useIbcChainSelection } from "features/CosmosWallet";
 import {
   AddERC20ToWalletButton,
   createWithdrawerService,
   useEvmChainSelection,
 } from "features/EthWallet";
-import { useIbcChainSelection } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function WithdrawCard(): React.ReactElement {

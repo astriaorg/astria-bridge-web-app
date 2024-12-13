@@ -10,7 +10,7 @@ import {
   ibcCurrencyBelongsToChain,
 } from "config";
 import { useBalancePolling } from "features/GetBalancePolling";
-import { getBalanceFromChain } from "features/KeplrWallet/services/ibc";
+import { getBalanceFromChain } from "../services/ibc";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.

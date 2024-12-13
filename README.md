@@ -33,8 +33,8 @@ the Astria bridge.
   * `src/config/index.ts` - AppConfig and exports
 * `src/features` - Organizes components, contexts, hooks, services, types, and
   utils for different features
+  * `src/features/CosmosWallet` - User for interacting with Keplr wallet
   * `src/features/EthWallet` - Used for interacting with EVM wallets
-  * `src/features/KeplrWallet` - User for interacting with Keplr wallet
   * `src/features/Notifications` - Used for displaying notifications and toasts
 * `src/pages`
   * React components for each page

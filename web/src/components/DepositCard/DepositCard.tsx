@@ -5,11 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config";
+import { sendIbcTransfer, useIbcChainSelection } from "features/CosmosWallet";
 import {
   AddERC20ToWalletButton,
   useEvmChainSelection,
 } from "features/EthWallet";
-import { sendIbcTransfer, useIbcChainSelection } from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
