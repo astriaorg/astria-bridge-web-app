@@ -10,7 +10,7 @@ import {
   ibcCurrencyBelongsToChain,
 } from "config";
 import { useBalancePolling } from "features/GetBalancePolling";
-import { getBalanceFromChain } from "../services/ibc";
+import { getBalanceFromChain } from "../services/cosmos";
 
 /**
  * Custom hook to manage the selection of an IBC chain and currency.
@@ -19,7 +19,7 @@ import { getBalanceFromChain } from "../services/ibc";
  * Updates the address when the selected chain changes.
  * @param ibcChains - The possible IBC chains to select from.
  */
-export function useIbcChainSelection(ibcChains: CosmosChains) {
+export function useCosmosChainSelection(ibcChains: CosmosChains) {
   const [selectedIbcChain, setSelectedIbcChain] =
     useState<CosmosChainInfo | null>(null);
   const [selectedIbcCurrency, setSelectedIbcCurrency] =

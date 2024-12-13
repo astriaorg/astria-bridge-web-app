@@ -5,7 +5,7 @@ import { useConfig as useWagmiConfig } from "wagmi";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config";
-import { useIbcChainSelection } from "features/CosmosWallet";
+import { useCosmosChainSelection } from "features/CosmosWallet";
 import {
   AddERC20ToWalletButton,
   createWithdrawerService,
@@ -47,7 +47,7 @@ export default function WithdrawCard(): React.ReactElement {
     isLoadingIbcBalance,
     resetState: resetIbcWalletState,
     connectCosmosWallet,
-  } = useIbcChainSelection(cosmosChains);
+  } = useCosmosChainSelection(cosmosChains);
 
   // the ibc currency selection is controlled by the sender's chosen evm currency,
   // and should be updated when an ibc currency or ibc chain is selected
