@@ -43,7 +43,7 @@ export default function App(): React.ReactElement {
   // cosmoskit config
   const cosmosWalletConnectOptions = {
     signClient: {
-      projectId: "YOUR_PROJECT_ID", // TODO
+      projectId: "b1a4f5a9bc91120e74a7df1dd785b336",
     },
   };
   // TODO - should i handle this so that for prod we rely on chain-registry?
