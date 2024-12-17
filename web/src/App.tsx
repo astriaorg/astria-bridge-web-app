@@ -25,6 +25,9 @@ import "styles/index.scss";
 import "@rainbow-me/rainbowkit/styles.css";
 import "@interchain-ui/react/styles";
 
+// https://docs.reown.com/ - for walletconnect so we can use mobile wallets
+const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";
+
 /**
  * App component with routes.
  * Sets up the RainbowKitProvider and QueryClientProvider for tanstack/react-query.
@@ -32,18 +35,18 @@ import "@interchain-ui/react/styles";
 export default function App(): React.ReactElement {
   const { evmChains, cosmosChains } = useConfig();
 
-  // wagmi and rainbowkit config
+  // wagmi and rainbowkit config, for evm chains
   const rainbowKitConfig = getDefaultConfig({
     appName: "Flame Bridge",
-    projectId: "YOUR_PROJECT_ID", // TODO
+    projectId: WALLET_CONNECT_PROJECT_ID,
     chains: evmChainsToRainbowKitChains(evmChains),
   });
   const queryClient = new QueryClient();
 
-  // cosmoskit config
+  // cosmoskit config, for cosmos chains
   const cosmosWalletConnectOptions = {
     signClient: {
-      projectId: "b1a4f5a9bc91120e74a7df1dd785b336",
+      projectId: WALLET_CONNECT_PROJECT_ID,
     },
   };
   // TODO - should i handle this so that for prod we rely on chain-registry?
