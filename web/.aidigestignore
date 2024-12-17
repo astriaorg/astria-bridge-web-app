@@ -1,1 +1,4 @@
 public/fonts
+build/
+coverage/
+node_modules/
