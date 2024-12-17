@@ -1,14 +1,19 @@
-import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from "./types";
+import type {
+  CosmosChainInfo,
+  CosmosChains,
+  EvmChainInfo,
+  EvmChains,
+} from "./types";
 
-const CelestiaChainInfo: IbcChainInfo = {
+const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.
   chainId: "celestia",
   // The name of the chain to be displayed to the user.
   chainName: "Celestia",
   // RPC endpoint of the chain
-  rpc: "wss://rpc.celestia.pops.one",
+  rpc: "https://celestia-rpc.polkachu.com:443",
   // REST endpoint of the chain.
-  rest: "https://api.celestia.pops.one",
+  rest: "https://celestia-api.polkachu.com",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -82,7 +87,7 @@ const CelestiaChainInfo: IbcChainInfo = {
   iconClass: "i-celestia",
 };
 
-const NobleChainInfo: IbcChainInfo = {
+const NobleChainInfo: CosmosChainInfo = {
   chainId: "noble-1",
   chainName: "Noble",
   rpc: "https://noble-rpc.polkachu.com:443",
@@ -129,7 +134,7 @@ const NobleChainInfo: IbcChainInfo = {
   iconClass: "i-noble",
 };
 
-const OsmosisChainInfo: IbcChainInfo = {
+const OsmosisChainInfo: CosmosChainInfo = {
   chainId: "osmosis-1",
   chainName: "Osmosis",
   rpc: "https://osmosis-rpc.polkachu.com/",
@@ -178,7 +183,7 @@ const OsmosisChainInfo: IbcChainInfo = {
   iconClass: "i-osmosis",
 };
 
-const StrideChainInfo: IbcChainInfo = {
+const StrideChainInfo: CosmosChainInfo = {
   chainId: "stride-1",
   chainName: "Stride",
   rpc: "https://stride-rpc.polkachu.com",
@@ -224,7 +229,7 @@ const StrideChainInfo: IbcChainInfo = {
   iconClass: "i-stride",
 };
 
-export const ibcChains: IbcChains = {
+export const cosmosChains: CosmosChains = {
   Celestia: CelestiaChainInfo,
   Noble: NobleChainInfo,
   Osmosis: OsmosisChainInfo,

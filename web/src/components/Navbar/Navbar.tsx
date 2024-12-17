@@ -8,11 +8,11 @@ import logo from "logo-flame-w-text.svg";
 function Navbar() {
   const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);
 
-  const onHamburgerClick = (event: React.SyntheticEvent<HTMLButtonElement>) => {
+  const onHamburgerClick = (_: React.SyntheticEvent<HTMLButtonElement>) => {
     setIsMobileMenuActive((prev) => !prev);
   };
 
-  const { brandURL, bridgeURL, swapURL, poolURL } = useConfig();
+  const { brandURL, swapURL, poolURL } = useConfig();
 
   return (
     <nav

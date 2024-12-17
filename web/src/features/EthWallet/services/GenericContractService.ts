@@ -1,5 +1,5 @@
-import type { Abi, Address, Hash } from "viem";
 import { type Config, getPublicClient, getWalletClient } from "@wagmi/core";
+import type { Abi, Address, Hash } from "viem";
 
 export class GenericContractService {
   constructor(

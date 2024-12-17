@@ -1,5 +1,5 @@
-import type React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import type React from "react";
 
 import Notification from "./Notification";
 import { NotificationType } from "./types";
