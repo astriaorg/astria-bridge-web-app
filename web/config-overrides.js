@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const webpack = require("webpack");
 
 module.exports = function override(config) {
@@ -17,7 +19,6 @@ module.exports = function override(config) {
       Buffer: ["buffer", "Buffer"],
     }),
   ]);
-
   config.ignoreWarnings = [
     {
       module: /node_modules/,
@@ -25,6 +26,21 @@ module.exports = function override(config) {
     },
   ];
 
+  // generate file for domain verification for walletconnect
+  const walletConnectVerificationCode = process.env.REACT_APP_WALLET_CONNECT_DOMAIN_VERIFICATION_CODE;
+  if (walletConnectVerificationCode) {
+    const wellKnownFolder = path.join(__dirname, "public/.well-known");
+    const walletConnectVerificationPath = path.join(wellKnownFolder, "walletconnect.txt");
+    if (!fs.existsSync(wellKnownFolder)) {
+      fs.mkdirSync(wellKnownFolder);
+    }
+    fs.writeFileSync(walletConnectVerificationPath, walletConnectVerificationCode);
+    console.log(
+      `Generated walletconnect.txt with content:`,
+      walletConnectVerificationCode
+    );
+
+  }
   // optimize for build by default but not for local dev server
   if (process.env.WEBPACK_OPTIMIZE_FOR_BUILD !== "false") {
     // optimization configuration with safer chunking
