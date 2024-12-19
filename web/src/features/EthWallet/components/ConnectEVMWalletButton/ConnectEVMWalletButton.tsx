@@ -1,6 +1,13 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAccount } from "wagmi";
+import jazzicon from "@metamask/jazzicon";
 
 import { shortenAddress } from "../../utils/utils.ts";
 
@@ -21,6 +28,16 @@ export default function ConnectEVMWalletButton({
   const userAccount = useAccount();
   console.log("userAccount", userAccount);
 
+  const iconRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (userAccount?.address && iconRef.current) {
+      iconRef.current.innerHTML = "";
+      iconRef.current.appendChild(
+        jazzicon(24, parseInt(userAccount.address.slice(2, 10), 16)),
+      );
+    }
+  }, [userAccount?.address, iconRef]);
+
   const [isDropdownActive, setIsDropdownActive] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -35,15 +52,15 @@ export default function ConnectEVMWalletButton({
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected, userAccount?.address]);
 
-  const openEVMWalletModal = useCallback(() => {
-    if (!userAccount && openConnectModal) {
+  const handleConnectWallet = useCallback(() => {
+    if (!userAccount?.address && openConnectModal) {
       openConnectModal();
     }
-    if (userAccount) {
+    if (userAccount?.address) {
       // if user is already connected, open information dropdown
       toggleDropdown();
     }
-  }, [openConnectModal, toggleDropdown, userAccount]);
+  }, [openConnectModal, toggleDropdown, userAccount?.address]);
 
   // button class can be overridden
   const className = useMemo(() => {
@@ -60,12 +77,11 @@ export default function ConnectEVMWalletButton({
         <button
           type="button"
           key="connect-evm-wallet-button"
-          onClick={openEVMWalletModal}
+          onClick={handleConnectWallet}
           className={className}
         >
-          <span className="icon icon-left is-small">
-            {/* TODO - replace with icon from wallet account */}
-            <i className="fas fa-wallet" />
+          <span className="icon icon-left is-small" ref={iconRef}>
+            {/* this span is for the avatar and is updated via iconRef */}
           </span>
           <span className="connect-wallet-button-label">{label}</span>
           <span className="icon icon-right is-small">
