@@ -13,8 +13,8 @@ import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipbo
 import { shortenAddress } from "../../utils/utils.ts";
 
 interface ConnectEVMWalletButtonProps {
+  // Label to show before the user is connected to a wallet.
   labelBeforeConnected?: string;
-  buttonClassNameOverride?: string;
 }
 
 /**
@@ -22,7 +22,6 @@ interface ConnectEVMWalletButtonProps {
  */
 export default function ConnectEVMWalletButton({
   labelBeforeConnected,
-  buttonClassNameOverride,
 }: ConnectEVMWalletButtonProps) {
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
@@ -76,12 +75,6 @@ export default function ConnectEVMWalletButton({
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected, userAccount?.address]);
 
-  // button class can be overridden
-  const className = useMemo(() => {
-    const defaultClassName = "button is-ghost is-rounded-hover";
-    return buttonClassNameOverride ?? defaultClassName;
-  }, [buttonClassNameOverride]);
-
   // connect to wallet or show information dropdown
   const handleConnectWallet = useCallback(() => {
     if (!userAccount?.address && openConnectModal) {
@@ -103,7 +96,7 @@ export default function ConnectEVMWalletButton({
           type="button"
           key="connect-evm-wallet-button"
           onClick={handleConnectWallet}
-          className={className}
+          className="button is-ghost is-rounded-hover"
         >
           {userAccount?.address && (
             <span className="icon icon-left is-small" ref={avatarRef}>
