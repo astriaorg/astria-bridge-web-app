@@ -1,3 +1,4 @@
+import jazzicon from "@metamask/jazzicon";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, {
   useCallback,
@@ -7,7 +8,6 @@ import React, {
   useState,
 } from "react";
 import { useAccount } from "wagmi";
-import jazzicon from "@metamask/jazzicon";
 
 import { shortenAddress } from "../../utils/utils.ts";
 
@@ -33,10 +33,10 @@ export default function ConnectEVMWalletButton({
     if (userAccount?.address && iconRef.current) {
       iconRef.current.innerHTML = "";
       iconRef.current.appendChild(
-        jazzicon(24, parseInt(userAccount.address.slice(2, 10), 16)),
+        jazzicon(24, Number.parseInt(userAccount.address.slice(2, 10), 16)),
       );
     }
-  }, [userAccount?.address, iconRef]);
+  }, [userAccount?.address]);
 
   const [isDropdownActive, setIsDropdownActive] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
