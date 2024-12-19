@@ -1,74 +1,99 @@
 @import 'astria-colors';
 
-.button.is-square {
-  border-radius: 0;
-}
+.button {
+  // Shape modifiers
+  &.is-square {
+    border-radius: 0;
+  }
 
-.button.has-gradient-to-right-orange {
-  @include astria-button-gradient;
-}
+  &.is-rounded-hover {
+    border-radius: 24px;
+    border: 1px solid transparent;
 
-.button.is-tall {
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-}
+    &:hover,
+    &.is-hovered {
+      border-color: $astria-grey-dark;
+    }
+  }
 
-.button.is-taller {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
+  // Gradient modifiers
+  &.has-gradient-to-right-orange {
+    @include astria-button-gradient;
+  }
 
-.button.is-wide {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
+  // Size modifiers
+  &.is-tall {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
 
-.button.is-wider {
-  padding-left: 3rem;
-  padding-right: 3rem;
-}
+  &.is-taller {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
 
-.button.is-transparent {
-  background-color: transparent;
-  border-color: transparent;
+  &.is-wide {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 
-  &:hover, &.is-hovered {
+  &.is-wider {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+
+  // Style modifiers
+  &.is-transparent {
     background-color: transparent;
     border-color: transparent;
+
+    &:hover,
+    &.is-hovered {
+      background-color: transparent;
+      border-color: transparent;
+    }
+  }
+
+  &.is-ghost {
+    &.is-outlined-light {
+      border-color: $astria-grey-dark;
+
+      &:disabled {
+        background-color: transparent;
+        border-color: $astria-grey-dark;
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+
+    &.is-outlined-white {
+      border-color: $astria-white;
+
+      &:disabled {
+        background-color: transparent;
+        border-color: $astria-white;
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+
+    &:hover,
+    &.is-hovered {
+      text-decoration: none !important;
+    }
+
+    &:focus,
+    &.is-focused {
+      box-shadow: none;
+    }
   }
 }
 
-.button.is-ghost {
-
-  &.is-outlined-light {
-    border-color: $astria-grey-dark;
-
-    &:disabled {
-      background-color: transparent;
-      border-color: $astria-grey-dark;
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-  }
-
-  &.is-outlined-white {
-    border-color: $astria-white;
-
-    &:disabled {
-      background-color: transparent;
-      border-color: $astria-white;
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-  }
-
-  &:hover, &.is-hovered {
-    // this selector should be specific enough to override bulma's default,
-    // but for some reason !important was necessary here
-    text-decoration: none !important;
-  }
-
-  &:focus, &.is-focused {
-    box-shadow: none;
+.connect-wallet-button-container .button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .connect-wallet-button-inner {
+    display: flex;
   }
 }

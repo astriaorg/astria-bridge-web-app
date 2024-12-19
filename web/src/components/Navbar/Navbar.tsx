@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useConfig } from "config";
 import logo from "logo-flame-w-text.svg";
+import { ConnectEVMWalletButton } from "../../features/EthWallet";
 
 function Navbar() {
   const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);
@@ -60,9 +61,12 @@ function Navbar() {
             POOL
           </a>
         </div>
+        <div className="navbar-end">
+          <ConnectEVMWalletButton />
+        </div>
       </div>
 
-      <div className="navbar-placeholder-end" />
+      {/*<div className="navbar-placeholder-end" />*/}
     </nav>
   );
 }
