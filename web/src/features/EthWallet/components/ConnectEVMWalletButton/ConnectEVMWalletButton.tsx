@@ -28,30 +28,39 @@ export default function ConnectEVMWalletButton({
   const userAccount = useAccount();
   console.log("userAccount", userAccount);
 
-  const iconRef = useRef<HTMLDivElement>(null);
+  // user avatar
+  const avatarRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (userAccount?.address && iconRef.current) {
-      iconRef.current.innerHTML = "";
-      iconRef.current.appendChild(
-        jazzicon(24, Number.parseInt(userAccount.address.slice(2, 10), 16)),
-      );
+    if (userAccount?.address && avatarRef.current) {
+      avatarRef.current.innerHTML = "";
+      // NOTE - only using jazzicon for the avatar right now
+      // this seed ensures we generate the same jazzicon as metamask
+      const seed = Number.parseInt(userAccount.address.slice(2, 10), 16);
+      const iconElem = jazzicon(24, seed);
+      avatarRef.current.appendChild(iconElem);
     }
   }, [userAccount?.address]);
 
+  // information dropdown
   const [isDropdownActive, setIsDropdownActive] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   const toggleDropdown = useCallback(() => {
     setIsDropdownActive(!isDropdownActive);
   }, [isDropdownActive]);
 
+  // ui
   const label = useMemo(() => {
     if (userAccount?.address) {
       return shortenAddress(userAccount.address);
     }
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected, userAccount?.address]);
-
+  // button class can be overridden
+  const className = useMemo(() => {
+    const defaultClassName = "button is-ghost is-rounded-hover";
+    return buttonClassNameOverride ?? defaultClassName;
+  }, [buttonClassNameOverride]);
+  // connect to wallet or show information dropdown
   const handleConnectWallet = useCallback(() => {
     if (!userAccount?.address && openConnectModal) {
       openConnectModal();
@@ -61,12 +70,6 @@ export default function ConnectEVMWalletButton({
       toggleDropdown();
     }
   }, [openConnectModal, toggleDropdown, userAccount?.address]);
-
-  // button class can be overridden
-  const className = useMemo(() => {
-    const defaultClassName = "button is-ghost is-rounded-hover";
-    return buttonClassNameOverride ?? defaultClassName;
-  }, [buttonClassNameOverride]);
 
   return (
     <div
@@ -80,8 +83,8 @@ export default function ConnectEVMWalletButton({
           onClick={handleConnectWallet}
           className={className}
         >
-          <span className="icon icon-left is-small" ref={iconRef}>
-            {/* this span is for the avatar and is updated via iconRef */}
+          <span className="icon icon-left is-small" ref={avatarRef}>
+            {/* this span is for the avatar and is updated via avatarRef */}
           </span>
           <span className="connect-wallet-button-label">{label}</span>
           <span className="icon icon-right is-small">
