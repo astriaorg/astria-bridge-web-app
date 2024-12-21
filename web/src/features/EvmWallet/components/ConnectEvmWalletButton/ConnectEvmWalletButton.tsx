@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { useAccount } from "wagmi";
 
-import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton.tsx";
+import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton";
 
 import { useEvmWallet } from "../../hooks/useEvmWallet.ts";
 import { shortenAddress } from "../../utils/utils.ts";

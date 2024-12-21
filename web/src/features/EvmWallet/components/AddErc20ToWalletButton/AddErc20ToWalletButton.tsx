@@ -3,16 +3,16 @@ import { useAccount } from "wagmi";
 
 import type { EvmCurrency } from "config";
 
-interface AddERC20ToWalletButtonProps {
+interface AddErc20ToWalletButtonProps {
   evmCurrency: EvmCurrency;
   buttonClassNameOverride?: string;
 }
 
-// TODO - move to hook useAddERC20ToWallet
-export default function AddERC20ToWalletButton({
+// TODO - move to hook useAddErc20ToWallet
+export default function AddErc20ToWalletButton({
   evmCurrency,
   buttonClassNameOverride,
-}: AddERC20ToWalletButtonProps) {
+}: AddErc20ToWalletButtonProps) {
   const { connector, isConnected } = useAccount();
 
   const buttonClassName =

@@ -1,11 +1,11 @@
-import AddERC20ToWalletButton from "./components/AddERC20ToWalletButton/AddERC20ToWalletButton";
-import ConnectEvmWalletButton from "./components/ConnectEvmWalletButton/ConnectEvmWalletButton.tsx";
+import AddErc20ToWalletButton from "./components/AddErc20ToWalletButton/AddErc20ToWalletButton";
+import ConnectEvmWalletButton from "./components/ConnectEvmWalletButton/ConnectEvmWalletButton";
 import { EvmWalletProvider } from "./contexts/EvmWalletContext";
 import { useEvmWallet } from "./hooks/useEvmWallet";
 import { createWithdrawerService } from "./services/AstriaWithdrawerService/AstriaWithdrawerService";
 
 export {
-  AddERC20ToWalletButton,
+  AddErc20ToWalletButton,
   ConnectEvmWalletButton,
   EvmWalletProvider,
   useEvmWallet,

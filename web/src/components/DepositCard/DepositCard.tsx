@@ -9,7 +9,7 @@ import {
   sendIbcTransfer,
   useCosmosChainSelection,
 } from "features/CosmosWallet";
-import { AddERC20ToWalletButton, useEvmWallet } from "features/EvmWallet";
+import { AddErc20ToWalletButton, useEvmWallet } from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
@@ -418,7 +418,7 @@ export default function DepositCard(): React.ReactElement {
                 </p>
               )}
               {selectedEvmCurrencyOption?.value?.erc20ContractAddress && (
-                <AddERC20ToWalletButton
+                <AddErc20ToWalletButton
                   evmCurrency={selectedEvmCurrencyOption.value}
                 />
               )}

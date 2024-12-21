@@ -7,7 +7,7 @@ import Dropdown from "components/Dropdown/Dropdown";
 import { useConfig } from "config";
 import { useCosmosChainSelection } from "features/CosmosWallet";
 import {
-  AddERC20ToWalletButton,
+  AddErc20ToWalletButton,
   createWithdrawerService,
   useEvmWallet,
 } from "features/EvmWallet";
@@ -339,7 +339,7 @@ export default function WithdrawCard(): React.ReactElement {
                 </p>
               )}
               {selectedEvmCurrency?.erc20ContractAddress && (
-                <AddERC20ToWalletButton evmCurrency={selectedEvmCurrency} />
+                <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency} />
               )}
             </div>
           )}
