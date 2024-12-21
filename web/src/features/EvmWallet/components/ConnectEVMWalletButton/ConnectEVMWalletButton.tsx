@@ -11,6 +11,7 @@ import { useAccount, useDisconnect } from "wagmi";
 
 import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton.tsx";
 
+import { useEvmWallet } from "../../hooks/useEvmWallet.ts";
 import { shortenAddress } from "../../utils/utils.ts";
 
 interface ConnectEVMWalletButtonProps {
@@ -24,8 +25,7 @@ interface ConnectEVMWalletButtonProps {
 export default function ConnectEVMWalletButton({
   labelBeforeConnected,
 }: ConnectEVMWalletButtonProps) {
-  const { openConnectModal } = useConnectModal();
-  const { disconnect } = useDisconnect();
+  const { connectEvmWallet, disconnectEvmWallet } = useEvmWallet();
 
   const userAccount = useAccount();
   console.log("userAccount", userAccount);
@@ -78,14 +78,14 @@ export default function ConnectEVMWalletButton({
 
   // connect to wallet or show information dropdown
   const handleConnectWallet = useCallback(() => {
-    if (!userAccount?.address && openConnectModal) {
-      openConnectModal();
+    if (!userAccount?.address) {
+      connectEvmWallet();
     }
     if (userAccount?.address) {
       // if user is already connected, open information dropdown
       toggleDropdown();
     }
-  }, [openConnectModal, toggleDropdown, userAccount?.address]);
+  }, [connectEvmWallet, toggleDropdown, userAccount?.address]);
 
   return (
     <div
@@ -132,7 +132,7 @@ export default function ConnectEVMWalletButton({
               <button
                 type="button"
                 className="button is-ghost"
-                onClick={() => disconnect()}
+                onClick={() => disconnectEvmWallet()}
               >
                 <span>
                   <i className="fas fa-up-right-from-square" />
@@ -141,7 +141,7 @@ export default function ConnectEVMWalletButton({
               <button
                 type="button"
                 className="button is-ghost"
-                onClick={() => disconnect()}
+                onClick={() => disconnectEvmWallet()}
               >
                 <span>
                   <i className="fas fa-power-off" />

@@ -9,12 +9,12 @@ import { useCosmosChainSelection } from "features/CosmosWallet";
 import {
   AddERC20ToWalletButton,
   createWithdrawerService,
-  useEvmChainSelection,
+  useEvmWallet,
 } from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function WithdrawCard(): React.ReactElement {
-  const { evmChains, cosmosChains } = useConfig();
+  const { cosmosChains } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const { addNotification } = useNotifications();
 
@@ -31,8 +31,8 @@ export default function WithdrawCard(): React.ReactElement {
     selectedEvmCurrency,
     evmBalance,
     isLoadingEvmBalance,
-    connectEVMWallet,
-  } = useEvmChainSelection(evmChains);
+    connectEvmWallet,
+  } = useEvmWallet();
 
   const {
     cosmosAccountAddress,
@@ -140,7 +140,7 @@ export default function WithdrawCard(): React.ReactElement {
     if (!selectedEvmChain) {
       return;
     }
-    connectEVMWallet();
+    connectEvmWallet();
   }, [selectedEvmChain]);
 
   // ensure cosmos wallet connection when selected ibc chain changes
@@ -287,12 +287,12 @@ export default function WithdrawCard(): React.ReactElement {
     return [
       {
         label: "Connect EVM Wallet",
-        action: connectEVMWallet,
+        action: connectEvmWallet,
         className: "has-text-primary",
         rightIconClass: "fas fa-plus",
       },
     ];
-  }, [connectEVMWallet]);
+  }, [connectEvmWallet]);
 
   return (
     <div>

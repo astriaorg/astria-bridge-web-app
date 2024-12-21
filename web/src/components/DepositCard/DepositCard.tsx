@@ -9,14 +9,11 @@ import {
   sendIbcTransfer,
   useCosmosChainSelection,
 } from "features/CosmosWallet";
-import {
-  AddERC20ToWalletButton,
-  useEvmChainSelection,
-} from "features/EvmWallet";
+import { AddERC20ToWalletButton, useEvmWallet } from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
-  const { evmChains, cosmosChains } = useConfig();
+  const { cosmosChains } = useConfig();
   const { addNotification } = useNotifications();
 
   const {
@@ -30,9 +27,9 @@ export default function DepositCard(): React.ReactElement {
     evmCurrencyOptions,
     evmBalance,
     isLoadingEvmBalance,
-    connectEVMWallet,
+    connectEvmWallet,
     resetState: resetEvmWalletState,
-  } = useEvmChainSelection(evmChains);
+  } = useEvmWallet();
 
   const {
     cosmosAccountAddress: fromAddress,
@@ -148,8 +145,8 @@ export default function DepositCard(): React.ReactElement {
     // clear recipient address override values when user attempts to connect evm wallet
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-    connectEVMWallet();
-  }, [connectEVMWallet]);
+    connectEvmWallet();
+  }, [connectEvmWallet]);
 
   // ensure evm wallet connection when selected EVM chain changes
   useEffect(() => {
@@ -158,10 +155,11 @@ export default function DepositCard(): React.ReactElement {
     }
     // FIXME - there is a bad implicit loop of logic here.
     //  - see comment in `features/EvmWallet/hooks/useEvmChainSelection.tsx`
-    //  1. user can click "Connect EVM Wallet", which calls `connectEVMWallet`, before selecting a chain
-    //  2. `connectEVMWallet` will set the selected evm chain if it's not set
-    //  3. this `useEffect` is then triggered, which ultimately calls `connectEVMWallet`,
+    //  1. user can click "Connect EVM Wallet", which calls `connectEvmWallet`, before selecting a chain
+    //  2. `connectEvmWallet` will set the selected evm chain if it's not set
+    //  3. this `useEffect` is then triggered, which ultimately calls `connectEvmWallet`,
     //     but now a chain is set so it will open the connect modal
+    console.log("useEffect handle connect evm wallet");
     handleConnectEVMWallet();
   }, [selectedEvmChain, handleConnectEVMWallet]);
 
