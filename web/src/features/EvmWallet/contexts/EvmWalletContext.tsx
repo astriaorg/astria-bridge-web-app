@@ -10,6 +10,13 @@ import {
   evmCurrencyBelongsToChain,
   useConfig as useAppConfig,
 } from "config";
+import { useBalancePolling } from "features/GetBalancePolling";
+
+import {
+  type AstriaErc20WithdrawerService,
+  createWithdrawerService,
+} from "../services/AstriaWithdrawerService/AstriaWithdrawerService.ts";
+import { formatBalance } from "../utils/utils.ts";
 
 interface EvmWalletContextProps {
   connectEvmWallet: () => void;
@@ -73,8 +80,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     setEvmAccountAddress(null);
   }, []);
 
-  // Get balance logic
-  const getBalance = useCallback(async () => {
+  // polling get balance
+  const getBalanceCallback = useCallback(async () => {
     if (
       !wagmiConfig ||
       !selectedEvmChain ||
@@ -87,9 +94,25 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       return null;
     }
 
-    return nativeTokenBalance?.data?.formatted
-      ? `${nativeTokenBalance.data.formatted} ${selectedEvmCurrency.coinDenom}`
-      : null;
+    // for ERC20 tokens, call the contract
+    if (selectedEvmCurrency.erc20ContractAddress) {
+      const withdrawerSvc = createWithdrawerService(
+        wagmiConfig,
+        selectedEvmCurrency.erc20ContractAddress,
+        true,
+      ) as AstriaErc20WithdrawerService;
+      const balanceRes = await withdrawerSvc.getBalance(
+        selectedEvmChain.chainId,
+        evmAccountAddress,
+      );
+      const balanceStr = formatBalance(
+        balanceRes.toString(),
+        selectedEvmCurrency.coinDecimals,
+      );
+      return `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
+    }
+
+    return `${nativeTokenBalance?.data?.formatted} ${selectedEvmCurrency.coinDenom}`;
   }, [
     wagmiConfig,
     nativeTokenBalance?.data?.formatted,
@@ -97,31 +120,18 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     selectedEvmCurrency,
     evmAccountAddress,
   ]);
-
-  const [evmBalance, setEvmBalance] = useState<string | null>(null);
-  const [isLoadingEvmBalance, setIsLoadingEvmBalance] = useState(false);
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (!selectedEvmChain || !selectedEvmCurrency || !evmAccountAddress) {
-        return;
-      }
-      setIsLoadingEvmBalance(true);
-      try {
-        const balance = await getBalance();
-        setEvmBalance(balance);
-      } catch (error) {
+  const pollingConfig = useMemo(
+    () => ({
+      enabled: !!selectedEvmChain && !!selectedEvmCurrency,
+      intervalMS: 10_000,
+      onError: (error: Error) => {
         console.error("Failed to get balance:", error);
-      } finally {
-        setIsLoadingEvmBalance(false);
-      }
-    };
-
-    fetchBalance();
-    // Set up polling
-    const intervalId = setInterval(fetchBalance, 10000);
-    return () => clearInterval(intervalId);
-  }, [getBalance, selectedEvmChain, selectedEvmCurrency, evmAccountAddress]);
+      },
+    }),
+    [selectedEvmChain, selectedEvmCurrency],
+  );
+  const { balance: evmBalance, isLoading: isLoadingEvmBalance } =
+    useBalancePolling(getBalanceCallback, pollingConfig);
 
   const selectedEvmChainNativeToken = useMemo(() => {
     return selectedEvmChain?.currencies[0];
