@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useConfig } from "config";
-import { ConnectEVMWalletButton } from "features/EthWallet";
+import { ConnectEVMWalletButton } from "features/EvmWallet";
 import logo from "logo-flame-w-text.svg";
 
 function Navbar() {

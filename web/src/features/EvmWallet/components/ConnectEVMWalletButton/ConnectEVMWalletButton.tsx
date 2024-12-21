@@ -10,6 +10,7 @@ import React, {
 import { useAccount, useDisconnect } from "wagmi";
 
 import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton.tsx";
+
 import { shortenAddress } from "../../utils/utils.ts";
 
 interface ConnectEVMWalletButtonProps {

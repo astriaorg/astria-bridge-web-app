@@ -1,5 +1,6 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { formatUnits } from "viem";
 import { useAccount, useBalance, useConfig } from "wagmi";
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";
@@ -9,14 +10,13 @@ import {
   type EvmCurrency,
   evmCurrencyBelongsToChain,
 } from "config";
+import { useBalancePolling } from "features/GetBalancePolling";
 
 import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
-} from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
-import { formatBalance } from "features/EthWallet/utils/utils";
-import { useBalancePolling } from "features/GetBalancePolling";
-import { formatUnits } from "viem";
+} from "../services/AstriaWithdrawerService/AstriaWithdrawerService";
+import { formatBalance } from "../utils/utils";
 
 export function useEvmChainSelection(evmChains: EvmChains) {
   const { openConnectModal } = useConnectModal();

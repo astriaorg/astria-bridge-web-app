@@ -10,7 +10,7 @@ import {
   AddERC20ToWalletButton,
   createWithdrawerService,
   useEvmChainSelection,
-} from "features/EthWallet";
+} from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function WithdrawCard(): React.ReactElement {

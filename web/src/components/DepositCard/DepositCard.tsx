@@ -12,7 +12,7 @@ import {
 import {
   AddERC20ToWalletButton,
   useEvmChainSelection,
-} from "features/EthWallet";
+} from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
@@ -157,7 +157,7 @@ export default function DepositCard(): React.ReactElement {
       return;
     }
     // FIXME - there is a bad implicit loop of logic here.
-    //  - see comment in `features/EthWallet/hooks/useEvmChainSelection.tsx`
+    //  - see comment in `features/EvmWallet/hooks/useEvmChainSelection.tsx`
     //  1. user can click "Connect EVM Wallet", which calls `connectEVMWallet`, before selecting a chain
     //  2. `connectEVMWallet` will set the selected evm chain if it's not set
     //  3. this `useEffect` is then triggered, which ultimately calls `connectEVMWallet`,
