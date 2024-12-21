@@ -165,6 +165,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
       return;
     }
 
+    // TODO - if already connected, don't open modal?
     openCosmosWalletModal();
   }, [
     selectCosmosChain,

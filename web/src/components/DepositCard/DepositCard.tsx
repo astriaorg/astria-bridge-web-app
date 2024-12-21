@@ -149,7 +149,6 @@ export default function DepositCard(): React.ReactElement {
       return;
     }
     // FIXME - there is a bad implicit loop of logic here.
-    //  - see comment in `features/EvmWallet/hooks/useEvmChainSelection.tsx`
     //  1. user can click "Connect EVM Wallet", which calls `connectEvmWallet`, before selecting a chain
     //  2. `connectEvmWallet` will set the selected evm chain if it's not set
     //  3. this `useEffect` is then triggered, which ultimately calls `connectEvmWallet`,
