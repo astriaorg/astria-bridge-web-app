@@ -1,5 +1,4 @@
 import jazzicon from "@metamask/jazzicon";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, {
   useCallback,
   useEffect,
@@ -7,14 +6,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount } from "wagmi";
 
 import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton.tsx";
 
 import { useEvmWallet } from "../../hooks/useEvmWallet.ts";
 import { shortenAddress } from "../../utils/utils.ts";
 
-interface ConnectEVMWalletButtonProps {
+interface ConnectEvmWalletButtonProps {
   // Label to show before the user is connected to a wallet.
   labelBeforeConnected?: string;
 }
@@ -22,9 +21,9 @@ interface ConnectEVMWalletButtonProps {
 /**
  * Button with information dropdown to connect to an EVM wallet.
  */
-export default function ConnectEVMWalletButton({
+export default function ConnectEvmWalletButton({
   labelBeforeConnected,
-}: ConnectEVMWalletButtonProps) {
+}: ConnectEvmWalletButtonProps) {
   const { connectEvmWallet, disconnectEvmWallet } = useEvmWallet();
 
   const userAccount = useAccount();

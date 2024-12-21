@@ -141,7 +141,7 @@ export default function DepositCard(): React.ReactElement {
     setIsRecipientAddressValid(addressValid);
   };
 
-  const handleConnectEVMWallet = useCallback(() => {
+  const handleConnectEvmWallet = useCallback(() => {
     // clear recipient address override values when user attempts to connect evm wallet
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
@@ -160,8 +160,8 @@ export default function DepositCard(): React.ReactElement {
     //  3. this `useEffect` is then triggered, which ultimately calls `connectEvmWallet`,
     //     but now a chain is set so it will open the connect modal
     console.log("useEffect handle connect evm wallet");
-    handleConnectEVMWallet();
-  }, [selectedEvmChain, handleConnectEVMWallet]);
+    handleConnectEvmWallet();
+  }, [selectedEvmChain, handleConnectEvmWallet]);
 
   const handleDeposit = async () => {
     if (!selectedCosmosChain || !selectedIbcCurrency) {
@@ -286,7 +286,7 @@ export default function DepositCard(): React.ReactElement {
     return [
       {
         label: "Connect EVM Wallet",
-        action: handleConnectEVMWallet,
+        action: handleConnectEvmWallet,
         className: "has-text-primary",
         rightIconClass: "fas fa-plus",
       },
@@ -297,7 +297,7 @@ export default function DepositCard(): React.ReactElement {
         rightIconClass: "fas fa-pen-to-square",
       },
     ];
-  }, [handleConnectEVMWallet, handleEditRecipientClick]);
+  }, [handleConnectEvmWallet, handleEditRecipientClick]);
 
   return (
     <div>
