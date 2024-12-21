@@ -15,6 +15,7 @@ import {
   evmChainsToRainbowKitChains,
   useConfig,
 } from "config";
+import { CosmosWalletProvider } from "features/CosmosWallet";
 import { EvmWalletProvider } from "features/EvmWallet";
 import { NotificationsContextProvider } from "features/Notifications";
 import BridgePage from "pages/BridgePage/BridgePage";
@@ -77,13 +78,15 @@ export default function App(): React.ReactElement {
                 },
               }}
             >
-              <EvmWalletProvider>
-                <Routes>
-                  <Route element={<Layout />}>
-                    <Route index element={<BridgePage />} />
-                  </Route>
-                </Routes>
-              </EvmWalletProvider>
+              <CosmosWalletProvider>
+                <EvmWalletProvider>
+                  <Routes>
+                    <Route element={<Layout />}>
+                      <Route index element={<BridgePage />} />
+                    </Route>
+                  </Routes>
+                </EvmWalletProvider>
+              </CosmosWalletProvider>
             </ChainProvider>
           </RainbowKitProvider>
         </QueryClientProvider>

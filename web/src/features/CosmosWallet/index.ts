@@ -1,4 +1,5 @@
-import { useCosmosChainSelection } from "./hooks/useCosmosChainSelection";
+import { CosmosWalletProvider } from "./contexts/CosmosWalletContext";
+import { useCosmosWallet } from "./hooks/useCosmosWallet";
 import { sendIbcTransfer } from "./services/cosmos";
 
-export { sendIbcTransfer, useCosmosChainSelection };
+export { CosmosWalletProvider, useCosmosWallet, sendIbcTransfer };

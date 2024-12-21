@@ -4,16 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig } from "config";
-import {
-  sendIbcTransfer,
-  useCosmosChainSelection,
-} from "features/CosmosWallet";
+import { sendIbcTransfer, useCosmosWallet } from "features/CosmosWallet";
 import { AddErc20ToWalletButton, useEvmWallet } from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
-  const { cosmosChains } = useConfig();
   const { addNotification } = useNotifications();
 
   const {
@@ -45,7 +40,7 @@ export default function DepositCard(): React.ReactElement {
     isLoadingCosmosBalance,
     connectCosmosWallet,
     getCosmosSigningClient,
-  } = useCosmosChainSelection(cosmosChains);
+  } = useCosmosWallet();
 
   // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {
