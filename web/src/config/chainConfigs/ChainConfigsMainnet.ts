@@ -6,9 +6,9 @@ const CelestiaChainInfo: IbcChainInfo = {
   // The name of the chain to be displayed to the user.
   chainName: "Celestia",
   // RPC endpoint of the chain
-  rpc: "wss://rpc.celestia.pops.one",
+  rpc: "wss://celestia-rpc.publicnode.com:443",
   // REST endpoint of the chain.
-  rest: "https://api.celestia.pops.one",
+  rest: "https://celestia-rest.publicnode.com",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
