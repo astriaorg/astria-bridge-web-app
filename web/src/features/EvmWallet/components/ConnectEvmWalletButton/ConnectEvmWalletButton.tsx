@@ -24,7 +24,12 @@ interface ConnectEvmWalletButtonProps {
 export default function ConnectEvmWalletButton({
   labelBeforeConnected,
 }: ConnectEvmWalletButtonProps) {
-  const { connectEvmWallet, disconnectEvmWallet } = useEvmWallet();
+  const {
+    connectEvmWallet,
+    disconnectEvmWallet,
+    evmBalance,
+    isLoadingEvmBalance,
+  } = useEvmWallet();
 
   const userAccount = useAccount();
   console.log("userAccount", userAccount);
@@ -151,11 +156,17 @@ export default function ConnectEvmWalletButton({
 
           {/* Balance Row */}
           <div className="balance-container">
-            <div className="balance-amount">0.00 TIA</div>
+            {isLoadingEvmBalance && (
+              <div className="balance-loading">Loading...</div>
+            )}
+            {!isLoadingEvmBalance && (
+              <div className="balance-amount">{evmBalance}</div>
+            )}
+            {/* TODO - price in USD */}
             <div className="balance-usd">$0.00 USD</div>
           </div>
 
-          {/* Transactions Section */}
+          {/* Transactions Section - TODO */}
           <div className="transactions-container">
             <button
               type="button"
