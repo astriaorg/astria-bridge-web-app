@@ -4,7 +4,7 @@ export function SwapPage(): React.ReactElement {
 	return (
 		<section>
 				<div className="bg-radial-dark w-[500px] h-[600px] mx-auto rounded-2xl">
-					This div has a red background!
+					Swap
 				</div>
 		</section>
 	);
