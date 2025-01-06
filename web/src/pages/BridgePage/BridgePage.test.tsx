@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import type React from "react";
 
 import { renderWithRouter } from "testHelpers";
-import BridgePage from "./BridgePage";
+import { BridgePage } from "./BridgePage";
 
 describe("BridgePage", () => {
   test("renders bridge page correctly", () => {

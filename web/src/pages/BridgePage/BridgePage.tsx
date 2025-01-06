@@ -34,7 +34,7 @@ const TabContent: React.FC<{ activeTab: TabType }> = ({ activeTab }) => {
   }
 };
 
-export default function BridgePage(): React.ReactElement {
+export function BridgePage(): React.ReactElement {
   const [activeTab, setActiveTab] = useState<TabType>("DEPOSIT");
 
   const tabs: TabType[] = ["DEPOSIT", "WITHDRAW"];

@@ -16,7 +16,7 @@ import {
   useConfig,
 } from "config";
 import { NotificationsContextProvider } from "features/Notifications";
-import BridgePage from "pages/BridgePage/BridgePage";
+import { BridgePage, PoolPage, SwapPage } from "./pages";
 import Layout from "pages/Layout";
 
 // global styles
@@ -24,6 +24,7 @@ import "styles/index.scss";
 // contrib styles
 import "@rainbow-me/rainbowkit/styles.css";
 import "@interchain-ui/react/styles";
+
 
 // https://docs.reown.com/ - for walletconnect so we can use mobile wallets
 const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";
@@ -79,6 +80,8 @@ export default function App(): React.ReactElement {
               <Routes>
                 <Route element={<Layout />}>
                   <Route index element={<BridgePage />} />
+                  <Route path="/swap" element={<SwapPage />} />
+                  <Route path="/pool" element={<PoolPage />} />
                 </Route>
               </Routes>
             </ChainProvider>

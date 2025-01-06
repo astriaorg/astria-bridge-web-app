@@ -1,19 +1,20 @@
 import type React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { useConfig } from "config";
 import logo from "logo-flame-w-text.svg";
 
 function Navbar() {
+  const { pathname } = useLocation();
   const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);
 
   const onHamburgerClick = (_: React.SyntheticEvent<HTMLButtonElement>) => {
     setIsMobileMenuActive((prev) => !prev);
   };
 
-  const { brandURL, swapURL, poolURL } = useConfig();
-
+  const { brandURL } = useConfig();
+  
   return (
     <nav
       className="navbar is-spaced is-transparent"
@@ -49,16 +50,15 @@ function Navbar() {
         }`}
       >
         <div className="navbar-middle has-text-weight-medium is-family-monospace">
-          {/* this link is always active right now since the bridge is a separate app */}
-          <Link to="/" className="navbar-item is-active">
+          <Link to="/" className={`navbar-item ${pathname === '/' ? 'is-active' : ''}`}>
             BRIDGE
           </Link>
-          <a href={swapURL} className="navbar-item" rel="noreferrer">
+          <Link to="/swap" className={`navbar-item ${pathname === '/swap' ? 'is-active' : ''}`}>
             SWAP
-          </a>
-          <a href={poolURL} className="navbar-item" rel="noreferrer">
+          </Link>
+          <Link to="/pool" className={`navbar-item ${pathname === '/pool' ? 'is-active' : ''}`}>
             POOL
-          </a>
+          </Link>
         </div>
       </div>
 
