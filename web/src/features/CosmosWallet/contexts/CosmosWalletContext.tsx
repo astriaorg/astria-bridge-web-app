@@ -20,6 +20,7 @@ interface CosmosWalletContextProps {
   cosmosBalance: string | null;
   cosmosChainsOptions: DropdownOption<CosmosChainInfo>[];
   defaultIbcCurrencyOption: DropdownOption<IbcCurrency> | undefined;
+  disconnectCosmosWallet: () => void;
   getCosmosSigningClient: () => Promise<SigningStargateClient>;
   ibcCurrencyOptions: DropdownOption<IbcCurrency>[];
   isLoadingCosmosBalance: boolean;
@@ -57,6 +58,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     address: cosmosAddressFromWallet,
     openView: openCosmosWalletModal,
     getSigningStargateClient: getCosmosSigningClient,
+    disconnect,
   } = useChain(chainName);
 
   // we are keeping track of the address ourselves so that we can clear it if
@@ -174,6 +176,11 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     openCosmosWalletModal,
   ]);
 
+  const disconnectCosmosWallet = useCallback(() => {
+    disconnect().then((_) => {});
+    resetState();
+  }, [disconnect, resetState]);
+
   const value = {
     connectCosmosWallet,
     cosmosAccountAddress,
@@ -181,6 +188,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     cosmosChainsOptions,
     defaultIbcCurrencyOption,
     getCosmosSigningClient,
+    disconnectCosmosWallet,
     ibcCurrencyOptions,
     isLoadingCosmosBalance,
     resetState,

@@ -25,6 +25,7 @@ export default function ConnectCosmosWalletButton({
     connectCosmosWallet,
     cosmosAccountAddress,
     cosmosBalance,
+    disconnectCosmosWallet,
     isLoadingCosmosBalance,
   } = useCosmosWallet();
 
@@ -72,6 +73,14 @@ export default function ConnectCosmosWalletButton({
     }
   }, [connectCosmosWallet, toggleDropdown, cosmosAccountAddress]);
 
+  const handleDisconnectWallet = useCallback(() => {
+    const disconnect = async () => {
+      await disconnectCosmosWallet();
+    };
+
+    disconnect().then((_) => {});
+  }, [disconnectCosmosWallet]);
+
   return (
     <div
       ref={dropdownRef}
@@ -108,9 +117,7 @@ export default function ConnectCosmosWalletButton({
               <button
                 type="button"
                 className="button is-ghost"
-                onClick={() => {
-                  console.log("TODO!");
-                }}
+                onClick={handleDisconnectWallet}
               >
                 <span>
                   <i className="fas fa-up-right-from-square" />
@@ -119,9 +126,7 @@ export default function ConnectCosmosWalletButton({
               <button
                 type="button"
                 className="button is-ghost"
-                onClick={() => {
-                  console.log("TODO!");
-                }}
+                onClick={handleDisconnectWallet}
               >
                 <span>
                   <i className="fas fa-power-off" />
