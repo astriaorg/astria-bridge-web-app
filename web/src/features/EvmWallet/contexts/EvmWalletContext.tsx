@@ -57,7 +57,11 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
 
-  const { status: nativeBalanceStatus, data: nativeBalance, isLoading: isLoadingEvmNativeTokenBalance } = useBalance({
+  const {
+    status: nativeBalanceStatus,
+    data: nativeBalance,
+    isLoading: isLoadingEvmNativeTokenBalance,
+  } = useBalance({
     address: userAccount.address,
   });
 
@@ -144,8 +148,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }),
     [selectedEvmChain, selectedEvmCurrency],
   );
-  const { balance: selectedEvmCurrencyBalance, isLoading: isLoadingSelectedEvmCurrencyBalance } =
-    useBalancePolling(getBalanceCallback, pollingConfig);
+  const {
+    balance: selectedEvmCurrencyBalance,
+    isLoading: isLoadingSelectedEvmCurrencyBalance,
+  } = useBalancePolling(getBalanceCallback, pollingConfig);
 
   const selectedEvmChainNativeToken = useMemo(() => {
     return selectedEvmChain?.currencies[0];

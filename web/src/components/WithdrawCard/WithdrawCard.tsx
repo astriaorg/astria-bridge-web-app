@@ -326,11 +326,13 @@ export default function WithdrawCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && selectedEvmCurrency && !isLoadingSelectedEvmCurrencyBalance && (
-                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {selectedEvmCurrencyBalance}
-                </p>
-              )}
+              {fromAddress &&
+                selectedEvmCurrency &&
+                !isLoadingSelectedEvmCurrencyBalance && (
+                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                    Balance: {selectedEvmCurrencyBalance}
+                  </p>
+                )}
               {fromAddress && isLoadingSelectedEvmCurrencyBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
