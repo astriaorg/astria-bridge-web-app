@@ -138,7 +138,7 @@ export default function ConnectEvmWalletButton({
               <button
                 type="button"
                 className="button is-ghost"
-                onClick={() => disconnectEvmWallet()}
+                onClick={() => {console.log("TODO open explorer")}}
               >
                 <span>
                   <i className="fas fa-up-right-from-square" />
