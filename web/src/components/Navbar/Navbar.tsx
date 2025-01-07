@@ -66,8 +66,6 @@ function Navbar() {
           <ConnectWalletsButton />
         </div>
       </div>
-
-      {/*<div className="navbar-placeholder-end" />*/}
     </nav>
   );
 }

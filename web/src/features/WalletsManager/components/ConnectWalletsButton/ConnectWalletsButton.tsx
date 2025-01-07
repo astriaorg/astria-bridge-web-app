@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 
+import { ConnectCosmosWalletButton } from "features/CosmosWallet";
 import { ConnectEvmWalletButton } from "features/EvmWallet";
 
 interface ConnectWalletsButtonProps {
@@ -45,9 +46,6 @@ export default function ConnectWalletsButton({
 
   // ui
   const label = useMemo(() => {
-    // if (userAccount?.address) {
-    //   return shortenAddress(userAccount.address);
-    // }
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected]);
 
@@ -77,9 +75,13 @@ export default function ConnectWalletsButton({
       {/* Dropdown element */}
       {isDropdownActive && (
         <div className="dropdown-card card">
-          {/* Top Row - Address and Actions */}
-          <div className="dropdown-header">
-            <ConnectEvmWalletButton labelBeforeConnected="Connect to Flame wallet" />
+          <div className="">
+            <div>
+              <ConnectEvmWalletButton labelBeforeConnected="Connect to Flame wallet" />
+            </div>
+            <div>
+              <ConnectCosmosWalletButton labelBeforeConnected="Connect to Cosmos wallet" />
+            </div>
           </div>
         </div>
       )}
