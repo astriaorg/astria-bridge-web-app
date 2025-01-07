@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useConfig } from "config";
 import { ConnectEvmWalletButton } from "features/EvmWallet";
+import { ConnectWalletsButton } from "features/WalletsManager";
 import logo from "logo-flame-w-text.svg";
 
 function Navbar() {
@@ -62,7 +63,7 @@ function Navbar() {
           </a>
         </div>
         <div className="navbar-end">
-          <ConnectEvmWalletButton />
+          <ConnectWalletsButton />
         </div>
       </div>
 

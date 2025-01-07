@@ -10,8 +10,8 @@ import { useAccount } from "wagmi";
 
 import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton";
 
-import { useEvmWallet } from "../../hooks/useEvmWallet.ts";
-import { shortenAddress } from "../../utils/utils.ts";
+import { useEvmWallet } from "../../hooks/useEvmWallet";
+import { shortenAddress } from "../../utils/utils";
 
 interface ConnectEvmWalletButtonProps {
   // Label to show before the user is connected to a wallet.
