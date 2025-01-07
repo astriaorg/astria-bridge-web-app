@@ -27,8 +27,8 @@ export default function WithdrawCard(): React.ReactElement {
     selectEvmCurrency,
     evmCurrencyOptions,
     selectedEvmCurrency,
-    evmBalance,
-    isLoadingEvmBalance,
+    selectedEvmCurrencyBalance,
+    isLoadingSelectedEvmCurrencyBalance,
     connectEvmWallet,
   } = useEvmWallet();
 
@@ -326,12 +326,12 @@ export default function WithdrawCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && selectedEvmCurrency && !isLoadingEvmBalance && (
+              {fromAddress && selectedEvmCurrency && !isLoadingSelectedEvmCurrencyBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {evmBalance}
+                  Balance: {selectedEvmCurrencyBalance}
                 </p>
               )}
-              {fromAddress && isLoadingEvmBalance && (
+              {fromAddress && isLoadingSelectedEvmCurrencyBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>

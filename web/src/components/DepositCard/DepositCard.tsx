@@ -20,8 +20,8 @@ export default function DepositCard(): React.ReactElement {
     defaultEvmCurrencyOption,
     selectEvmCurrency,
     evmCurrencyOptions,
-    evmBalance,
-    isLoadingEvmBalance,
+    selectedEvmCurrencyBalance,
+    isLoadingSelectedEvmCurrencyBalance,
     connectEvmWallet,
     resetState: resetEvmWalletState,
   } = useEvmWallet();
@@ -401,12 +401,12 @@ export default function DepositCard(): React.ReactElement {
               )}
               {evmAccountAddress &&
                 selectedEvmChain &&
-                !isLoadingEvmBalance && (
+                !isLoadingSelectedEvmCurrencyBalance && (
                   <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                    Balance: {evmBalance}
+                    Balance: {selectedEvmCurrencyBalance}
                   </p>
                 )}
-              {evmAccountAddress && isLoadingEvmBalance && (
+              {evmAccountAddress && isLoadingSelectedEvmCurrencyBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>

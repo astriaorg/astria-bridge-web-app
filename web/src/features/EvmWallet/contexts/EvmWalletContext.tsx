@@ -23,15 +23,17 @@ interface EvmWalletContextProps {
   defaultEvmCurrencyOption: DropdownOption<EvmCurrency> | undefined;
   disconnectEvmWallet: () => void;
   evmAccountAddress: string | null;
-  evmBalance: string | null;
   evmChainsOptions: DropdownOption<EvmChainInfo>[];
   evmCurrencyOptions: DropdownOption<EvmCurrency>[];
-  isLoadingEvmBalance: boolean;
+  evmNativeTokenBalance: string | null;
+  isLoadingEvmNativeTokenBalance: boolean;
+  isLoadingSelectedEvmCurrencyBalance: boolean;
   resetState: () => void;
   selectedEvmChain: EvmChainInfo | null;
   selectedEvmChainNativeToken: EvmCurrency | undefined;
   selectedEvmChainOption: DropdownOption<EvmChainInfo> | null;
   selectedEvmCurrency: EvmCurrency | null;
+  selectedEvmCurrencyBalance: string | null;
   selectEvmChain: (chain: EvmChainInfo | null) => void;
   selectEvmCurrency: (currency: EvmCurrency) => void;
   withdrawFeeDisplay: string;
@@ -55,9 +57,21 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
 
-  const nativeTokenBalance = useBalance({
+  const { status: nativeBalanceStatus, data: nativeBalance, isLoading: isLoadingEvmNativeTokenBalance } = useBalance({
     address: userAccount.address,
   });
+
+  // FIXME - this could show a balance for a chain that is not the "selected" chain,
+  //  e.g. when a user refreshes the page and the selected chain is not set. tho i guess
+  //  when a user selects a chain the balance will be updated, maybe not an issue actually?
+  //  it's not an issue right now because there is only flame atm, but this will be an issue
+  //  for CosmosWalletContext since there are multiple chains.
+  const evmNativeTokenBalance = useMemo(() => {
+    if (nativeBalanceStatus !== "success") {
+      return null;
+    }
+    return `${nativeBalance.formatted} ${nativeBalance.symbol}`;
+  }, [nativeBalance, nativeBalanceStatus]);
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
@@ -112,10 +126,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       return `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
     }
 
-    return `${nativeTokenBalance?.data?.formatted} ${selectedEvmCurrency.coinDenom}`;
+    return `${nativeBalance?.formatted} ${selectedEvmCurrency.coinDenom}`;
   }, [
     wagmiConfig,
-    nativeTokenBalance?.data?.formatted,
+    nativeBalance?.formatted,
     selectedEvmChain,
     selectedEvmCurrency,
     evmAccountAddress,
@@ -130,7 +144,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }),
     [selectedEvmChain, selectedEvmCurrency],
   );
-  const { balance: evmBalance, isLoading: isLoadingEvmBalance } =
+  const { balance: selectedEvmCurrencyBalance, isLoading: isLoadingSelectedEvmCurrencyBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);
 
   const selectedEvmChainNativeToken = useMemo(() => {
@@ -226,15 +240,17 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     defaultEvmCurrencyOption,
     disconnectEvmWallet,
     evmAccountAddress,
-    evmBalance,
     evmChainsOptions,
     evmCurrencyOptions,
-    isLoadingEvmBalance,
+    evmNativeTokenBalance,
+    isLoadingEvmNativeTokenBalance,
+    isLoadingSelectedEvmCurrencyBalance,
     resetState,
     selectedEvmChain,
     selectedEvmChainNativeToken,
     selectedEvmChainOption,
     selectedEvmCurrency,
+    selectedEvmCurrencyBalance,
     selectEvmChain,
     selectEvmCurrency,
     withdrawFeeDisplay,

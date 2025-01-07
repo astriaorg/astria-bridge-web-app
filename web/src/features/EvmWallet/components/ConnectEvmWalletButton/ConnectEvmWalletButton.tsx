@@ -27,8 +27,10 @@ export default function ConnectEvmWalletButton({
   const {
     connectEvmWallet,
     disconnectEvmWallet,
-    evmBalance,
-    isLoadingEvmBalance,
+    selectedEvmCurrencyBalance,
+    isLoadingSelectedEvmCurrencyBalance,
+    evmNativeTokenBalance,
+    isLoadingEvmNativeTokenBalance,
   } = useEvmWallet();
 
   const userAccount = useAccount();
@@ -156,11 +158,11 @@ export default function ConnectEvmWalletButton({
 
           {/* Balance Row */}
           <div className="balance-container">
-            {isLoadingEvmBalance && (
+            {isLoadingEvmNativeTokenBalance && (
               <div className="balance-loading">Loading...</div>
             )}
-            {!isLoadingEvmBalance && (
-              <div className="balance-amount">{evmBalance}</div>
+            {!isLoadingEvmNativeTokenBalance && evmNativeTokenBalance && (
+              <div className="balance-amount">{evmNativeTokenBalance}</div>
             )}
             {/* TODO - price in USD */}
             <div className="balance-usd">$0.00 USD</div>
