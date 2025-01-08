@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import type { FC } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // DropdownOption is an interface for the options that can be selected in the dropdown.
 export interface DropdownOption<T> {
   label: string;
   value: T;
-  // leftIconClass allows for an icon to be displayed to the left of the option label in the dropdown content
-  leftIconClass?: string;
+  LeftIcon?: FC<{className?: string; size?: number}>;
 }
 
 // DropdownAdditionalOption is an interface for additional options that can be added to the dropdown.
@@ -16,10 +16,10 @@ export interface DropdownAdditionalOption {
   action: () => void;
   // className allows for additional classes to be added to the additional option
   className?: string;
-  // leftIconClass allows for an icon to be displayed to the left of the label in the dropdown content
-  leftIconClass?: string;
-  // rightIconClass allows for an icon to be displayed to the right of the label in the dropdown content
-  rightIconClass?: string;
+  // LeftIcon allows for an icon to be displayed to the left of the label in the dropdown content
+  LeftIcon?: FC<{className?: string; size?: number}>;
+  // RightIcon allows for an icon to be displayed to the right of the label in the dropdown content
+  RightIcon?: FC<{className?: string; size?: number}>;
 }
 
 interface DropdownProps<T> {
@@ -29,7 +29,7 @@ interface DropdownProps<T> {
   defaultOption?: DropdownOption<T>;
   disabled?: boolean;
   // leftIconClass allows for an icon to be displayed to the left of input for the dropdown label
-  leftIconClass?: string;
+  LeftIcon?: FC;
   // additionalOptions allows for additional options with actions to be added to the dropdown
   additionalOptions?: DropdownAdditionalOption[];
   // valueOverride will trigger a call of onSelect in the component so the labels update correctly.
@@ -44,7 +44,7 @@ export default function Dropdown<T>({
   placeholder = "Select an option",
   defaultOption,
   disabled = false,
-  leftIconClass,
+  LeftIcon,
   additionalOptions = [],
   valueOverride,
 }: DropdownProps<T>) {
@@ -107,95 +107,92 @@ export default function Dropdown<T>({
   return (
     <div
       ref={dropdownRef}
-      className={`dropdown ${isActive ? "is-active" : ""} ${
-        disabled ? "is-disabled" : ""
+      className={`relative w-full ${isActive ? "z-50" : ""} ${
+        disabled ? "opacity-50" : ""
       }`}
     >
-      <div className="dropdown-trigger">
+      <div className="w-full">
         <button
           type="button"
-          className="button is-ghost is-outlined-light is-tall"
+          className="w-full flex items-center justify-between bg-transparent text-grey-light hover:bg-opacity-5 hover:bg-white px-4 py-2 disabled:opacity-50 border border-dark rounded-xl h-14"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
           onClick={toggleDropdown}
           disabled={disabled}
         >
-          {/* only show left icon class if there isn't a selected option left icon class */}
-          {leftIconClass && !selectedOption?.leftIconClass && (
-            <span className="icon icon-left is-small ml-1 mr-3">
-              <i className={leftIconClass} />
+          {LeftIcon && !selectedOption?.LeftIcon && (
+            <span className="text-grey-light ml-1 mr-3 flex">
+              <LeftIcon />
             </span>
           )}
-          {selectedOption?.leftIconClass && (
-            <span className="icon icon-left is-small ml-1 mr-3">
-              <i className={selectedOption.leftIconClass} />
+          {selectedOption?.LeftIcon && (
+            <span className="text-grey-light ml-1 mr-3 flex">
+              <selectedOption.LeftIcon />
             </span>
           )}
-          <span className="dropdown-label is-text-overflow">
+          <span className="truncate">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span className="icon icon-right is-small">
-            {isActive ? (
-              <i className="fas fa-angle-up" />
-            ) : (
-              <i className="fas fa-angle-down" />
-            )}
+          <span className="ml-auto text-grey-light">
+            <i className={`fas fa-angle-${isActive ? 'up' : 'down'}`} />
           </span>
         </button>
       </div>
-      <div className="dropdown-menu" id="dropdown-menu" role="menu">
-        <div className="dropdown-content">
-          {options?.map((option) => (
-            <button
-              type="button"
-              key={option.label}
-              className={`dropdown-item ${
-                selectedOption?.value === option.value ? "is-active" : ""
-              }`}
-              onClick={() => handleSelect(option)}
-            >
-              <span className="dropdown-item-inner is-size-6">
-                {option.leftIconClass && (
-                  <span className="icon ml-1 mr-3">
-                    <i className={option.leftIconClass} />
-                  </span>
-                )}
-                {option.label}
-              </span>
-            </button>
-          ))}
-
-          {additionalOptions.map((option) => (
-            <button
-              type="button"
-              key={`additional-${option.label}`}
-              className={`additional-dropdown-item dropdown-item ${
-                option.className || ""
-              }`}
-              onClick={() => {
-                option.action();
-                setIsActive(false);
-              }}
-            >
-              <span className="dropdown-item-inner is-size-6">
-                {option.leftIconClass && (
-                  <span className="icon ml-1 mr-3">
-                    <i className={option.leftIconClass} />
-                  </span>
-                )}
-                <span className="dropdown-item-label is-text-overflow">
+      {isActive && (
+        <div className="absolute w-full mt-2" id="dropdown-menu" role="menu">
+          <div className="bg-radial-dark border border-white/10 shadow-inner rounded-2xl p-2">
+            {options?.map((option) => (
+              <button
+                type="button"
+                key={option.label}
+                className={`w-full text-left ${
+                  selectedOption?.value === option.value ? "bg-white/5" : ""
+                }`}
+                onClick={() => handleSelect(option)}
+              >
+                <span className="flex items-center w-full p-4 text-sm rounded-xl hover:bg-white/5 transition-colors">
+                  {option.LeftIcon && (
+                    <span className="ml-1 mr-3 flex">
+                      <option.LeftIcon />
+                    </span>
+                  )}
                   {option.label}
                 </span>
-                {option.rightIconClass && (
-                  <span className="icon icon-right">
-                    <i className={option.rightIconClass} />
+              </button>
+            ))}
+
+            {additionalOptions.map((option) => (
+              <button
+                type="button"
+                key={`additional-${option.label}`}
+                className={`w-full text-left text-white ${option.className || ""}`}
+                onClick={() => {
+                  option.action();
+                  setIsActive(false);
+                }}
+              >
+                <span className="flex items-center justify-between w-full p-4 text-sm rounded-xl hover:bg-white/5 transition-colors">
+                  <span className="flex items-center">
+                    {option.LeftIcon && (
+                      <span className="ml-1 mr-3 text-white flex">
+                        <option.LeftIcon />
+                      </span>
+                    )}
+                    <span className="truncate flex-grow">
+                      {option.label}
+                    </span>
                   </span>
-                )}
-              </span>
-            </button>
-          ))}
+                  {option.RightIcon && (
+                    <span className="text-white flex">
+                      <option.RightIcon size={20}/>
+                    </span>
+                  )}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

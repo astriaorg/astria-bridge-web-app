@@ -22,20 +22,20 @@ export default function CopyToClipboardButton({
   }
 
   return (
-    <>
-      <button
-        type="button"
-        key={textToCopy}
-        onClick={() => copyToClipboard(textToCopy)}
-        className="button has-text-light is-ghost"
-      >
-        {copyStatus && <div className="fade-out">{copyStatus}</div>}
-        {!copyStatus && (
-          <span className={`icon ${fadeInClass}`}>
-            <i className="fas fa-clipboard" />
-          </span>
-        )}
-      </button>
-    </>
+    <button
+      type="button"
+      key={textToCopy}
+      onClick={() => copyToClipboard(textToCopy)}
+      className="p-2 text-white hover:text-gray-200 transition-colors"
+    >
+      {copyStatus && (
+        <div className="animate-fade-out">{copyStatus}</div>
+      )}
+      {!copyStatus && (
+        <span className={`inline-block ${fadeInClass}`}>
+          <i className="fas fa-clipboard" />
+        </span>
+      )}
+    </button>
   );
 }

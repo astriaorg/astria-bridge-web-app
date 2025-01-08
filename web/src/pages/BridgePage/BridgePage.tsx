@@ -14,12 +14,25 @@ interface TabProps {
 
 const Tab: React.FC<TabProps> = ({ label, isActive, onClick }) => (
   <li
-    className={isActive ? "is-active" : ""}
+    className={`flex flex-1 h-14 justify-center items-center cursor-pointer ${
+      isActive
+        ? "bg-[radial-gradient(100%_100%_at_50.15%_0%,#221f1f_0%,#050a0d_100%)] shadow-[inset_3px_3px_3px_-3px_rgba(255,255,255,0.5)] rounded-xl"
+        : ""
+    }`}
     onClick={() => onClick(label)}
     onKeyUp={() => onClick(label)}
   >
-    {/* biome-ignore lint/a11y/useValidAnchor: Biome unfortunately uses anchors for tabs */}
-    <a onClick={() => {}}>{label}</a>
+    <a
+    /* biome-ignore lint/a11y/useValidAnchor: Biome unfortunately uses anchors for tabs */
+      onClick={() => {}}
+      className={`px-6 py-4 font-mono font-medium transition-all duration-100 ease-in ${
+        isActive
+          ? "text-white font-bold"
+          : "text-[#9B9B9B] hover:text-[#D9D9D9]"
+      }`}
+    >
+      {label}
+    </a>
   </li>
 );
 
@@ -40,13 +53,11 @@ export function BridgePage(): React.ReactElement {
   const tabs: TabType[] = ["DEPOSIT", "WITHDRAW"];
 
   return (
-    <section className="">
-      <div className="container px-2">
-        <div className="columns is-centered is-vcentered is-fullheight-with-navbar-and-footer">
-          <div className="column is-12-mobile is-8-tablet is-8-desktop is-6-widescreen">
-            <div className="card">
-              <div className="tabs is-fullwidth">
-                <ul>
+    <section className="min-h-[calc(100vh-85px-96px)] flex flex-col items-center justify-center">
+          <div className="w-full md:w-2/3 lg:w-2/3 xl:w-1/2 max-w-[676px]">
+            <div className="p-12 md:p-[48px] bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
+              <div className="flex items-center justify-center p-1 w-full bg-white/[0.04] border-[1px] border-white/20 rounded-xl border-b-0 border-r-0 mb-5">
+                <ul className="flex w-full text-center">
                   {tabs.map((tab) => (
                     <Tab
                       key={tab}
@@ -60,8 +71,6 @@ export function BridgePage(): React.ReactElement {
               <TabContent activeTab={activeTab} />
             </div>
           </div>
-        </div>
-      </div>
     </section>
   );
 }

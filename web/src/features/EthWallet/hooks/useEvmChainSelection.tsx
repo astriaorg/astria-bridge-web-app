@@ -122,7 +122,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       ([chainLabel, chain]): DropdownOption<EvmChainInfo> => ({
         label: chainLabel,
         value: chain,
-        leftIconClass: chain.iconClass,
+        LeftIcon: chain.IconComponent,
       }),
     );
   }, [evmChains]);
@@ -134,7 +134,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     return {
       label: selectedEvmChain?.chainName || "",
       value: selectedEvmChain,
-      leftIconClass: selectedEvmChain?.iconClass || "",
+      LeftIcon: selectedEvmChain?.IconComponent || null,
     } as DropdownOption<EvmChainInfo>;
   }, [selectedEvmChain]);
 
@@ -157,7 +157,7 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       (currency): DropdownOption<EvmCurrency> => ({
         label: currency.coinDenom,
         value: currency,
-        leftIconClass: currency.iconClass,
+        LeftIcon: currency.IconComponent,
       }),
     );
   }, [selectedEvmChain]);

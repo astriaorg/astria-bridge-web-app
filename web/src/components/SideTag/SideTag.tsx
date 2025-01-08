@@ -18,12 +18,17 @@ export default function SideTag({
   iconClass,
 }: SideTagProps): React.ReactElement {
   return (
-    <div className="side-tag">
-      <a href={url} target="_blank" rel="noreferrer" className="side-tag-link">
-        <span className="icon is-small">
+    <div className="inline-flex items-center">
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 transition-colors"
+      >
+        <span className="w-5 h-5 flex items-center justify-center">
           <i className={`fas ${iconClass}`} />
         </span>
-        <span className="label">{label}</span>
+        <span>{label}</span>
       </a>
     </div>
   );

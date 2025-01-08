@@ -1,3 +1,4 @@
+import { CelestiaIcon, FlameIcon, NobleIcon } from "icons";
 import type {
   CosmosChainInfo,
   CosmosChains,
@@ -58,7 +59,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-1",
       sequencerBridgeAccount: "astria14wyh2u6efndllr8gup29295krc98rqas8d0ans",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
     {
       // Not a real currency, just using for developing the ui
@@ -93,7 +94,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-celestia",
+  IconComponent: CelestiaIcon,
 };
 
 const NobleChainInfo: CosmosChainInfo = {
@@ -148,7 +149,7 @@ const NobleChainInfo: CosmosChainInfo = {
       ibcChannel: "channel-0",
       // NOTE - noble requires bech32 address, not bech32m.
       sequencerBridgeAccount: "astria14wyh2u6efndllr8gup29295krc98rqasj3l3kj",
-      iconClass: "i-noble",
+      IconComponent: NobleIcon,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -174,7 +175,7 @@ const NobleChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-noble",
+  IconComponent: NobleIcon,
 };
 
 export const cosmosChains: CosmosChains = {
@@ -192,7 +193,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "uria",
       coinDecimals: 18,
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
     {
       coinDenom: "TIA",
@@ -201,10 +202,10 @@ const FlameChainInfo: EvmChainInfo = {
       nativeTokenWithdrawerContractAddress:
         "0xA58639fB5458e65E4fA917FF951C390292C24A15",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
   ],
-  iconClass: "i-flame",
+  IconComponent: FlameIcon,
 };
 
 const FakeChainInfo: EvmChainInfo = {
@@ -217,7 +218,7 @@ const FakeChainInfo: EvmChainInfo = {
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
     {
       coinDenom: "FAKE",
@@ -227,10 +228,10 @@ const FakeChainInfo: EvmChainInfo = {
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-flame",
+      IconComponent: FlameIcon,
     },
   ],
-  iconClass: "i-flame",
+  IconComponent: FlameIcon,
 };
 
 export const evmChains: EvmChains = {

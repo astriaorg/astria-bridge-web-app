@@ -19,8 +19,7 @@ import { NotificationsContextProvider } from "features/Notifications";
 import { BridgePage, PoolPage, SwapPage } from "./pages";
 import Layout from "pages/Layout";
 
-// global styles
-import "styles/index.scss";
+import "./index.css";
 // contrib styles
 import "@rainbow-me/rainbowkit/styles.css";
 import "@interchain-ui/react/styles";

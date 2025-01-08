@@ -58,7 +58,6 @@ const CelestiaChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-159",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
-      iconClass: "i-celestia",
     },
     {
       // Coin denomination to be displayed to the user.
@@ -72,7 +71,6 @@ const CelestiaChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-420",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
-      iconClass: "i-celestia",
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -98,7 +96,6 @@ const CelestiaChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-celestia",
 };
 
 const NobleChainInfo: CosmosChainInfo = {
@@ -154,7 +151,6 @@ const NobleChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-231",
       sequencerBridgeAccount: "astria12saluecm8dd7hkutk83eavkl2p70lf5w7txezg",
-      iconClass: "i-noble",
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -180,7 +176,6 @@ const NobleChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-noble",
 };
 
 export const cosmosChains: CosmosChains = {
@@ -198,7 +193,6 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "uria",
       coinDecimals: 18,
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-celestia",
     },
     {
       coinDenom: "USDC",
@@ -209,7 +203,6 @@ const FlameChainInfo: EvmChainInfo = {
       // this value would only exist for native tokens
       // nativeTokenWithdrawerContractAddress: "",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-noble",
     },
     {
       coinDenom: "fakeTIA",
@@ -220,10 +213,8 @@ const FlameChainInfo: EvmChainInfo = {
       erc20ContractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
       // nativeTokenWithdrawerContractAddress: "",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-celestia",
     },
   ],
-  iconClass: "i-flame",
 };
 
 export const evmChains: EvmChains = {

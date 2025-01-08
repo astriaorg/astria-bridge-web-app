@@ -9,7 +9,7 @@ export function SwapPage(): React.ReactElement {
 					<h2 className="text-lg font-semibold">Swap</h2>
 					<button
 						type="button"
-						className="text-neutral-400 hover:text-neutral-200 transition"
+						className="text-grey-light hover:text-white"
 						aria-label="Settings"
 					>
 						<GearIcon className="transition duration-300"/>

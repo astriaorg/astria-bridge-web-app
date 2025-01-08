@@ -49,38 +49,40 @@ function Notification({
 
   // modals can be used for confirmation dialogs
   const ModalElem = () => (
-    <div className="modal is-active">
-      <div className="modal-background" />
-      <div className={`modal-card ${modalBackgroundClass()}`}>
-        <header className={`modal-card-head ${modalBackgroundClass()}`}>
-          <p className="modal-card-title has-text-white-ter">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/50" />
+      <div className="relative w-full max-w-lg mx-4 bg-radial-dark rounded-xl shadow-lg">
+        <header className="flex items-center justify-between p-4 rounded-t-xl">
+          <p className="text-lg font-semibold text-white">
             {modalOpts?.title}
           </p>
           <button
             type="button"
-            className="delete"
+            className="p-2 rounded-full hover:bg-gray-700/50"
             aria-label="close"
             onClick={() => {
               onRemove(id);
               onModalCancel();
             }}
-          />
+          >
+            <span className="text-white">&times;</span>
+          </button>
         </header>
-        <section className="modal-card-body has-text-dark">
+        <section className="p-6 text-white">
           {modalOpts?.message}
           {modalOpts?.component && modalOpts.component}
         </section>
-        <footer className="modal-card-foot">
+        <footer className="flex justify-end gap-4 p-4">
           <button
             type="button"
-            className={`button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white ${modalButtonClass()}`}
+            className="px-6 py-2 font-bold text-white rounded-lg bg-gradient"
             onClick={onModalConfirm}
           >
             Confirm
           </button>
           <button
             type="button"
-            className="button is-light is-tall is-wide"
+            className="px-6 py-2 font-bold text-dark bg-gray-200 rounded-lg hover:bg-gray-300"
             onClick={onModalCancel}
           >
             Cancel
@@ -113,19 +115,36 @@ function Notification({
     }
   };
 
+  const getToastColorClass = () => {
+    switch (toastOpts?.toastType) {
+      case NotificationType.INFO:
+        return 'bg-status-info';
+      case NotificationType.SUCCESS:
+        return 'bg-status-success';
+      case NotificationType.WARNING:
+        return 'bg-status-warning';
+      case NotificationType.DANGER:
+        return 'bg-status-danger';
+      default:
+        return 'bg-gray-700';
+    }
+  };
+
   // toasts are used for notifications that do not need confirmation
   const ToastElem = () => (
-    <article className={`message ${toastTypeClass}`}>
-      <div className="message-header">
+    <article className={`rounded-lg shadow-lg overflow-hidden ${getToastColorClass()}`}>
+      <div className="flex items-center justify-between px-4 py-2 text-white">
         <p>{getToastTitle()}</p>
         <button
           type="button"
-          className="delete"
+          className="p-1 rounded-full hover:bg-black/20"
           aria-label="acknowledge"
           onClick={onToastAcknowledge}
-        />
+        >
+          <span className="text-white">&times;</span>
+        </button>
       </div>
-      <div className="message-body">
+      <div className="px-4 py-3 bg-white/10 text-white">
         {toastOpts?.message}
         {toastOpts?.component ? toastOpts.component : null}
       </div>
@@ -133,11 +152,9 @@ function Notification({
   );
 
   return (
-    <div
-      className={`${isModal ? "" : "notifications-toast-container"} ${
-        toastOpts?.position || ToastPosition.TOP_MID
-      }`}
-    >
+    <div className={`${
+      isModal ? '' : 'fixed z-50'
+    } ${toastOpts?.position || ToastPosition.TOP_MID}`}>
       {isModal ? <ModalElem /> : <ToastElem />}
     </div>
   );

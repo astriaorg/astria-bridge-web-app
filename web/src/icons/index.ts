@@ -11,3 +11,7 @@ export * from "./StrideTiaIcon";
 export * from "./OsmosisIcon";
 export * from "./GearIcon";
 export * from "./ArrowUpDownIcon";
+export * from "./WalletIcon";
+export * from "./FlameIcon";
+export * from "./PlusIcon";
+export * from "./EditIcon";

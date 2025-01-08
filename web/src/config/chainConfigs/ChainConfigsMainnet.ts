@@ -1,3 +1,4 @@
+import { CelestiaIcon, FlameIcon, MilkTiaIcon, NobleIcon, OsmosisIcon, StrideIcon, StrideTiaIcon, UsdcIcon } from "icons";
 import type {
   CosmosChainInfo,
   CosmosChains,
@@ -58,7 +59,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-48",
       sequencerBridgeAccount: "astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -84,7 +85,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-celestia",
+  IconComponent: CelestiaIcon,
 };
 
 const NobleChainInfo: CosmosChainInfo = {
@@ -116,7 +117,7 @@ const NobleChainInfo: CosmosChainInfo = {
       ibcChannel: "channel-104",
       sequencerBridgeAccount:
         "astriacompat1eg8hhey0n4untdvqqdvlyl0e7zx8wfcaz3l6wu",
-      iconClass: "i-usdc",
+      IconComponent: UsdcIcon,
     },
   ],
   feeCurrencies: [
@@ -131,7 +132,7 @@ const NobleChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-noble",
+  IconComponent: NobleIcon,
 };
 
 const OsmosisChainInfo: CosmosChainInfo = {
@@ -164,7 +165,7 @@ const OsmosisChainInfo: CosmosChainInfo = {
       coinDecimals: 6,
       ibcChannel: "channel-85486",
       sequencerBridgeAccount: "astria1kgxhyhvynhcwwrylkzzx6q3a8rn3tuvasxvuy8",
-      iconClass: "i-milk-tia",
+      IconComponent: MilkTiaIcon,
     },
   ],
   feeCurrencies: [
@@ -180,7 +181,7 @@ const OsmosisChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-osmosis",
+  IconComponent: OsmosisIcon,
 };
 
 const StrideChainInfo: CosmosChainInfo = {
@@ -210,8 +211,8 @@ const StrideChainInfo: CosmosChainInfo = {
       coinMinimalDenom: "stutia",
       coinDecimals: 6,
       ibcChannel: "channel-285",
-      sequencerBridgeAccount: "astria1dllx9d9karss9ca8le25a4vqhf67a67d5d4l6r",
-      iconClass: "i-stride-tia",
+      sequencerBridgeAccount: "astria1dllx9d8karss9ca8le25a4vqhf67a67d5d4l6r",
+      IconComponent: StrideTiaIcon,
     },
   ],
   feeCurrencies: [
@@ -226,7 +227,7 @@ const StrideChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-stride",
+  IconComponent: StrideIcon,
 };
 
 export const cosmosChains: CosmosChains = {
@@ -248,7 +249,7 @@ const FlameChainInfo: EvmChainInfo = {
       nativeTokenWithdrawerContractAddress:
         "0xB086557f9B5F6fAe5081CC5850BE94e62B1dDE57",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
     {
       coinDenom: "USDC",
@@ -256,7 +257,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-usdc",
+      IconComponent: UsdcIcon,
     },
     {
       coinDenom: "milkTIA",
@@ -265,7 +266,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       erc20ContractAddress: "0xcbb93e854AA4EF5Db51c3b094F28952eF0dC67bE",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-milk-tia",
+      IconComponent: MilkTiaIcon,
     },
     {
       coinDenom: "stTIA",
@@ -273,10 +274,10 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       erc20ContractAddress: "0xdf941D092b10FF07eAb44bD174dEe915c13FECcd",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-stride-tia",
+      IconComponent: StrideTiaIcon,
     },
   ],
-  iconClass: "i-flame",
+  IconComponent: FlameIcon,
 };
 
 export const evmChains: EvmChains = {

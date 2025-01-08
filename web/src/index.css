@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    @apply h-screen;
+  }
+  
+  body {
+    @apply m-0 p-0 bg-body;
+    @apply text-white;
+  }
+}
+
+@layer components {
+  .side-tag {
+    @apply absolute top-1/2 right-0 bg-orange-soft text-white text-xs font-bold translate-x-10 -rotate-90 overflow-hidden;
+  }
+
+  .side-tag-link {
+    @apply flex items-center px-3 py-2 text-white transition-colors duration-200 hover:bg-black/10;
+  }
+}
+
+@layer utilities {
+  .fade-out {
+    @apply animate-fade-out;
+  }
+
+  .fade-in {
+    @apply animate-fade-in;
+  }
+
+  .is-text-overflow {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  }
+}

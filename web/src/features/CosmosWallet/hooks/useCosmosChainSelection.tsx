@@ -80,12 +80,14 @@ export function useCosmosChainSelection(cosmosChains: CosmosChains) {
   const { balance: cosmosBalance, isLoading: isLoadingCosmosBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);
 
+  console.log(cosmosChains);
+
   const cosmosChainsOptions = useMemo(() => {
     return Object.entries(cosmosChains).map(
       ([chainLabel, chain]): DropdownOption<CosmosChainInfo> => ({
         label: chainLabel,
         value: chain,
-        leftIconClass: chain.iconClass,
+        LeftIcon: chain.IconComponent,
       }),
     );
   }, [cosmosChains]);
@@ -102,7 +104,7 @@ export function useCosmosChainSelection(cosmosChains: CosmosChains) {
       (currency): DropdownOption<IbcCurrency> => ({
         label: currency.coinDenom,
         value: currency,
-        leftIconClass: currency.iconClass,
+        LeftIcon: currency.IconComponent,
       }),
     );
   }, [selectedCosmosChain]);
@@ -121,7 +123,7 @@ export function useCosmosChainSelection(cosmosChains: CosmosChains) {
     return {
       label: selectedCosmosChain?.chainName || "",
       value: selectedCosmosChain,
-      leftIconClass: selectedCosmosChain?.iconClass || "",
+      LeftIcon: selectedCosmosChain?.IconComponent || "",
     } as DropdownOption<CosmosChainInfo>;
   }, [selectedCosmosChain]);
 

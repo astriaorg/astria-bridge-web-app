@@ -15,7 +15,7 @@ export default function AddERC20ToWalletButton({
   const { connector, isConnected } = useAccount();
 
   const buttonClassName =
-    buttonClassNameOverride ?? "p-0 is-size-7 has-text-light is-ghost";
+    buttonClassNameOverride ?? "p-0 text-xs text-white hover:text-white/80";
 
   const addCoinToWallet = async () => {
     if (!connector || !isConnected) {
@@ -51,7 +51,7 @@ export default function AddERC20ToWalletButton({
         type="button"
         key={evmCurrency.coinMinimalDenom}
         onClick={() => addCoinToWallet()}
-        className={`button is-underlined ${buttonClassName}`}
+        className={`underline ${buttonClassName}`}
       >
         Add ERC20 to wallet
       </button>

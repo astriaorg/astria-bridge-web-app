@@ -5,6 +5,8 @@ import type {
   EvmChains,
 } from "./types";
 
+import { CelestiaIcon, FlameIcon, NeutronIcon, NobleIcon } from "../../icons";
+
 const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.
   chainId: "mocha-4",
@@ -58,7 +60,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-160",
       sequencerBridgeAccount: "astria1lepnry7tlpzvrukp5xej4v5wp532k2f94vxqnr",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
     {
       // Coin denomination to be displayed to the user.
@@ -72,7 +74,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-420",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -98,7 +100,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-celestia",
+  IconComponent: CelestiaIcon,
 };
 
 const NobleChainInfo: CosmosChainInfo = {
@@ -154,7 +156,7 @@ const NobleChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-232",
       sequencerBridgeAccount: "astria1u6ewl0tejz0df2l6tzc7k2degx6mqsjahldqxd",
-      iconClass: "i-noble",
+      IconComponent: NobleIcon,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -180,7 +182,7 @@ const NobleChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-noble",
+  IconComponent: NobleIcon,
 };
 
 const NeutronChainInfo: CosmosChainInfo = {
@@ -238,7 +240,7 @@ const NeutronChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-1412",
       sequencerBridgeAccount: "astria1j7juyc9nv6tlv0la74a9rrm7v72y3x336mgxvk",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -265,7 +267,7 @@ const NeutronChainInfo: CosmosChainInfo = {
       },
     },
   ],
-  iconClass: "i-neutron",
+  IconComponent: NeutronIcon,
 };
 
 export const cosmosChains: CosmosChains = {
@@ -286,7 +288,7 @@ const FlameChainInfo: EvmChainInfo = {
       nativeTokenWithdrawerContractAddress:
         "0x77Af806d724699B3644F9CCBFD45CC999CCC3d49",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
     {
       coinDenom: "USDC",
@@ -294,7 +296,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       erc20ContractAddress: "0x6e18cE6Ec3Fc7b8E3EcFca4fA35e25F3f6FA879a",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-noble",
+      IconComponent: NobleIcon,
     },
     {
       coinDenom: "dTIA",
@@ -303,10 +305,10 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       erc20ContractAddress: "0x0F0C3207a9fE9B7e8AaE4bb83E865C91A13Fd8a7",
       ibcWithdrawalFeeWei: "10000000000000000",
-      iconClass: "i-celestia",
+      IconComponent: CelestiaIcon,
     },
   ],
-  iconClass: "i-flame",
+  IconComponent: FlameIcon,
 };
 
 export const evmChains: EvmChains = {
