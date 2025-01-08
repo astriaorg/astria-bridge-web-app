@@ -35,6 +35,7 @@ module.exports = {
       backgroundImage: {
         'astria-gradient': 'linear-gradient(to right, #f09226, #df5822)',
         'radial-dark': 'radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%)',
+        'button-gradient': 'linear-gradient(to right, #f09226, #df5822)',
       },
       textColor: {
         'light': '#f5f5f5',  // $astria-text-light
