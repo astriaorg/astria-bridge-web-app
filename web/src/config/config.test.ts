@@ -1,13 +1,12 @@
-import { getEnvChainConfigs } from "./chainConfigs";
+// import the mocked function for type safety
+import { getEnvVariable } from "config";
+import { FlameNetwork, getChainConfigs } from "./chainConfigs";
 import type { CosmosChains, EvmChains } from "./chainConfigs/types";
 
 // mock the config import to control getEnvVariable
 jest.mock("config", () => ({
   getEnvVariable: jest.fn(),
 }));
-
-// import the mocked function for type safety
-import { getEnvVariable } from "config";
 
 describe("Chain Configs", () => {
   // Store original env vars
@@ -30,7 +29,7 @@ describe("Chain Configs", () => {
     process.env = originalEnv;
   });
 
-  describe("getEnvChainConfigs", () => {
+  describe("getChainConfigs", () => {
     const mockCosmosChains: CosmosChains = {
       "Test Chain": {
         chainId: "test-1",
@@ -86,103 +85,25 @@ describe("Chain Configs", () => {
 
     it("should error when expected environment variables are not set", () => {
       process.env.REACT_APP_ENV = "";
-      expect(() => getEnvChainConfigs()).toThrowError("REACT_APP_ENV not set");
+      expect(() => getChainConfigs(FlameNetwork.LOCAL)).toThrowError(
+        "REACT_APP_ENV not set",
+      );
     });
 
-    it("should return environment-specific config for each valid environment", () => {
-      const environments = ["local", "dusk", "dawn", "mainnet"];
+    it("should return config for each valid network", () => {
+      const networks = [
+        FlameNetwork.LOCAL,
+        FlameNetwork.DUSK,
+        FlameNetwork.DAWN,
+        FlameNetwork.MAINNET,
+      ];
 
-      for (const env of environments) {
-        (getEnvVariable as jest.Mock).mockImplementation((key: string) => {
-          if (key === "REACT_APP_ENV") return env;
-          throw new Error(`${key} not set`);
-        });
-
-        const config = getEnvChainConfigs();
+      for (const network of networks) {
+        const config = getChainConfigs(network);
         expect(config).toBeDefined();
         expect(config.cosmos).toBeDefined();
         expect(config.evm).toBeDefined();
       }
-    });
-
-    it("should override IBC chains when REACT_APP_IBC_CHAINS is set", () => {
-      // set up environment
-      (getEnvVariable as jest.Mock).mockImplementation((key: string) => {
-        if (key === "REACT_APP_ENV") return "local";
-        if (key === "REACT_APP_IBC_CHAINS")
-          return JSON.stringify(mockCosmosChains);
-        throw new Error(`${key} not set`);
-      });
-
-      const config = getEnvChainConfigs();
-      expect(config.cosmos).toEqual(mockCosmosChains);
-      // EVM chains should still be from local config
-      expect(config.evm.Flame.chainName).toEqual("Flame (local)");
-    });
-
-    it("should override EVM chains when REACT_APP_EVM_CHAINS is set", () => {
-      // set up environment
-      (getEnvVariable as jest.Mock).mockImplementation((key: string) => {
-        if (key === "REACT_APP_ENV") return "local";
-        if (key === "REACT_APP_EVM_CHAINS")
-          return JSON.stringify(mockEvmChains);
-        throw new Error(`${key} not set`);
-      });
-
-      const config = getEnvChainConfigs();
-      expect(config.evm).toEqual(mockEvmChains);
-      // IBC chains should still be from local config
-      expect(config.cosmos["Celestia Local"].chainName).toEqual(
-        "Celestia Local",
-      );
-    });
-
-    it("should override both chains when both environment variables are set", () => {
-      // set up environment
-      (getEnvVariable as jest.Mock).mockImplementation((key: string) => {
-        if (key === "REACT_APP_ENV") return "local";
-        if (key === "REACT_APP_IBC_CHAINS")
-          return JSON.stringify(mockCosmosChains);
-        if (key === "REACT_APP_EVM_CHAINS")
-          return JSON.stringify(mockEvmChains);
-        throw new Error(`${key} not set`);
-      });
-
-      const config = getEnvChainConfigs();
-      expect(config.cosmos).toEqual(mockCosmosChains);
-      expect(config.evm).toEqual(mockEvmChains);
-    });
-
-    it("should handle invalid JSON in IBC and EVM chains override", () => {
-      // set up environment
-      (getEnvVariable as jest.Mock).mockImplementation((key: string) => {
-        if (key === "REACT_APP_ENV") return "local";
-        if (key === "REACT_APP_IBC_CHAINS") return "invalid json";
-        if (key === "REACT_APP_EVM_CHAINS") return "invalid json";
-        throw new Error(`${key} not set`);
-      });
-
-      const config = getEnvChainConfigs();
-      // should fall back to local config
-      expect(config.cosmos["Celestia Local"].chainName).toEqual(
-        "Celestia Local",
-      );
-      expect(config.evm.Flame.chainName).toEqual("Flame (local)");
-    });
-
-    it("should handle mixed valid and invalid JSON overrides", () => {
-      // set up environment
-      (getEnvVariable as jest.Mock).mockImplementation((key: string) => {
-        if (key === "REACT_APP_ENV") return "local";
-        if (key === "REACT_APP_IBC_CHAINS")
-          return JSON.stringify(mockCosmosChains);
-        if (key === "REACT_APP_EVM_CHAINS") return "invalid json";
-        throw new Error(`${key} not set`);
-      });
-
-      const config = getEnvChainConfigs();
-      expect(config.cosmos).toEqual(mockCosmosChains); // should use override
-      expect(config.evm.Flame.chainName).toEqual("Flame (local)"); // should fall back to local config
     });
   });
 });

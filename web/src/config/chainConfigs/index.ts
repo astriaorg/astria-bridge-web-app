@@ -1,71 +1,76 @@
-import { type CosmosChains, type EvmChains, getEnvVariable } from "config";
+import type { CosmosChains, EvmChainInfo, EvmChains } from "config";
 
-import {
-  cosmosChains as dawnCosmosChains,
-  evmChains as dawnEvmChains,
-} from "./ChainConfigsDawn";
-import {
-  cosmosChains as duskCosmosChains,
-  evmChains as duskEvmChains,
-} from "./ChainConfigsDusk";
-import {
-  cosmosChains as localCosmosChains,
-  evmChains as localEvmChains,
-} from "./ChainConfigsLocal";
-import {
-  cosmosChains as mainnetCosmosChains,
-  evmChains as mainnetEvmChains,
-} from "./ChainConfigsMainnet";
+export enum FlameNetwork {
+  LOCAL = "local",
+  DUSK = "dusk",
+  DAWN = "dawn",
+  MAINNET = "mainnet",
+}
 
-// Map of environment labels to their chain configurations
-const ENV_CHAIN_CONFIGS = {
-  local: { evm: localEvmChains, cosmos: localCosmosChains },
-  dusk: { evm: duskEvmChains, cosmos: duskCosmosChains },
-  dawn: { evm: dawnEvmChains, cosmos: dawnCosmosChains },
-  mainnet: { evm: mainnetEvmChains, cosmos: mainnetCosmosChains },
-} as const;
-
-type Environment = keyof typeof ENV_CHAIN_CONFIGS;
-
-type ChainConfigs = {
+export interface ChainConfigs {
   evm: EvmChains;
   cosmos: CosmosChains;
+}
+
+import * as local from "./ChainConfigsLocal";
+import * as dusk from "./ChainConfigsDusk";
+import * as dawn from "./ChainConfigsDawn";
+import * as mainnet from "./ChainConfigsMainnet";
+
+const NETWORK_CONFIGS: Record<FlameNetwork, ChainConfigs> = {
+  [FlameNetwork.LOCAL]: {
+    evm: local.evmChains,
+    cosmos: local.cosmosChains,
+  },
+  [FlameNetwork.DUSK]: {
+    evm: dusk.evmChains,
+    cosmos: dusk.cosmosChains,
+  },
+  [FlameNetwork.DAWN]: {
+    evm: dawn.evmChains,
+    cosmos: dawn.cosmosChains,
+  },
+  [FlameNetwork.MAINNET]: {
+    evm: mainnet.evmChains,
+    cosmos: mainnet.cosmosChains,
+  },
 };
 
 /**
- * Gets the chain configurations for the current environment.
- * If the chain configurations are overridden by environment variables,
- * those will be used instead.
+ * Gets chain configurations for the specified network.
+ * Falls back to local network config if specified network is not found.
  */
-export function getEnvChainConfigs(): ChainConfigs {
-  // get environment-specific configs as base
-  const env = getEnvVariable("REACT_APP_ENV").toLowerCase() as Environment;
-  const baseConfig = ENV_CHAIN_CONFIGS[env] || ENV_CHAIN_CONFIGS.local;
+export function getChainConfigs(network: FlameNetwork): ChainConfigs {
+  return NETWORK_CONFIGS[network] || NETWORK_CONFIGS[FlameNetwork.LOCAL];
+}
 
-  // copy baseConfig to result
-  const result = { ...baseConfig };
+/**
+ * Gets all chain configurations.
+ * This was needed to instantiate the cosmoskit and rainbowkit configs to support s
+ */
+export function getAllChainConfigs(): ChainConfigs {
+  const showLocalNetwork = process.env.REACT_APP_SHOW_LOCAL_NETWORK === "true";
+  return {
+    evm: {
+      ...local.evmChains,
+      ...dusk.evmChains,
+      ...dawn.evmChains,
+      ...mainnet.evmChains,
+    },
+    cosmos: {
+      ...local.cosmosChains,
+      ...dusk.cosmosChains,
+      ...dawn.cosmosChains,
+      ...mainnet.cosmosChains,
+    },
+  };
+}
 
-  // try to get cosmos chains override
-  try {
-    const cosmosChainsOverride = getEnvVariable("REACT_APP_IBC_CHAINS");
-    if (cosmosChainsOverride) {
-      result.cosmos = JSON.parse(cosmosChainsOverride);
-      console.debug("Using IBC chains override from environment");
-    }
-  } catch (e) {
-    console.debug("No valid IBC chains override found, using default");
+export function getEvmChainByChainId(chainId: number): EvmChainInfo {
+  const allChainConfigs = getAllChainConfigs();
+  const found = Object.values(allChainConfigs.evm).find((chainConfig) => chainConfig.chainId === chainId);
+  if (!found) {
+    throw new Error(`Chain with chainId ${chainId} not found`);
   }
-
-  // try to get EVM chains override
-  try {
-    const evmChainsOverride = getEnvVariable("REACT_APP_EVM_CHAINS");
-    if (evmChainsOverride) {
-      result.evm = JSON.parse(evmChainsOverride);
-      console.debug("Using EVM chains override from environment");
-    }
-  } catch (e) {
-    console.debug("No valid EVM chains override found, using default");
-  }
-
-  return result;
+  return found;
 }

@@ -117,7 +117,9 @@ export default function ConnectCosmosWalletButton({
               <button
                 type="button"
                 className="button is-ghost"
-                onClick={() => {console.log("TODO open explorer")}}
+                onClick={() => {
+                  console.log("TODO open explorer");
+                }}
               >
                 <span>
                   <i className="fas fa-up-right-from-square" />

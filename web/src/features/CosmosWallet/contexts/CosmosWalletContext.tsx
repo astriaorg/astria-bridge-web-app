@@ -42,7 +42,7 @@ interface CosmosWalletProviderProps {
 export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   children,
 }) => {
-  const { cosmosChains } = useConfig();
+  const { cosmosChains, selectedFlameNetwork } = useConfig();
 
   const [selectedCosmosChain, setSelectedCosmosChain] =
     useState<CosmosChainInfo | null>(null);
@@ -59,6 +59,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     openView: openCosmosWalletModal,
     getSigningStargateClient: getCosmosSigningClient,
     disconnect,
+    isWalletConnected,
   } = useChain(chainName);
 
   // we are keeping track of the address ourselves so that we can clear it if
@@ -118,6 +119,12 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     );
   }, [cosmosChains]);
 
+  // deselect chain and currency when network is changed
+  useEffect(() => {
+    resetState();
+    // TODO - make wallet switch network?
+  }, [selectedFlameNetwork]);
+
   const selectCosmosChain = useCallback((chain: CosmosChainInfo | null) => {
     setSelectedCosmosChain(chain);
   }, []);
@@ -167,13 +174,17 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
       return;
     }
 
-    // TODO - if already connected, don't open modal?
-    openCosmosWalletModal();
+    // if already connected, don't open modal
+    if (!isWalletConnected) {
+      console.log("opening cosmos wallet modal");
+      openCosmosWalletModal();
+    }
   }, [
     selectCosmosChain,
     selectedCosmosChain,
     cosmosChainsOptions,
     openCosmosWalletModal,
+    isWalletConnected,
   ]);
 
   const disconnectCosmosWallet = useCallback(() => {

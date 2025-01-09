@@ -50,7 +50,7 @@ interface EvmWalletProviderProps {
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
-  const { evmChains } = useAppConfig();
+  const { evmChains, selectedFlameNetwork, selectFlameNetwork } = useAppConfig();
 
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
@@ -86,11 +86,18 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     null,
   );
 
+  // set the address when the address, chain, or currency changes
   useEffect(() => {
     if (selectedEvmChain && selectedEvmCurrency && userAccount?.address) {
       setEvmAccountAddress(userAccount.address);
     }
   }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
+
+  console.log("evm wallet context user account", userAccount?.chainId);
+  useEffect(() => {
+    // TODO - detect when user changes networks from wallet and update selected network
+    selectFlameNetwork
+  }, [userAccount.chainId]);
 
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
@@ -178,6 +185,12 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       }),
     );
   }, [evmChains]);
+
+  // deselect chain and currency when network is changed
+  useEffect(() => {
+    resetState();
+    // TODO - make wallet switch network? e.g. the balance from
+  }, [selectedFlameNetwork]);
 
   const selectedEvmChainOption = useMemo(() => {
     if (!selectedEvmChain) {

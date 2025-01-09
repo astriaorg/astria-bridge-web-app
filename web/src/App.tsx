@@ -13,7 +13,7 @@ import {
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainInfosToCosmosKitChains,
   evmChainsToRainbowKitChains,
-  useConfig,
+  getAllChainConfigs,
 } from "config";
 import { CosmosWalletProvider } from "features/CosmosWallet";
 import { EvmWalletProvider } from "features/EvmWallet";
@@ -35,7 +35,12 @@ const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";
  * Sets up the RainbowKitProvider and QueryClientProvider for tanstack/react-query.
  */
 export default function App(): React.ReactElement {
-  const { evmChains, cosmosChains } = useConfig();
+  // NOTE - needed to get all chain configs for all networks so that
+  //   we can switch between all the different networks
+  // FIXME - why didn't components reload correctly when i was using useConfig()?
+  //  the evmChains and cosmosChains should have updated when the network changed and
+  //  then triggered this component to rerender
+  const { evm: evmChains, cosmos: cosmosChains } = getAllChainConfigs();
 
   // wagmi and rainbowkit config, for evm chains
   const rainbowKitConfig = getDefaultConfig({
