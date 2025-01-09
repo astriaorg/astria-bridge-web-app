@@ -1,52 +1,111 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAccount, useBalance, useConfig } from "wagmi";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { formatUnits } from "viem";
+import { useAccount, useBalance, useConfig, useDisconnect } from "wagmi";
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
   type EvmChainInfo,
-  type EvmChains,
   type EvmCurrency,
   evmCurrencyBelongsToChain,
+  useConfig as useAppConfig,
 } from "config";
+import { useBalancePolling } from "features/GetBalancePolling";
 
 import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
-} from "features/EthWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
-import { formatBalance } from "features/EthWallet/utils/utils";
-import { useBalancePolling } from "features/GetBalancePolling";
-import { formatUnits } from "viem";
+} from "../services/AstriaWithdrawerService/AstriaWithdrawerService.ts";
+import { formatBalance } from "../utils/utils.ts";
 
-export function useEvmChainSelection(evmChains: EvmChains) {
+interface EvmWalletContextProps {
+  connectEvmWallet: () => void;
+  defaultEvmCurrencyOption: DropdownOption<EvmCurrency> | undefined;
+  disconnectEvmWallet: () => void;
+  evmAccountAddress: string | null;
+  evmChainsOptions: DropdownOption<EvmChainInfo>[];
+  evmCurrencyOptions: DropdownOption<EvmCurrency>[];
+  evmNativeTokenBalance: string | null;
+  isLoadingEvmNativeTokenBalance: boolean;
+  isLoadingSelectedEvmCurrencyBalance: boolean;
+  resetState: () => void;
+  selectedEvmChain: EvmChainInfo | null;
+  selectedEvmChainNativeToken: EvmCurrency | undefined;
+  selectedEvmChainOption: DropdownOption<EvmChainInfo> | null;
+  selectedEvmCurrency: EvmCurrency | null;
+  selectedEvmCurrencyBalance: string | null;
+  selectEvmChain: (chain: EvmChainInfo | null) => void;
+  selectEvmCurrency: (currency: EvmCurrency) => void;
+  withdrawFeeDisplay: string;
+}
+
+export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
+  {} as EvmWalletContextProps,
+);
+
+interface EvmWalletProviderProps {
+  children: React.ReactNode;
+}
+
+export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
+  children,
+}) => {
+  const { evmChains, selectedFlameNetwork, selectFlameNetwork } = useAppConfig();
+
   const { openConnectModal } = useConnectModal();
+  const { disconnect } = useDisconnect();
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
 
-  const nativeTokenBalance = useBalance({
+  const {
+    status: nativeBalanceStatus,
+    data: nativeBalance,
+    isLoading: isLoadingEvmNativeTokenBalance,
+  } = useBalance({
     address: userAccount.address,
   });
+
+  // FIXME - this could show a balance for a chain that is not the "selected" chain,
+  //  e.g. when a user refreshes the page and the selected chain is not set. tho i guess
+  //  when a user selects a chain the balance will be updated, maybe not an issue actually?
+  //  it's not an issue right now because there is only flame atm, but this will be an issue
+  //  for CosmosWalletContext since there are multiple chains.
+  const evmNativeTokenBalance = useMemo(() => {
+    if (nativeBalanceStatus !== "success") {
+      return null;
+    }
+    return `${nativeBalance.formatted} ${nativeBalance.symbol}`;
+  }, [nativeBalance, nativeBalanceStatus]);
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
   );
   const [selectedEvmCurrency, setSelectedEvmCurrency] =
     useState<EvmCurrency | null>(null);
-  // track address in hook state. this supports ux where we can clear the address
   const [evmAccountAddress, setEvmAccountAddress] = useState<string | null>(
     null,
   );
+
+  // set the address when the address, chain, or currency changes
   useEffect(() => {
     if (selectedEvmChain && selectedEvmCurrency && userAccount?.address) {
       setEvmAccountAddress(userAccount.address);
     }
   }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
+
+  console.log("evm wallet context user account", userAccount?.chainId);
+  useEffect(() => {
+    // TODO - detect when user changes networks from wallet and update selected network
+    selectFlameNetwork
+  }, [userAccount.chainId]);
+
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
     setEvmAccountAddress(null);
   }, []);
 
+  // polling get balance
   const getBalanceCallback = useCallback(async () => {
     if (
       !wagmiConfig ||
@@ -59,6 +118,8 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     if (!evmCurrencyBelongsToChain(selectedEvmCurrency, selectedEvmChain)) {
       return null;
     }
+
+    // for ERC20 tokens, call the contract
     if (selectedEvmCurrency.erc20ContractAddress) {
       const withdrawerSvc = createWithdrawerService(
         wagmiConfig,
@@ -76,30 +137,28 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       return `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
     }
 
-    return `${nativeTokenBalance?.data?.formatted} ${selectedEvmCurrency.coinDenom}`;
+    return `${nativeBalance?.formatted} ${selectedEvmCurrency.coinDenom}`;
   }, [
     wagmiConfig,
-    nativeTokenBalance?.data?.formatted,
+    nativeBalance?.formatted,
     selectedEvmChain,
     selectedEvmCurrency,
     evmAccountAddress,
   ]);
-
   const pollingConfig = useMemo(
     () => ({
-      enabled: Boolean(
-        selectedEvmChain && selectedEvmCurrency && evmAccountAddress,
-      ),
+      enabled: !!selectedEvmChain && !!selectedEvmCurrency,
       intervalMS: 10_000,
       onError: (error: Error) => {
-        console.error("Failed to get balance from EVM wallet", error);
+        console.error("Failed to get balance:", error);
       },
     }),
-    [selectedEvmChain, selectedEvmCurrency, evmAccountAddress],
+    [selectedEvmChain, selectedEvmCurrency],
   );
-
-  const { balance: evmBalance, isLoading: isLoadingEvmBalance } =
-    useBalancePolling(getBalanceCallback, pollingConfig);
+  const {
+    balance: selectedEvmCurrencyBalance,
+    isLoading: isLoadingSelectedEvmCurrencyBalance,
+  } = useBalancePolling(getBalanceCallback, pollingConfig);
 
   const selectedEvmChainNativeToken = useMemo(() => {
     return selectedEvmChain?.currencies[0];
@@ -126,6 +185,12 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       }),
     );
   }, [evmChains]);
+
+  // deselect chain and currency when network is changed
+  useEffect(() => {
+    resetState();
+    // TODO - make wallet switch network? e.g. the balance from
+  }, [selectedFlameNetwork]);
 
   const selectedEvmChainOption = useMemo(() => {
     if (!selectedEvmChain) {
@@ -170,14 +235,11 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     setSelectedEvmCurrency(currency);
   }, []);
 
-  // opens RainbowKit modal for user to connect their EVM wallet
-  const connectEVMWallet = useCallback(() => {
+  const connectEvmWallet = useCallback(() => {
+    // if no chain is set, set the first one and return
+    // FIXME - the caller has to to re-trigger the connect function
+    //  by watching the selectedEvmChain value. this is a foot gun for sure.
     if (!selectedEvmChain) {
-      // FIXME - the fact this function needs to be called again after setting an evm chain
-      //  in the parent component is implicit and should be somehow made explicit. this is
-      //  hard to debug, especially since the parent uses `useEffect` to call this function.
-      // select default chain if none selected, then return.
-      // useEffect in parent component handles recalling this function.
       setSelectedEvmChain(evmChainsOptions[0]?.value);
       return;
     }
@@ -187,25 +249,35 @@ export function useEvmChainSelection(evmChains: EvmChains) {
     }
   }, [selectedEvmChain, openConnectModal, evmChainsOptions]);
 
-  return {
+  const disconnectEvmWallet = useCallback(() => {
+    disconnect();
+    resetState();
+  }, [disconnect, resetState]);
+
+  const value = {
+    connectEvmWallet,
+    defaultEvmCurrencyOption,
+    disconnectEvmWallet,
+    evmAccountAddress,
     evmChainsOptions,
     evmCurrencyOptions,
-
-    selectEvmChain,
-    selectEvmCurrency,
-
+    evmNativeTokenBalance,
+    isLoadingEvmNativeTokenBalance,
+    isLoadingSelectedEvmCurrencyBalance,
+    resetState,
     selectedEvmChain,
     selectedEvmChainNativeToken,
-    withdrawFeeDisplay,
-    selectedEvmCurrency,
-    defaultEvmCurrencyOption,
     selectedEvmChainOption,
-
-    evmAccountAddress,
-    evmBalance,
-    isLoadingEvmBalance,
-
-    connectEVMWallet,
-    resetState,
+    selectedEvmCurrency,
+    selectedEvmCurrencyBalance,
+    selectEvmChain,
+    selectEvmCurrency,
+    withdrawFeeDisplay,
   };
-}
+
+  return (
+    <EvmWalletContext.Provider value={value}>
+      {children}
+    </EvmWalletContext.Provider>
+  );
+};

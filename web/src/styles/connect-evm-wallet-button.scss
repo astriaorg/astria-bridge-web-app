@@ -1,0 +1,128 @@
+@import 'astria-colors';
+
+// FIXME - don't really have a pattern for custom component-specific styles yet.
+//   all component styling so far has been done in files that override or customize
+//   bulma styles.
+//   - should this go in a file closer to the component?
+//     - now styles are in multiple places though
+
+.connect-wallet-button-container .button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .connect-wallet-button-inner {
+    display: flex;
+  }
+}
+
+.connect-wallet-dropdown {
+  position: static;
+  display: inline-block;
+  overflow: visible;
+
+  .dropdown-card {
+    position: fixed;
+    right: 0;
+    margin-top: 0.5rem;
+    z-index: 50;
+    padding: 1rem;
+    margin-right: 1.5rem;
+    background: radial-gradient(144.23% 141.13% at 50.15% 0%, #221F1F 0%, #050A0D 100%);
+
+    // Top row styling
+    .dropdown-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+
+      .address-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .avatar {
+          display: flex;
+          align-items: center;
+        }
+
+        .address {
+          margin-right: 1rem;
+          color: $astria-white;
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        align-items: center;
+        button {
+          margin: 0 0.5rem;
+          padding: 0;
+          span {
+            border-radius: 24px;
+            background: $astria-grey-dark;
+            i {
+              color: $astria-white;
+              transition: color 0.2s ease;
+
+              &:hover {
+                color: $astria-white;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Balance section
+    .balance-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid $astria-grey-dark;
+
+      .balance-amount {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: $astria-white;
+        margin-bottom: 0.25rem;
+      }
+
+      .balance-usd {
+        font-size: 0.875rem;
+        color: $astria-grey-light;
+      }
+    }
+
+    // Transactions section
+    .transactions-container {
+      .transactions-header {
+        width: 100%;
+        text-align: left;
+        padding: 0.5rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: $astria-grey-light;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: $astria-white;
+        }
+      }
+
+      .transactions-list {
+        margin-top: 0.5rem;
+
+        .no-transactions {
+          font-size: 0.875rem;
+          color: $astria-grey-light;
+          padding: 0.5rem 0;
+        }
+      }
+    }
+  }
+}

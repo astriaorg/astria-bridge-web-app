@@ -1,5 +1,6 @@
 import type { Config } from "@wagmi/core";
 import { type Abi, type Address, parseUnits } from "viem";
+
 import { GenericContractService } from "../GenericContractService.ts";
 
 // AstriaWithdrawerService.ts
