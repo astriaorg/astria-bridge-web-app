@@ -3,13 +3,55 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Base Colors */
+    --color-white: 0 0% 96%;
+    --color-whitest: 0 0% 100%;
+    --color-black: 203 45% 4%;
+    --color-grey-dark: 0 0% 20%;
+    --color-grey-light: 0 0% 60%;
+    --color-grey-lighter: 0 0% 80%;
+    --color-red: 2 58% 46%;
+    --color-orange: 17 73% 50%;
+    --color-orange-soft: 35 87% 54%;
+    --color-green: 140 35% 36%;
+    --color-blue-light: 203 35% 60%;
+    --color-yellow: 43 71% 58%;
+
+    /* Semantic Colors */
+    --background: var(--color-black);
+    --foreground: var(--color-black);
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+    --accent: var(--color-orange);
+    --accent-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+    --border: 0, 0%, 20%;
+    --input: 216 34% 17%;
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 216 34% 17%;
+
+    --radius: 16px;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
   html, body {
     @apply h-screen;
   }
-  
   body {
-    @apply m-0 p-0 bg-body;
-    @apply text-white;
+    @apply m-0 p-0 bg-body font-sans antialiased text-foreground text-white;
   }
 }
 
@@ -22,6 +64,7 @@
     @apply flex items-center px-3 py-2 text-white transition-colors duration-200 hover:bg-black/10;
   }
 }
+
 
 @layer utilities {
   .fade-out {

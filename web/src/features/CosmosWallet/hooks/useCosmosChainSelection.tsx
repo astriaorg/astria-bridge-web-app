@@ -80,8 +80,6 @@ export function useCosmosChainSelection(cosmosChains: CosmosChains) {
   const { balance: cosmosBalance, isLoading: isLoadingCosmosBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);
 
-  console.log(cosmosChains);
-
   const cosmosChainsOptions = useMemo(() => {
     return Object.entries(cosmosChains).map(
       ([chainLabel, chain]): DropdownOption<CosmosChainInfo> => ({

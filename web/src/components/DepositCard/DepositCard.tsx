@@ -27,8 +27,6 @@ export default function DepositCard(): React.ReactElement {
 	const { evmChains, cosmosChains } = useConfig();
 	const { addNotification } = useNotifications();
 
-	console.log({ cosmosChains });
-
 	const {
 		evmAccountAddress,
 		selectEvmChain,
@@ -307,8 +305,6 @@ export default function DepositCard(): React.ReactElement {
 			},
 		];
 	}, [handleConnectEVMWallet, handleEditRecipientClick]);
-
-	console.log({ evmChainsOptions });
 
 	return (
 		<div>

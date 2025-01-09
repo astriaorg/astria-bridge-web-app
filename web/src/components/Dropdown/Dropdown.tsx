@@ -114,7 +114,7 @@ export default function Dropdown<T>({
       <div className="w-full">
         <button
           type="button"
-          className="w-full flex items-center justify-between bg-transparent text-grey-light hover:bg-opacity-5 hover:bg-white px-4 py-2 disabled:opacity-50 border border-dark rounded-xl h-14"
+          className="w-full flex items-center justify-between bg-transparent text-grey-light px-4 py-2 disabled:opacity-50 border border-dark rounded-xl h-14"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
           onClick={toggleDropdown}
@@ -133,7 +133,7 @@ export default function Dropdown<T>({
           <span className="truncate">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span className="ml-auto text-grey-light">
+          <span className="ml-auto text-white">
             <i className={`fas fa-angle-${isActive ? 'up' : 'down'}`} />
           </span>
         </button>
