@@ -1,6 +1,6 @@
 import { GearIcon, DownArrowIcon } from "icons";
 import type React from "react";
-import { ActionButton, TokenSelector } from "components";
+import { ActionButton, TokenSelector, SwapSettings } from "components";
 import type { TokenItem } from "./use-token-modal";
 import { useTokenModal } from "./use-token-modal";
 import { useState } from "react";
@@ -12,6 +12,7 @@ enum TOKEN_INPUTS {
 
 export function SwapPage(): React.ReactElement {
 	const { tokens } = useTokenModal();
+	const [openSettings, setOpenSettings] = useState(false);
 	const [inputSelected, setInputSelected] = useState(TOKEN_INPUTS.TOKEN_ONE);
 	const [tokenInputOne, setTokenInputOne] = useState<TokenItem | null>(tokens[0]);
 	const [tokenInputTwo, setTokenInputTwo] = useState<TokenItem | null>(null);
@@ -28,13 +29,7 @@ export function SwapPage(): React.ReactElement {
 			<div className="max-w-[480px] mx-auto rounded-2xl p-6 border border-solid border-transparent bg-radial-dark shadow-[inset_1px_1px_1px_-1px_hsla(0,0%,100%,0.5)]">
 				<div className="flex items-center justify-between mb-4">
 					<h2 className="text-lg font-semibold">Swap</h2>
-					<button
-						type="button"
-						className="text-grey-light hover:text-white"
-						aria-label="Settings"
-					>
-						<GearIcon className="transition duration-300" />
-					</button>
+					<SwapSettings />
 				</div>
 				<div onKeyDown={() => null} onClick={() => setInputSelected(TOKEN_INPUTS.TOKEN_ONE)} className={`flex flex-col rounded-md p-3 transition duration-300 border border-solid border-border hover:border-grey-light ${
 					inputSelected === TOKEN_INPUTS.TOKEN_ONE
@@ -85,7 +80,6 @@ export function SwapPage(): React.ReactElement {
 				<ActionButton
 					buttonText="Connect Wallet"
 					className="w-full"
-					disabled={true}
 				/>
 			</div>
 		</section>

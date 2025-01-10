@@ -1,9 +1,6 @@
-interface GearIconProps {
-  className?: string;
-  size?: number;
-}
+import { IconProps } from "types";
 
-export const GearIcon: React.FC<GearIconProps> = ({ className = '', size = 24 }) => {
+export const GearIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => {
   return (
     <svg
       width={size}

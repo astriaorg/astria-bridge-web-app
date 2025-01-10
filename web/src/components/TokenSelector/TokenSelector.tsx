@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogPortal, DialogTitle, DialogTrigger } from "../Dialog/Dialog";
+import { Dialog, DialogContent, DialogPortal, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import type { TokenItem } from "../../pages/SwapPage/use-token-modal";
 import { useState } from "react";
 import { ChevronDownIcon } from "icons";

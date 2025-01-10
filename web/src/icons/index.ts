@@ -18,3 +18,5 @@ export * from "./EditIcon";
 export * from "./WrappedTiaIcon";
 export * from "./ChevronDownIcon";
 export * from "./DownArrowIcon";
+export * from "./CloseIcon";
+export * from "./InfoIcon";
