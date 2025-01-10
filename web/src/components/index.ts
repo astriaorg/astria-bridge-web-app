@@ -8,3 +8,4 @@ export * from './Navbar/Navbar';
 export * from './SideTag/SideTag';
 export * from './WithdrawCard/WithdrawCard';
 export * from './Dialog/Dialog';
+export * from './TokenSelector/TokenSelector';

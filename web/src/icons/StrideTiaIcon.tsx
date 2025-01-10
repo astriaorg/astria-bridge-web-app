@@ -1,7 +1,4 @@
-interface IconProps {
-  className?: string;
-  size?: number;
-}
+import type { IconProps } from "../types";
 
 export const StrideTiaIcon: React.FC<IconProps> = ({ className = "", size = 24 }) => {
   return (

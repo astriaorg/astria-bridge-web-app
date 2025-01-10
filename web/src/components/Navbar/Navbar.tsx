@@ -31,7 +31,7 @@ function Navbar() {
   
   return (
     <nav
-      className="flex border-b border-[#2A2A2A] px-8 py-4"
+      className="flex border-b border-[#2A2A2A] px-8 py-4 w-full"
       aria-label="main navigation"
     >
       <div className="flex items-center">

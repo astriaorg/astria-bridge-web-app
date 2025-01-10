@@ -9,6 +9,7 @@
     --color-whitest: 0 0% 100%;
     --color-black: 203 45% 4%;
     --color-grey-dark: 0 0% 20%;
+    --color-grey-medium: 0 0% 40%;
     --color-grey-light: 0 0% 60%;
     --color-grey-lighter: 0 0% 80%;
     --color-red: 2 58% 46%;
@@ -51,7 +52,7 @@
     @apply h-screen;
   }
   body {
-    @apply m-0 p-0 bg-body font-sans antialiased text-foreground text-white;
+    @apply m-0 p-0 bg-body font-sans antialiased text-white;
   }
 }
 
