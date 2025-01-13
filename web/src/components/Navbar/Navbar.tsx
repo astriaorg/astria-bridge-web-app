@@ -16,10 +16,10 @@ function Navbar() {
   const { brandURL } = useConfig();
   
   const navLinkClasses = (path: string) => `
-    relative px-4 py-2 text-[#9CA3AF] hover:text-white
+    relative px-4 py-2 text-grey-light hover:text-white
     hover:after:content-[''] hover:after:absolute hover:after:bottom-[-22px]
     hover:after:left-1/2 hover:after:transform hover:after:-translate-x-1/2
-    hover:after:w-[85%] hover:after:h-1 hover:after:bg-[#9CA3AF]
+    hover:after:w-[85%] hover:after:h-1 hover:after:bg-grey-light
     ${pathname === path ? `
       text-white
       after:content-[''] after:absolute after:bottom-[-22px]
@@ -59,7 +59,7 @@ function Navbar() {
 
       <div
         id="topNavbar"
-        className={`flex-1 ${
+        className={`flex-1 mr-[185px] ${
           isMobileMenuActive ? 'block' : 'hidden md:block'
         }`}
       >
@@ -84,8 +84,6 @@ function Navbar() {
           </Link>
         </div>
       </div>
-
-      <div className="w-[185px]" /> {/* navbar-placeholder-end */}
     </nav>
   );
 }

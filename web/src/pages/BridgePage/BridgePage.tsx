@@ -53,7 +53,7 @@ export function BridgePage(): React.ReactElement {
   const tabs: TabType[] = ["DEPOSIT", "WITHDRAW"];
 
   return (
-    <section className="min-h-[calc(100vh-85px-96px)] flex flex-col items-center justify-center">
+    <section className="min-h-[calc(100vh-85px-96px)] flex flex-col items-center mt-[100px]">
           <div className="w-full md:w-2/3 lg:w-2/3 xl:w-1/2 max-w-[676px]">
             <div className="p-12 md:p-[48px] bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
               <div className="flex items-center justify-center p-1 w-full bg-white/[0.04] border-[1px] border-white/20 rounded-xl border-b-0 border-r-0 mb-5">

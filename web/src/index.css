@@ -8,9 +8,9 @@
     --color-white: 0 0% 96%;
     --color-whitest: 0 0% 100%;
     --color-black: 203 45% 4%;
-    --color-grey-dark: 0 0% 20%;
-    --color-grey-medium: 0 0% 40%;
-    --color-grey-light: 0 0% 60%;
+    --color-grey-medium: 0 0% 20%;
+    --color-grey-dark: 0 0% 100% / 0.05;
+    --color-grey-light: 220 9% 65%;
     --color-grey-lighter: 0 0% 80%;
     --color-red: 2 58% 46%;
     --color-orange: 17 73% 50%;

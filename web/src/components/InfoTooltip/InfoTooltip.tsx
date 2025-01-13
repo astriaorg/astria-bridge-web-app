@@ -8,9 +8,10 @@ import { InfoIcon } from "icons"
 
 interface InfoTooltipProps {
     content: string;
+    side?: "left" | "right" | "top" | "bottom" | undefined
 }
 
-export const InfoTooltip: React.FC<InfoTooltipProps> = ({ content }) => {
+export const InfoTooltip: React.FC<InfoTooltipProps> = ({ content, side = "left" }) => {
     return (
         <TooltipProvider>
             <Tooltip defaultOpen={false}>
@@ -20,9 +21,9 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({ content }) => {
                     </span>
                 </TooltipTrigger>
                 <TooltipContent
-                    className="bg-grey-dark text-white border border-border rounded-md px-3 py-2 w-[200px]"
+                    className="bg-black text-white border border-border rounded-md px-3 py-2 max-w-[200px] text-[14px]"
                     sideOffset={5}
-                    side="left"
+                    side={side}
                 >
                     <div>{content}</div>
                 </TooltipContent>

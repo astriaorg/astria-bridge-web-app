@@ -8,5 +8,6 @@ export * from './Navbar/Navbar';
 export * from './SideTag/SideTag';
 export * from './WithdrawCard/WithdrawCard';
 export * from './TokenSelector/TokenSelector';
-export * from './SwapSettings/SwapSettings';
+export * from './SettingsPopover/SettingsPopover';
 export * from './InfoTooltip/InfoTooltip';
+export * from './SwapTxnInfo/SwapTxnInfo';

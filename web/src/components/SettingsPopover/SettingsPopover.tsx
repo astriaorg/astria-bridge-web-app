@@ -3,17 +3,23 @@ import { Switch } from "@/components/ui/switch";
 import { GearIcon } from "icons";
 import { InfoTooltip } from "../InfoTooltip/InfoTooltip";
 import { useState } from "react"
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
-interface SwapSettingsProps {
-    slippage?: number;
-    setSlippage?: (value: number) => void;
-}
+interface SettingsPopoverProps {}
 
-export const SwapSettings: React.FC<SwapSettingsProps> = ({
-    slippage,
-}) => {
+export const SettingsPopover: React.FC<SettingsPopoverProps> = () => {
     const [customSlippage, setCustomSlippage] = useState<string>("");
-
+    const [expertMode, setExpertMode] = useState(false);
+    const [showExpertModeDialog, setShowExpertModeDialog] = useState(false);
 
     const handleCustomSlippageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -21,6 +27,14 @@ export const SwapSettings: React.FC<SwapSettingsProps> = ({
         const numValue = parseFloat(value);
         if (!isNaN(numValue) && numValue > 0) {
             // TODO: SET SLIPPAGE
+        }
+    };
+
+    const handleExpertModeChange = () => {
+        if (!expertMode) {
+            setShowExpertModeDialog(true);
+        } else {
+            setExpertMode(false);
         }
     };
 
@@ -65,12 +79,38 @@ export const SwapSettings: React.FC<SwapSettingsProps> = ({
                                 <InfoTooltip content="Allow high price impact trades and skip the confirm screen. Use at your own risk." />
                             </div>
                             <Switch
+                                checked={expertMode}
+                                onCheckedChange={handleExpertModeChange}
                                 className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-accent [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
                             />
                         </div>
                     </div>
                 </div>
             </PopoverContent>
+            
+            <AlertDialog open={showExpertModeDialog} onOpenChange={setShowExpertModeDialog}>
+                <AlertDialogContent className="bg-radial-dark border-border">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-white">Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-grey-light">
+                            Expert mode turns off the confirm transaction prompt and allows high slippage trades that often result in bad rates and lost funds.
+                        </AlertDialogDescription>
+                        <AlertDialogTitle className="text-white">ONLY USE THIS MODE IF YOU KNOW WHAT YOU ARE DOING.</AlertDialogTitle>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="bg-grey-dark text-white hover:bg-grey-light">Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                            className="bg-accent text-white hover:bg-accent/90"
+                            onClick={() => {
+                                setExpertMode(true);
+                                setShowExpertModeDialog(false);
+                            }}
+                        >
+                            Turn On Expert Mode
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Popover>
     );
 };
