@@ -84,7 +84,7 @@ export default function ConnectCosmosWalletButton({
   return (
     <div
       ref={dropdownRef}
-      className={`connect-wallet-dropdown ${isDropdownActive ? "is-active" : ""}`}
+      className={`connect-wallet ${isDropdownActive ? "is-active" : ""}`}
     >
       <div className="connect-wallet-button-container">
         <button

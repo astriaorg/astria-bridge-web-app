@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FlameNetwork } from "../../chainConfigs";
 import { useConfig } from "../../hooks/useConfig.ts";
 
+import "./network-selector.scss";
+
 export default function NetworkSelector(): React.ReactElement {
   const { selectedFlameNetwork, selectFlameNetwork, showLocalNetwork } =
     useConfig();
@@ -57,9 +59,9 @@ export default function NetworkSelector(): React.ReactElement {
   return (
     <div
       ref={dropdownRef}
-      className={`connect-wallet-dropdown mr-4 ${isDropdownActive ? "is-active" : ""}`}
+      className={`network-selector ${isDropdownActive ? "is-active" : ""}`}
     >
-      <div className="connect-wallet-button-container">
+      <div className="network-selector-button-container">
         <button
           type="button"
           onClick={toggleDropdown}
@@ -68,7 +70,7 @@ export default function NetworkSelector(): React.ReactElement {
           <span className="icon icon-left is-small">
             <i className="i-flame" />
           </span>
-          <span className="connect-wallet-button-label">
+          <span className="network-selector-button-label is-hidden-touch">
             {getNetworkDisplayName(selectedFlameNetwork)}
           </span>
           <span className="icon icon-right is-small">
@@ -98,6 +100,11 @@ export default function NetworkSelector(): React.ReactElement {
                     <i className="i-flame" />
                   </span>
                   {getNetworkDisplayName(network)}
+                  <span className="icon icon-right">
+                    {network === selectedFlameNetwork && (
+                      <i className="fas fa-check" />
+                    )}
+                  </span>
                 </span>
               </button>
             ))}
