@@ -1,11 +1,13 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { FlameNetwork } from "../../chainConfigs";
 import { useConfig } from "../../hooks/useConfig.ts";
 
 export default function NetworkSelector(): React.ReactElement {
-  const { selectedFlameNetwork, selectFlameNetwork, showLocalNetwork } = useConfig();
+  const { selectedFlameNetwork, selectFlameNetwork, showLocalNetwork } =
+    useConfig();
   const [isDropdownActive, setIsDropdownActive] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +38,7 @@ export default function NetworkSelector(): React.ReactElement {
       selectFlameNetwork(network);
       setIsDropdownActive(false);
     },
-    [selectFlameNetwork]
+    [selectFlameNetwork],
   );
 
   const getNetworkDisplayName = (network: FlameNetwork): string => {

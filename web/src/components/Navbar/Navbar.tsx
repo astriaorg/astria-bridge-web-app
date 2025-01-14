@@ -2,8 +2,8 @@ import type React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { NetworkSelector, useConfig } from "config";
 import ConnectWalletsButton from "components/ConnectWalletsButton/ConnectWalletsButton";
+import { NetworkSelector, useConfig } from "config";
 import logo from "logo-flame-w-text.svg";
 
 function Navbar() {
@@ -27,7 +27,7 @@ function Navbar() {
           className="navbar-item"
           rel="noreferrer"
         >
-          <img src={logo} width="161" height="32" alt="logo"/>
+          <img src={logo} width="161" height="32" alt="logo" />
         </a>
         <button
           type="button"
@@ -37,9 +37,9 @@ function Navbar() {
           data-target="topNavbar"
           onClick={onHamburgerClick}
         >
-          <span aria-hidden="true"/>
-          <span aria-hidden="true"/>
-          <span aria-hidden="true"/>
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
         </button>
       </div>
 
@@ -62,8 +62,8 @@ function Navbar() {
           </a>
         </div>
         <div className="navbar-end">
-          <NetworkSelector/>
-          <ConnectWalletsButton/>
+          <NetworkSelector />
+          <ConnectWalletsButton />
         </div>
       </div>
     </nav>

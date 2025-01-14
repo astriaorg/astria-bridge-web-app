@@ -40,7 +40,7 @@ export default function App(): React.ReactElement {
   // FIXME - why didn't components reload correctly when i was using useConfig()?
   //  the evmChains and cosmosChains should have updated when the network changed and
   //  then triggered this component to rerender
-  const { evm: evmChains, cosmos: cosmosChains } = getAllChainConfigs();
+  const { evmChains, cosmosChains } = getAllChainConfigs();
 
   // wagmi and rainbowkit config, for evm chains
   const rainbowKitConfig = getDefaultConfig({

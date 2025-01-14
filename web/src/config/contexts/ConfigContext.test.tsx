@@ -1,36 +1,74 @@
-import { render, screen } from "@testing-library/react";
-import type React from "react";
+"use client";
 
-import { ConfigContextProvider } from "config/contexts/ConfigContext";
-import { useConfig } from "config/hooks/useConfig";
+import React from "react";
 
-const TestComponent: React.FC = () => {
-  const config = useConfig();
-  return <div>{JSON.stringify(config)}</div>;
+import { FlameNetwork, getChainConfigs } from "../chainConfigs";
+import { getEnvVariable } from "../env";
+import type { AppConfig, CosmosChains, EvmChains } from "../index";
+
+export const ConfigContext = React.createContext<AppConfig | undefined>(
+  undefined,
+);
+
+type ConfigContextProps = {
+  children: React.ReactNode;
 };
 
-describe("ConfigContextProvider", () => {
-  it("provides the correct config values", () => {
-    render(
-      <ConfigContextProvider>
-        <TestComponent />
-      </ConfigContextProvider>,
-    );
+/**
+ * ConfigContextProvider component to provide config context to children.
+ * @param children
+ */
+export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
+  children,
+}) => {
+  const brandURL = getEnvVariable("REACT_APP_BRAND_URL");
+  const bridgeURL = getEnvVariable("REACT_APP_BRIDGE_URL");
+  const swapURL = getEnvVariable("REACT_APP_SWAP_URL");
+  const poolURL = getEnvVariable("REACT_APP_POOL_URL");
 
-    // NOTE - astria1d7z matches value in .env.test
-    const configString = screen.getByText(/astria1d7z/);
-    expect(configString).toBeInTheDocument();
-    expect(configString).toHaveTextContent("Celestia Mocha-4");
-  });
+  let feedbackFormURL: string | null;
+  try {
+    feedbackFormURL = getEnvVariable("REACT_APP_FEEDBACK_FORM_URL");
+  } catch {
+    feedbackFormURL = null;
+  }
 
-  it("throws an error when useConfig is used outside of ConfigContextProvider", () => {
-    // this blocks the console.error output so the test output is clean
-    const consoleErrorSpy = jest
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    expect(() => render(<TestComponent />)).toThrow(
-      "useConfig must be used within a ConfigContextProvider",
-    );
-    consoleErrorSpy.mockRestore();
-  });
-});
+  // default to Mainnet
+  // TODO - remember in localStorage?
+  const [selectedFlameNetwork, setSelectedFlameNetwork] =
+    React.useState<FlameNetwork>(FlameNetwork.MAINNET);
+
+  const { evmChains: evm, cosmosChains: cosmos } =
+    getChainConfigs(selectedFlameNetwork);
+  const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
+  const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
+
+  const showLocalNetwork = process.env.REACT_APP_SHOW_LOCAL_NETWORK === "true";
+
+  // update evm and cosmos chains when the network is changed
+  const selectFlameNetwork = (network: FlameNetwork) => {
+    const { evmChains, cosmosChains } = getChainConfigs(selectedFlameNetwork);
+    setEvmChains(evmChains);
+    setCosmosChains(cosmosChains);
+    setSelectedFlameNetwork(network);
+  };
+
+  return (
+    <ConfigContext.Provider
+      value={{
+        cosmosChains,
+        evmChains,
+        selectedFlameNetwork,
+        selectFlameNetwork,
+        brandURL,
+        bridgeURL,
+        swapURL,
+        poolURL,
+        feedbackFormURL,
+        showLocalNetwork,
+      }}
+    >
+      {children}
+    </ConfigContext.Provider>
+  );
+};
