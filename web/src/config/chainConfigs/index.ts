@@ -99,7 +99,7 @@ export function getAllChainConfigs(): ChainConfigsObject {
 
   return {
     evmChains,
-    cosmosChains
+    cosmosChains,
   };
 }
 
