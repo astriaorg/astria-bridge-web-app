@@ -1,4 +1,9 @@
-import { type FlameNetwork, getAllChainConfigs } from "./chainConfigs";
+import {
+  type FlameNetwork,
+  getAllChainConfigs,
+  getFlameChainId,
+  getFlameNetworkByChainId,
+} from "./chainConfigs";
 import {
   type CosmosChainInfo,
   type CosmosChains,
@@ -40,8 +45,8 @@ export interface AppConfig {
   poolURL: string;
   // The URL for the feedback form side tag. Hides side tag when null.
   feedbackFormURL: string | null;
-  // Show local networks when developing.
-  showLocalNetwork: boolean;
+  // List of networks to display in the network selector.
+  networksList: FlameNetwork[];
 }
 
 export {
@@ -61,5 +66,7 @@ export {
   cosmosChainNameFromId,
   evmChainsToRainbowKitChains,
   getAllChainConfigs,
+  getFlameChainId,
+  getFlameNetworkByChainId,
   useConfig,
 };

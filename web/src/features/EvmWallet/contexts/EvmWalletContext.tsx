@@ -1,13 +1,21 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
-import { useAccount, useBalance, useConfig, useDisconnect } from "wagmi";
+import {
+  useAccount,
+  useBalance,
+  useConfig,
+  useDisconnect,
+  useSwitchChain,
+} from "wagmi";
 
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
   type EvmChainInfo,
   type EvmCurrency,
   evmCurrencyBelongsToChain,
+  getFlameChainId,
+  getFlameNetworkByChainId,
   useConfig as useAppConfig,
 } from "config";
 import { useBalancePolling } from "features/GetBalancePolling";
@@ -57,6 +65,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const { disconnect } = useDisconnect();
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
+  const { switchChain } = useSwitchChain();
 
   const {
     status: nativeBalanceStatus,
@@ -94,11 +103,23 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }
   }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
 
-  console.log("evm wallet context user account", userAccount?.chainId);
-  // useEffect(() => {
-  //   // TODO - detect when user changes networks from wallet and update selected network
-  //   selectFlameNetwork
-  // }, [userAccount.chainId]);
+  // detect when user changes networks from wallet and update selected network
+  useEffect(() => {
+    if (!userAccount?.chainId) {
+      return;
+    }
+    const network = getFlameNetworkByChainId(userAccount.chainId);
+    selectFlameNetwork(network);
+  }, [selectFlameNetwork, userAccount.chainId]);
+
+  // deselect chain and currency when network is changed and switch chains in wallet
+  useEffect(() => {
+    if (selectedFlameNetwork) {
+      resetState();
+      const chainId = getFlameChainId(selectedFlameNetwork);
+      switchChain({ chainId });
+    }
+  }, [selectedFlameNetwork, switchChain]);
 
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
@@ -186,12 +207,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       }),
     );
   }, [evmChains]);
-
-  // deselect chain and currency when network is changed
-  // useEffect(() => {
-  //   resetState();
-  //   // TODO - make wallet switch network? e.g. the balance from
-  // }, [selectedFlameNetwork]);
 
   const selectedEvmChainOption = useMemo(() => {
     if (!selectedEvmChain) {

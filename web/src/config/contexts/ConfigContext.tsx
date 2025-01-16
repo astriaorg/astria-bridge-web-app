@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { FlameNetwork, getChainConfigs } from "../chainConfigs";
 import { getEnvVariable } from "../env";
@@ -41,7 +41,9 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
-  const showLocalNetwork = process.env.REACT_APP_SHOW_LOCAL_NETWORK === "true";
+  const networksList = (
+    process.env.REACT_APP_NETWORK_LIST_OPTIONS || "dusk,mainnet"
+  ).split(",") as FlameNetwork[];
 
   // update evm and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
@@ -63,7 +65,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         swapURL,
         poolURL,
         feedbackFormURL,
-        showLocalNetwork,
+        networksList,
       }}
     >
       {children}

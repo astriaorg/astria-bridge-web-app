@@ -34,7 +34,6 @@ export default function ConnectEvmWalletButton({
   } = useEvmWallet();
 
   const userAccount = useAccount();
-  console.log("userAccount", userAccount);
 
   // user avatar
   const avatarRef = useRef<HTMLDivElement>(null);
