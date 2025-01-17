@@ -11,7 +11,6 @@ import {
   useCosmosWallet,
 } from "features/CosmosWallet";
 import { ConnectEvmWalletButton, useEvmWallet } from "features/EvmWallet";
-import { useConfig } from "config";
 
 /**
  * Button with dropdown to connect to multiple wallets.

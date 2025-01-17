@@ -5,12 +5,12 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Link } from "react-router-dom";
 
 import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton";
 import { shortenAddress } from "features/shared/utils.ts";
 
 import { useCosmosWallet } from "../../hooks/useCosmosWallet";
-import { Link } from "react-router-dom";
 
 interface ConnectCosmosWalletButtonProps {
   // Block explorer URL

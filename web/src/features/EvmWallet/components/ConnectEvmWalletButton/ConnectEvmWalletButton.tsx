@@ -6,12 +6,12 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Link } from "react-router-dom";
 
 import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton";
 import { shortenAddress } from "features/shared/utils.ts";
 
 import { useEvmWallet } from "../../hooks/useEvmWallet";
-import { Link } from "react-router-dom";
 
 interface ConnectEvmWalletButtonProps {
   // Block explorer URL
