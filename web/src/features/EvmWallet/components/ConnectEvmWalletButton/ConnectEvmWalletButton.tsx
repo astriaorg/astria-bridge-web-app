@@ -11,8 +11,11 @@ import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipbo
 import { shortenAddress } from "features/shared/utils.ts";
 
 import { useEvmWallet } from "../../hooks/useEvmWallet";
+import { Link } from "react-router-dom";
 
 interface ConnectEvmWalletButtonProps {
+  // Block explorer URL
+  blockExplorerURL?: string;
   // Label to show before the user is connected to a wallet.
   labelBeforeConnected?: string;
 }
@@ -21,6 +24,7 @@ interface ConnectEvmWalletButtonProps {
  * Button with information dropdown to connect to an EVM wallet.
  */
 export default function ConnectEvmWalletButton({
+  blockExplorerURL,
   labelBeforeConnected,
 }: ConnectEvmWalletButtonProps) {
   const {
@@ -77,6 +81,12 @@ export default function ConnectEvmWalletButton({
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected, evmAccountAddress]);
 
+  const blockExplorerAddressPageURL = useMemo(() => {
+    if (blockExplorerURL && evmAccountAddress) {
+      return `${blockExplorerURL}/address/${evmAccountAddress}`;
+    }
+  }, [blockExplorerURL, evmAccountAddress]);
+
   // connect to wallet or show information dropdown
   const handleConnectWallet = useCallback(() => {
     if (!evmAccountAddress) {
@@ -130,23 +140,23 @@ export default function ConnectEvmWalletButton({
             </div>
             <div className="action-buttons">
               <CopyToClipboardButton textToCopy={evmAccountAddress} />
-              <button
-                type="button"
-                className="button is-ghost"
-                onClick={() => {
-                  console.log("TODO open explorer");
-                }}
-              >
-                <span>
-                  <i className="fas fa-up-right-from-square" />
-                </span>
-              </button>
+              {blockExplorerAddressPageURL && (
+                <Link
+                  to={blockExplorerAddressPageURL}
+                  target="_blank"
+                  className="button is-ghost"
+                >
+                  <span className="icon">
+                    <i className="fas fa-up-right-from-square" />
+                  </span>
+                </Link>
+              )}
               <button
                 type="button"
                 className="button is-ghost"
                 onClick={() => disconnectEvmWallet()}
               >
-                <span>
+                <span className="icon">
                   <i className="fas fa-power-off" />
                 </span>
               </button>
@@ -162,7 +172,7 @@ export default function ConnectEvmWalletButton({
               <div className="balance-amount">{evmNativeTokenBalance}</div>
             )}
             {/* TODO - price in USD */}
-            <div className="balance-usd">$0.00 USD</div>
+            {/*<div className="balance-usd">$0.00 USD</div>*/}
           </div>
 
           {/* Transactions Section - TODO */}

@@ -59,25 +59,25 @@
         display: flex;
         align-items: center;
 
-        button {
-          margin: 0 0.5rem;
+        button, a {
+          margin: 0 3px;
           padding: 0;
-
+          background: $astria-grey-dark;
+          border-radius: 12px;
           span {
-            border-radius: 24px;
-            background: $astria-grey-dark;
-
+            margin: 0 4px;
             i {
               color: $astria-white;
               transition: color 0.2s ease;
-
               &:hover {
                 color: $astria-white;
               }
             }
           }
         }
+
       }
+
     }
 
     // Balance section

@@ -10,8 +10,11 @@ import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipbo
 import { shortenAddress } from "features/shared/utils.ts";
 
 import { useCosmosWallet } from "../../hooks/useCosmosWallet";
+import { Link } from "react-router-dom";
 
 interface ConnectCosmosWalletButtonProps {
+  // Block explorer URL
+  blockExplorerURL?: string;
   // Label to show before the user is connected to a wallet.
   labelBeforeConnected?: string;
 }
@@ -20,6 +23,7 @@ interface ConnectCosmosWalletButtonProps {
  * Button with information dropdown to connect to a Cosmos wallet.
  */
 export default function ConnectCosmosWalletButton({
+  blockExplorerURL,
   labelBeforeConnected,
 }: ConnectCosmosWalletButtonProps) {
   const {
@@ -63,6 +67,12 @@ export default function ConnectCosmosWalletButton({
     }
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected, cosmosAccountAddress]);
+
+  const blockExplorerAddressPageURL = useMemo(() => {
+    if (blockExplorerURL && cosmosAccountAddress) {
+      return `${blockExplorerURL}/address/${cosmosAccountAddress}`;
+    }
+  }, [blockExplorerURL, cosmosAccountAddress]);
 
   // connect to wallet or show information dropdown
   const handleConnectWallet = useCallback(() => {
@@ -116,17 +126,17 @@ export default function ConnectCosmosWalletButton({
             </div>
             <div className="action-buttons">
               <CopyToClipboardButton textToCopy={cosmosAccountAddress} />
-              <button
-                type="button"
-                className="button is-ghost"
-                onClick={() => {
-                  console.log("TODO open explorer");
-                }}
-              >
-                <span>
-                  <i className="fas fa-up-right-from-square" />
-                </span>
-              </button>
+              {blockExplorerAddressPageURL && (
+                <Link
+                  to={blockExplorerAddressPageURL}
+                  target="_blank"
+                  className="button is-ghost"
+                >
+                  <span className="icon">
+                    <i className="fas fa-up-right-from-square" />
+                  </span>
+                </Link>
+              )}
               <button
                 type="button"
                 className="button is-ghost"
@@ -148,7 +158,7 @@ export default function ConnectCosmosWalletButton({
               <div className="balance-amount">{cosmosBalance}</div>
             )}
             {/* TODO - price in USD */}
-            <div className="balance-usd">$0.00 USD</div>
+            {/*<div className="balance-usd">$0.00 USD</div>*/}
           </div>
 
           {/* Transactions Section - TODO */}

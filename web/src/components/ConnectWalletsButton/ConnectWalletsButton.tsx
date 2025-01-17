@@ -11,6 +11,7 @@ import {
   useCosmosWallet,
 } from "features/CosmosWallet";
 import { ConnectEvmWalletButton, useEvmWallet } from "features/EvmWallet";
+import { useConfig } from "config";
 
 /**
  * Button with dropdown to connect to multiple wallets.
@@ -23,8 +24,8 @@ export default function ConnectWalletsButton() {
     setIsDropdownActive(!isDropdownActive);
   }, [isDropdownActive]);
 
-  const { cosmosAccountAddress } = useCosmosWallet();
-  const { evmAccountAddress } = useEvmWallet();
+  const { cosmosAccountAddress, selectedCosmosChain } = useCosmosWallet();
+  const { evmAccountAddress, selectedEvmChain } = useEvmWallet();
 
   console.log({
     cosmosAccountAddress,
@@ -89,10 +90,16 @@ export default function ConnectWalletsButton() {
         <div className="dropdown-card card">
           <div className="">
             <div>
-              <ConnectEvmWalletButton labelBeforeConnected="Connect to Flame wallet" />
+              <ConnectEvmWalletButton
+                labelBeforeConnected="Connect to Flame wallet"
+                blockExplorerURL={selectedEvmChain?.blockExplorerUrl}
+              />
             </div>
             <div>
-              <ConnectCosmosWalletButton labelBeforeConnected="Connect to Cosmos wallet" />
+              <ConnectCosmosWalletButton
+                labelBeforeConnected="Connect to Cosmos wallet"
+                blockExplorerURL={selectedCosmosChain?.blockExplorerUrl}
+              />
             </div>
           </div>
         </div>
