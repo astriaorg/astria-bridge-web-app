@@ -6,26 +6,30 @@ import React, {
   useState,
 } from "react";
 
-import { ConnectCosmosWalletButton } from "features/CosmosWallet";
-import { ConnectEvmWalletButton } from "features/EvmWallet";
-
-interface ConnectWalletsButtonProps {
-  // Label to show before the user is connected to any wallets.
-  labelBeforeConnected?: string;
-}
+import {
+  ConnectCosmosWalletButton,
+  useCosmosWallet,
+} from "features/CosmosWallet";
+import { ConnectEvmWalletButton, useEvmWallet } from "features/EvmWallet";
 
 /**
  * Button with dropdown to connect to multiple wallets.
  */
-export default function ConnectWalletsButton({
-  labelBeforeConnected,
-}: ConnectWalletsButtonProps) {
+export default function ConnectWalletsButton() {
   // information dropdown
   const [isDropdownActive, setIsDropdownActive] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const toggleDropdown = useCallback(() => {
     setIsDropdownActive(!isDropdownActive);
   }, [isDropdownActive]);
+
+  const { cosmosAccountAddress } = useCosmosWallet();
+  const { evmAccountAddress } = useEvmWallet();
+
+  console.log({
+    cosmosAccountAddress,
+    evmAccountAddress,
+  });
 
   // handle clicking outside dropdown to close it
   useEffect(() => {
@@ -46,8 +50,16 @@ export default function ConnectWalletsButton({
 
   // ui
   const label = useMemo(() => {
-    return labelBeforeConnected ?? "Connect";
-  }, [labelBeforeConnected]);
+    if (!cosmosAccountAddress && !evmAccountAddress) {
+      return "Connect |";
+    }
+    if (cosmosAccountAddress && evmAccountAddress) {
+      return "2 Connected";
+    }
+    // TODO - show icons of wallets connected?
+    //  e.g. <metamask icon> Connected <leap icon> Connected?
+    return "1 Connected";
+  }, [cosmosAccountAddress, evmAccountAddress]);
 
   return (
     <div
@@ -57,12 +69,12 @@ export default function ConnectWalletsButton({
       <div className="connect-wallet-button-container">
         <button
           type="button"
-          key="connect-evm-wallet-button"
+          key="connect-networks-button"
           onClick={toggleDropdown}
           className="button is-ghost is-rounded-hover"
         >
           <span className="connect-wallet-button-label">{label}</span>
-          <span className="icon icon-right is-small">
+          <span className="icon icon-right is-small ml-0">
             {isDropdownActive ? (
               <i className="fas fa-angle-up" />
             ) : (

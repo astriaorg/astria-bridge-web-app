@@ -6,12 +6,11 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useAccount } from "wagmi";
 
 import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton";
+import { shortenAddress } from "features/shared/utils.ts";
 
 import { useEvmWallet } from "../../hooks/useEvmWallet";
-import { shortenAddress } from "../../utils/utils";
 
 interface ConnectEvmWalletButtonProps {
   // Label to show before the user is connected to a wallet.
@@ -27,26 +26,23 @@ export default function ConnectEvmWalletButton({
   const {
     connectEvmWallet,
     disconnectEvmWallet,
-    selectedEvmCurrencyBalance,
-    isLoadingSelectedEvmCurrencyBalance,
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
+    evmAccountAddress,
   } = useEvmWallet();
-
-  const userAccount = useAccount();
 
   // user avatar
   const avatarRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (userAccount?.address && avatarRef.current) {
+    if (evmAccountAddress && avatarRef.current) {
       avatarRef.current.innerHTML = "";
       // NOTE - only using jazzicon for the avatar right now.
       // this seed ensures we generate the same jazzicon as metamask
-      const seed = Number.parseInt(userAccount.address.slice(2, 10), 16);
+      const seed = Number.parseInt(evmAccountAddress.slice(2, 10), 16);
       const iconElem = jazzicon(24, seed);
       avatarRef.current.appendChild(iconElem);
     }
-  }, [userAccount?.address]);
+  }, [evmAccountAddress]);
 
   // information dropdown
   const [isDropdownActive, setIsDropdownActive] = useState(false);
@@ -75,22 +71,22 @@ export default function ConnectEvmWalletButton({
 
   // ui
   const label = useMemo(() => {
-    if (userAccount?.address) {
-      return shortenAddress(userAccount.address);
+    if (evmAccountAddress) {
+      return shortenAddress(evmAccountAddress);
     }
     return labelBeforeConnected ?? "Connect";
-  }, [labelBeforeConnected, userAccount?.address]);
+  }, [labelBeforeConnected, evmAccountAddress]);
 
   // connect to wallet or show information dropdown
   const handleConnectWallet = useCallback(() => {
-    if (!userAccount?.address) {
+    if (!evmAccountAddress) {
       connectEvmWallet();
     }
-    if (userAccount?.address) {
+    if (evmAccountAddress) {
       // if user is already connected, open information dropdown
       toggleDropdown();
     }
-  }, [connectEvmWallet, toggleDropdown, userAccount?.address]);
+  }, [connectEvmWallet, toggleDropdown, evmAccountAddress]);
 
   return (
     <div
@@ -104,7 +100,7 @@ export default function ConnectEvmWalletButton({
           onClick={handleConnectWallet}
           className="button is-ghost is-rounded-hover"
         >
-          {userAccount?.address && (
+          {evmAccountAddress && (
             <span className="icon icon-left is-small" ref={avatarRef}>
               {/* this span is for the avatar and is updated via avatarRef */}
             </span>
@@ -121,7 +117,7 @@ export default function ConnectEvmWalletButton({
       </div>
 
       {/* Dropdown element */}
-      {isDropdownActive && userAccount.address && (
+      {isDropdownActive && evmAccountAddress && (
         <div className="dropdown-card card">
           {/* Top Row - Address and Actions */}
           <div className="dropdown-header">
@@ -129,11 +125,11 @@ export default function ConnectEvmWalletButton({
               {/* FIXME - i don't think this html exists when the ref is set so it doesn't show the avatar */}
               <div className="avatar" ref={avatarRef} />
               <span className="address">
-                {shortenAddress(userAccount.address)}
+                {shortenAddress(evmAccountAddress)}
               </span>
             </div>
             <div className="action-buttons">
-              <CopyToClipboardButton textToCopy={userAccount.address} />
+              <CopyToClipboardButton textToCopy={evmAccountAddress} />
               <button
                 type="button"
                 className="button is-ghost"

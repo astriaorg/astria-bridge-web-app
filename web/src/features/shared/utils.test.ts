@@ -1,4 +1,4 @@
-import { formatBalance, shortenAddress } from "./utils";
+import { formatBalance, shortenAddress } from "./utils.ts";
 
 describe("Utility Functions", () => {
   describe("formatBalance", () => {

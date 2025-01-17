@@ -7,6 +7,7 @@ import React, {
 } from "react";
 
 import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton";
+import { shortenAddress } from "features/shared/utils.ts";
 
 import { useCosmosWallet } from "../../hooks/useCosmosWallet";
 
@@ -57,7 +58,8 @@ export default function ConnectCosmosWalletButton({
   // ui
   const label = useMemo(() => {
     if (cosmosAccountAddress) {
-      return cosmosAccountAddress;
+      // TODO - ensure shortenAddress startLength is length of chains' human readable prefix
+      return shortenAddress(cosmosAccountAddress);
     }
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected, cosmosAccountAddress]);

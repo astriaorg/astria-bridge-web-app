@@ -19,12 +19,12 @@ import {
   useConfig as useAppConfig,
 } from "config";
 import { useBalancePolling } from "features/GetBalancePolling";
+import { formatBalance } from "features/shared/utils.ts";
 
 import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
 } from "../services/AstriaWithdrawerService/AstriaWithdrawerService.ts";
-import { formatBalance } from "../utils/utils.ts";
 
 interface EvmWalletContextProps {
   connectEvmWallet: () => void;

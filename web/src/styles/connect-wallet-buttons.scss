@@ -6,12 +6,16 @@
 //   - should this go in a file closer to the component?
 //     - now styles are in multiple places though
 
-.connect-wallet-button-container .button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  .connect-wallet-button-inner {
+.connect-wallet-button-container {
+  .button {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    word-spacing: 0.25rem;
+
+    .connect-wallet-button-inner {
+      display: flex;
+    }
   }
 }
 
@@ -23,7 +27,6 @@
   .dropdown-card {
     position: fixed;
     right: 0;
-    margin-top: 0.5rem;
     z-index: 50;
     padding: 1rem;
     margin-right: 1.5rem;
@@ -55,12 +58,15 @@
       .action-buttons {
         display: flex;
         align-items: center;
+
         button {
           margin: 0 0.5rem;
           padding: 0;
+
           span {
             border-radius: 24px;
             background: $astria-grey-dark;
+
             i {
               color: $astria-white;
               transition: color 0.2s ease;
@@ -99,19 +105,28 @@
 
     // Transactions section
     .transactions-container {
+      &:hover {
+        color: $astria-white;
+        border-radius: 10px;
+        background: $astria-grey-light;
+
+        .transactions-header {
+          color: $astria-white;
+        }
+      }
+
       .transactions-header {
+        cursor: pointer;
         width: 100%;
         text-align: left;
-        padding: 0.5rem 0;
+        padding: 0.5rem 0.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         color: $astria-grey-light;
         transition: color 0.2s ease;
-
-        &:hover {
-          color: $astria-white;
-        }
+        background: transparent;
+        border: none;
       }
 
       .transactions-list {
