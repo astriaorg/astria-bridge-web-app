@@ -176,22 +176,22 @@ export default function ConnectEvmWalletButton({
           </div>
 
           {/* Transactions Section - TODO */}
-          <div className="transactions-container">
-            <button
-              type="button"
-              className="transactions-header"
-              onClick={() => setShowTransactions(!showTransactions)}
-            >
-              <span>Transactions</span>
-              <i className="fas fa-chevron-right" />
-            </button>
+          {/*<div className="transactions-container">*/}
+          {/*  <button*/}
+          {/*    type="button"*/}
+          {/*    className="transactions-header"*/}
+          {/*    onClick={() => setShowTransactions(!showTransactions)}*/}
+          {/*  >*/}
+          {/*    <span>Transactions</span>*/}
+          {/*    <i className="fas fa-chevron-right" />*/}
+          {/*  </button>*/}
 
-            {showTransactions && (
-              <div className="transactions-list">
-                <div className="no-transactions">No recent transactions</div>
-              </div>
-            )}
-          </div>
+          {/*  {showTransactions && (*/}
+          {/*    <div className="transactions-list">*/}
+          {/*      <div className="no-transactions">No recent transactions</div>*/}
+          {/*    </div>*/}
+          {/*  )}*/}
+          {/*</div>*/}
         </div>
       )}
     </div>
