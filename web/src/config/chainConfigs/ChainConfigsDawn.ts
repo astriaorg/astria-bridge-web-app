@@ -14,6 +14,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
   rpc: "wss://rpc-mocha.pops.one",
   // REST endpoint of the chain.
   rest: "https://api-mocha.pops.one",
+  blockExplorerUrl: "https://www.mintscan.io/celestia-testnet",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -110,6 +111,7 @@ const NobleChainInfo: CosmosChainInfo = {
   rpc: "https://noble-testnet-rpc.polkachu.com",
   // REST endpoint of the chain.
   rest: "https://noble-testnet-api.polkachu.com",
+  blockExplorerUrl: "https://www.mintscan.io/noble-testnet",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -192,6 +194,7 @@ const NeutronChainInfo: CosmosChainInfo = {
   rpc: "https://rpc-falcron.pion-1.ntrn.tech",
   // REST endpoint of the chain.
   rest: "https://rest-falcron.pion-1.ntrn.tech",
+  blockExplorerUrl: "https://www.mintscan.io/neutron-testnet",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -278,6 +281,7 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 16604737732183,
   chainName: "Flame Dawn-1",
   rpcUrls: ["https://rpc.flame.dawn-1.astria.org"],
+  blockExplorerUrl: "https://explorer.flame.dawn-1.astria.org",
   currencies: [
     {
       coinDenom: "TIA",

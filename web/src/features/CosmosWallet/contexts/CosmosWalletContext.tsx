@@ -1,24 +1,49 @@
 import { useChain } from "@cosmos-kit/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { SigningStargateClient } from "@cosmjs/stargate";
 import type { DropdownOption } from "components/Dropdown/Dropdown";
 import {
   type CosmosChainInfo,
-  type CosmosChains,
   type IbcCurrency,
   cosmosChainNameFromId,
   ibcCurrencyBelongsToChain,
+  useConfig,
 } from "config";
 import { useBalancePolling } from "features/GetBalancePolling";
+
 import { getBalanceFromChain } from "../services/cosmos";
 
-/**
- * Custom hook to manage the selection of an IBC chain and currency.
- * Calculates the balance whenever the address, selected chain,
- *   or selected currency changes.
- * Updates the address when the selected chain changes.
- */
-export function useCosmosChainSelection(cosmosChains: CosmosChains) {
+interface CosmosWalletContextProps {
+  connectCosmosWallet: () => void;
+  cosmosAccountAddress: string | null;
+  cosmosBalance: string | null;
+  cosmosChainsOptions: DropdownOption<CosmosChainInfo>[];
+  defaultIbcCurrencyOption: DropdownOption<IbcCurrency> | undefined;
+  disconnectCosmosWallet: () => void;
+  getCosmosSigningClient: () => Promise<SigningStargateClient>;
+  ibcCurrencyOptions: DropdownOption<IbcCurrency>[];
+  isLoadingCosmosBalance: boolean;
+  resetState: () => void;
+  selectedCosmosChain: CosmosChainInfo | null;
+  selectedCosmosChainOption: DropdownOption<CosmosChainInfo> | null;
+  selectedIbcCurrency: IbcCurrency | null;
+  selectCosmosChain: (chain: CosmosChainInfo | null) => void;
+  selectIbcCurrency: (currency: IbcCurrency) => void;
+}
+
+export const CosmosWalletContext =
+  React.createContext<CosmosWalletContextProps>({} as CosmosWalletContextProps);
+
+interface CosmosWalletProviderProps {
+  children: React.ReactNode;
+}
+
+export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
+  children,
+}) => {
+  const { cosmosChains, selectedFlameNetwork } = useConfig();
+
   const [selectedCosmosChain, setSelectedCosmosChain] =
     useState<CosmosChainInfo | null>(null);
   const [selectedIbcCurrency, setSelectedIbcCurrency] =
@@ -33,13 +58,16 @@ export function useCosmosChainSelection(cosmosChains: CosmosChains) {
     address: cosmosAddressFromWallet,
     openView: openCosmosWalletModal,
     getSigningStargateClient: getCosmosSigningClient,
+    disconnect,
+    isWalletConnected,
   } = useChain(chainName);
 
-  // we are keeping track of the address ourselves so that we can clear it if needed,
-  // e.g. to allow for manual address entry
+  // we are keeping track of the address ourselves so that we can clear it if
+  // needed, e.g. to allow for manual address entry
   const [cosmosAccountAddress, setCosmosAccountAddress] = useState<
     string | null
   >(null);
+
   useEffect(() => {
     // make sure the address is set when
     // the address, chain, or currency change
@@ -47,6 +75,7 @@ export function useCosmosChainSelection(cosmosChains: CosmosChains) {
       setCosmosAccountAddress(cosmosAddressFromWallet);
     }
   }, [cosmosAddressFromWallet, selectedCosmosChain, selectedIbcCurrency]);
+
   const resetState = useCallback(() => {
     setSelectedCosmosChain(null);
     setSelectedIbcCurrency(null);
@@ -90,6 +119,13 @@ export function useCosmosChainSelection(cosmosChains: CosmosChains) {
     );
   }, [cosmosChains]);
 
+  // deselect chain and currency when network is changed
+  useEffect(() => {
+    if (selectedFlameNetwork) {
+      resetState();
+    }
+  }, [resetState, selectedFlameNetwork]);
+
   const selectCosmosChain = useCallback((chain: CosmosChainInfo | null) => {
     setSelectedCosmosChain(chain);
   }, []);
@@ -131,37 +167,53 @@ export function useCosmosChainSelection(cosmosChains: CosmosChains) {
 
   // opens CosmosKit modal for user to connect their Cosmos wallet
   const connectCosmosWallet = useCallback(() => {
-    // if there is no selected chain, select the first one
+    // if no chain is set, set the first one and return
+    // FIXME - the caller has to to re-trigger the connect function
+    //  by watching the selectedEvmChain value. this is a foot gun for sure.
     if (!selectedCosmosChain) {
       selectCosmosChain(cosmosChainsOptions[0]?.value);
       return;
     }
 
-    openCosmosWalletModal();
+    // if already connected, don't open modal
+    if (!isWalletConnected) {
+      console.log("opening cosmos wallet modal");
+      openCosmosWalletModal();
+    }
   }, [
     selectCosmosChain,
     selectedCosmosChain,
     cosmosChainsOptions,
     openCosmosWalletModal,
+    isWalletConnected,
   ]);
 
-  return {
-    cosmosChainsOptions,
-    selectedCosmosChain,
-    selectedCosmosChainOption,
-    defaultIbcCurrencyOption,
+  const disconnectCosmosWallet = useCallback(() => {
+    disconnect().then((_) => {});
+    resetState();
+  }, [disconnect, resetState]);
 
-    ibcCurrencyOptions,
-    selectCosmosChain,
-    selectIbcCurrency,
-    selectedIbcCurrency,
-
+  const value = {
+    connectCosmosWallet,
     cosmosAccountAddress,
     cosmosBalance,
-    isLoadingCosmosBalance,
-
-    connectCosmosWallet,
+    cosmosChainsOptions,
+    defaultIbcCurrencyOption,
     getCosmosSigningClient,
+    disconnectCosmosWallet,
+    ibcCurrencyOptions,
+    isLoadingCosmosBalance,
     resetState,
+    selectedCosmosChain,
+    selectedCosmosChainOption,
+    selectedIbcCurrency,
+    selectCosmosChain,
+    selectIbcCurrency,
   };
-}
+
+  return (
+    <CosmosWalletContext.Provider value={value}>
+      {children}
+    </CosmosWalletContext.Provider>
+  );
+};

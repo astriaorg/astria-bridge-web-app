@@ -2,7 +2,8 @@ import type React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { useConfig } from "config";
+import ConnectWalletsButton from "components/ConnectWalletsButton/ConnectWalletsButton";
+import { NetworkSelector, useConfig } from "config";
 import logo from "logo-flame-w-text.svg";
 
 function Navbar() {
@@ -28,6 +29,13 @@ function Navbar() {
         >
           <img src={logo} width="161" height="32" alt="logo" />
         </a>
+
+        {/* shown before burger menu when not desktop */}
+        <div className="navbar-end is-hidden-desktop">
+          <NetworkSelector />
+          <ConnectWalletsButton />
+        </div>
+
         <button
           type="button"
           className={`navbar-burger ${isMobileMenuActive && "is-active"}`}
@@ -60,9 +68,12 @@ function Navbar() {
             POOL
           </a>
         </div>
+        {/* shown after menu items for desktop */}
+        <div className="navbar-end is-hidden-touch">
+          <NetworkSelector />
+          <ConnectWalletsButton />
+        </div>
       </div>
-
-      <div className="navbar-placeholder-end" />
     </nav>
   );
 }

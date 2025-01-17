@@ -1,17 +1,18 @@
-import type { EvmCurrency } from "config";
 import type { EIP1193Provider } from "viem";
 import { useAccount } from "wagmi";
 
-interface AddERC20ToWalletButtonProps {
+import type { EvmCurrency } from "config";
+
+interface AddErc20ToWalletButtonProps {
   evmCurrency: EvmCurrency;
   buttonClassNameOverride?: string;
 }
 
-// TODO - move to hook useAddERC20ToWallet
-export default function AddERC20ToWalletButton({
+// TODO - move to hook useAddErc20ToWallet
+export default function AddErc20ToWalletButton({
   evmCurrency,
   buttonClassNameOverride,
-}: AddERC20ToWalletButtonProps) {
+}: AddErc20ToWalletButtonProps) {
   const { connector, isConnected } = useAccount();
 
   const buttonClassName =

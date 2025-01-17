@@ -4,17 +4,15 @@ import { useConfig as useWagmiConfig } from "wagmi";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig } from "config";
-import { useCosmosChainSelection } from "features/CosmosWallet";
+import { useCosmosWallet } from "features/CosmosWallet";
 import {
-  AddERC20ToWalletButton,
+  AddErc20ToWalletButton,
   createWithdrawerService,
-  useEvmChainSelection,
-} from "features/EthWallet";
+  useEvmWallet,
+} from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function WithdrawCard(): React.ReactElement {
-  const { evmChains, cosmosChains } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const { addNotification } = useNotifications();
 
@@ -29,10 +27,10 @@ export default function WithdrawCard(): React.ReactElement {
     selectEvmCurrency,
     evmCurrencyOptions,
     selectedEvmCurrency,
-    evmBalance,
-    isLoadingEvmBalance,
-    connectEVMWallet,
-  } = useEvmChainSelection(evmChains);
+    selectedEvmCurrencyBalance,
+    isLoadingSelectedEvmCurrencyBalance,
+    connectEvmWallet,
+  } = useEvmWallet();
 
   const {
     cosmosAccountAddress,
@@ -47,7 +45,7 @@ export default function WithdrawCard(): React.ReactElement {
     isLoadingCosmosBalance,
     resetState: resetIbcWalletState,
     connectCosmosWallet,
-  } = useCosmosChainSelection(cosmosChains);
+  } = useCosmosWallet();
 
   // the ibc currency selection is controlled by the sender's chosen evm currency,
   // and should be updated when an ibc currency or ibc chain is selected
@@ -140,7 +138,7 @@ export default function WithdrawCard(): React.ReactElement {
     if (!selectedEvmChain) {
       return;
     }
-    connectEVMWallet();
+    connectEvmWallet();
   }, [selectedEvmChain]);
 
   // ensure cosmos wallet connection when selected ibc chain changes
@@ -287,12 +285,12 @@ export default function WithdrawCard(): React.ReactElement {
     return [
       {
         label: "Connect EVM Wallet",
-        action: connectEVMWallet,
+        action: connectEvmWallet,
         className: "has-text-primary",
         rightIconClass: "fas fa-plus",
       },
     ];
-  }, [connectEVMWallet]);
+  }, [connectEvmWallet]);
 
   return (
     <div>
@@ -328,18 +326,20 @@ export default function WithdrawCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress && selectedEvmCurrency && !isLoadingEvmBalance && (
-                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: {evmBalance}
-                </p>
-              )}
-              {fromAddress && isLoadingEvmBalance && (
+              {fromAddress &&
+                selectedEvmCurrency &&
+                !isLoadingSelectedEvmCurrencyBalance && (
+                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                    Balance: {selectedEvmCurrencyBalance}
+                  </p>
+                )}
+              {fromAddress && isLoadingSelectedEvmCurrencyBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
               {selectedEvmCurrency?.erc20ContractAddress && (
-                <AddERC20ToWalletButton evmCurrency={selectedEvmCurrency} />
+                <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency} />
               )}
             </div>
           )}
