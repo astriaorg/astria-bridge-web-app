@@ -44,7 +44,7 @@ export default function App(): React.ReactElement {
 
   // wagmi and rainbowkit config, for evm chains
   const rainbowKitConfig = getDefaultConfig({
-    appName: "Flame Bridge",
+    appName: "Flame Defi",
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: evmChainsToRainbowKitChains(evmChains),
   });
