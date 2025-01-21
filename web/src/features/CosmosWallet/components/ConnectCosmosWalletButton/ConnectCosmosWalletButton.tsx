@@ -122,7 +122,7 @@ export default function ConnectCosmosWalletButton({
           {/* Top Row - Address and Actions */}
           <div className="dropdown-header">
             <div className="address-container">
-              <span className="address">{cosmosAccountAddress}</span>
+              <span className="address">{shortenAddress(cosmosAccountAddress)}</span>
             </div>
             <div className="action-buttons">
               <CopyToClipboardButton textToCopy={cosmosAccountAddress} />
@@ -142,7 +142,7 @@ export default function ConnectCosmosWalletButton({
                 className="button is-ghost"
                 onClick={handleDisconnectWallet}
               >
-                <span>
+                <span className="icon">
                   <i className="fas fa-power-off" />
                 </span>
               </button>

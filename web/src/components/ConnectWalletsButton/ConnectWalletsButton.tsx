@@ -90,13 +90,13 @@ export default function ConnectWalletsButton() {
           <div className="">
             <div>
               <ConnectEvmWalletButton
-                labelBeforeConnected="Connect to Flame wallet"
+                labelBeforeConnected="Connect Flame wallet"
                 blockExplorerURL={selectedEvmChain?.blockExplorerUrl}
               />
             </div>
             <div>
               <ConnectCosmosWalletButton
-                labelBeforeConnected="Connect to Cosmos wallet"
+                labelBeforeConnected="Connect Cosmos wallet"
                 blockExplorerURL={selectedCosmosChain?.blockExplorerUrl}
               />
             </div>
