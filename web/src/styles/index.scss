@@ -9,7 +9,7 @@ html, body {
 
 // astria bulma overrides override bulma variables
 // NOTE - scss variable overrides must be imported BEFORE bulma,
-//  so that the overriden variables are used in the bulma sass
+//  so that the overridden variables are used in the bulma sass
 @import 'astria-colors';
 @import 'button-overrides';
 @import 'card-overrides';
@@ -41,6 +41,7 @@ html, body {
 @import 'navbar-customizations';
 @import 'toast-customizations';
 
+@import 'connect-wallet-buttons';
 
 // body reset
 body {

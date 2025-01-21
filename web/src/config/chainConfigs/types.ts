@@ -31,6 +31,7 @@ export interface CosmosChainInfo {
   readonly rest: string;
   readonly chainId: string;
   readonly chainName: string;
+  readonly blockExplorerUrl?: string;
   /**
    * This indicates the type of coin that can be used for stake.
    * You can get actual currency information from Currencies.

@@ -13,8 +13,10 @@ import {
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainInfosToCosmosKitChains,
   evmChainsToRainbowKitChains,
-  useConfig,
+  getAllChainConfigs,
 } from "config";
+import { CosmosWalletProvider } from "features/CosmosWallet";
+import { EvmWalletProvider } from "features/EvmWallet";
 import { NotificationsContextProvider } from "features/Notifications";
 import BridgePage from "pages/BridgePage/BridgePage";
 import Layout from "pages/Layout";
@@ -33,11 +35,16 @@ const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";
  * Sets up the RainbowKitProvider and QueryClientProvider for tanstack/react-query.
  */
 export default function App(): React.ReactElement {
-  const { evmChains, cosmosChains } = useConfig();
+  // NOTE - needed to get all chain configs for all networks so that
+  //   we can switch between all the different networks
+  // FIXME - why didn't components reload correctly when i was using useConfig()?
+  //  the evmChains and cosmosChains should have updated when the network changed and
+  //  then triggered this component to rerender
+  const { evmChains, cosmosChains } = getAllChainConfigs();
 
   // wagmi and rainbowkit config, for evm chains
   const rainbowKitConfig = getDefaultConfig({
-    appName: "Flame Bridge",
+    appName: "Flame Defi",
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: evmChainsToRainbowKitChains(evmChains),
   });
@@ -76,11 +83,15 @@ export default function App(): React.ReactElement {
                 },
               }}
             >
-              <Routes>
-                <Route element={<Layout />}>
-                  <Route index element={<BridgePage />} />
-                </Route>
-              </Routes>
+              <CosmosWalletProvider>
+                <EvmWalletProvider>
+                  <Routes>
+                    <Route element={<Layout />}>
+                      <Route index element={<BridgePage />} />
+                    </Route>
+                  </Routes>
+                </EvmWalletProvider>
+              </CosmosWalletProvider>
             </ChainProvider>
           </RainbowKitProvider>
         </QueryClientProvider>

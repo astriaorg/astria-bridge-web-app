@@ -1,4 +1,10 @@
 import {
+  type FlameNetwork,
+  getAllChainConfigs,
+  getFlameChainId,
+  getFlameNetworkByChainId,
+} from "./chainConfigs";
+import {
   type CosmosChainInfo,
   type CosmosChains,
   type EvmChainInfo,
@@ -12,6 +18,7 @@ import {
   evmCurrencyBelongsToChain,
   ibcCurrencyBelongsToChain,
 } from "./chainConfigs/types";
+import NetworkSelector from "./components/NetworkSelector/NetworkSelector";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
 import { useConfig } from "./hooks/useConfig";
@@ -24,6 +31,10 @@ export interface AppConfig {
   cosmosChains: CosmosChains;
   // The configurations for EVM chains.
   evmChains: EvmChains;
+  // The selected Flame network.
+  selectedFlameNetwork: FlameNetwork;
+  // Function to select the Flame network.
+  selectFlameNetwork: (network: FlameNetwork) => void;
   // The URL for the brand link in the navbar.
   brandURL: string;
   // The URL for the bridge link in the navbar.
@@ -34,6 +45,8 @@ export interface AppConfig {
   poolURL: string;
   // The URL for the feedback form side tag. Hides side tag when null.
   feedbackFormURL: string | null;
+  // List of networks to display in the network selector.
+  networksList: FlameNetwork[];
 }
 
 export {
@@ -46,10 +59,14 @@ export {
   type CosmosChainInfo,
   type CosmosChains,
   type IbcCurrency,
+  NetworkSelector,
   ibcCurrencyBelongsToChain,
   cosmosChainInfosToCosmosKitChains,
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainNameFromId,
   evmChainsToRainbowKitChains,
+  getAllChainConfigs,
+  getFlameChainId,
+  getFlameNetworkByChainId,
   useConfig,
 };

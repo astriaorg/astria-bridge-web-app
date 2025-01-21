@@ -4,19 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { useConfig } from "config";
-import {
-  sendIbcTransfer,
-  useCosmosChainSelection,
-} from "features/CosmosWallet";
-import {
-  AddERC20ToWalletButton,
-  useEvmChainSelection,
-} from "features/EthWallet";
+import { sendIbcTransfer, useCosmosWallet } from "features/CosmosWallet";
+import { AddErc20ToWalletButton, useEvmWallet } from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
-  const { evmChains, cosmosChains } = useConfig();
   const { addNotification } = useNotifications();
 
   const {
@@ -28,11 +20,11 @@ export default function DepositCard(): React.ReactElement {
     defaultEvmCurrencyOption,
     selectEvmCurrency,
     evmCurrencyOptions,
-    evmBalance,
-    isLoadingEvmBalance,
-    connectEVMWallet,
+    selectedEvmCurrencyBalance,
+    isLoadingSelectedEvmCurrencyBalance,
+    connectEvmWallet,
     resetState: resetEvmWalletState,
-  } = useEvmChainSelection(evmChains);
+  } = useEvmWallet();
 
   const {
     cosmosAccountAddress: fromAddress,
@@ -48,7 +40,7 @@ export default function DepositCard(): React.ReactElement {
     isLoadingCosmosBalance,
     connectCosmosWallet,
     getCosmosSigningClient,
-  } = useCosmosChainSelection(cosmosChains);
+  } = useCosmosWallet();
 
   // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {
@@ -144,12 +136,12 @@ export default function DepositCard(): React.ReactElement {
     setIsRecipientAddressValid(addressValid);
   };
 
-  const handleConnectEVMWallet = useCallback(() => {
+  const handleConnectEvmWallet = useCallback(() => {
     // clear recipient address override values when user attempts to connect evm wallet
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-    connectEVMWallet();
-  }, [connectEVMWallet]);
+    connectEvmWallet();
+  }, [connectEvmWallet]);
 
   // ensure evm wallet connection when selected EVM chain changes
   useEffect(() => {
@@ -157,13 +149,13 @@ export default function DepositCard(): React.ReactElement {
       return;
     }
     // FIXME - there is a bad implicit loop of logic here.
-    //  - see comment in `features/EthWallet/hooks/useEvmChainSelection.tsx`
-    //  1. user can click "Connect EVM Wallet", which calls `connectEVMWallet`, before selecting a chain
-    //  2. `connectEVMWallet` will set the selected evm chain if it's not set
-    //  3. this `useEffect` is then triggered, which ultimately calls `connectEVMWallet`,
+    //  1. user can click "Connect EVM Wallet", which calls `connectEvmWallet`, before selecting a chain
+    //  2. `connectEvmWallet` will set the selected evm chain if it's not set
+    //  3. this `useEffect` is then triggered, which ultimately calls `connectEvmWallet`,
     //     but now a chain is set so it will open the connect modal
-    handleConnectEVMWallet();
-  }, [selectedEvmChain, handleConnectEVMWallet]);
+    console.log("useEffect handle connect evm wallet");
+    handleConnectEvmWallet();
+  }, [selectedEvmChain, handleConnectEvmWallet]);
 
   const handleDeposit = async () => {
     if (!selectedCosmosChain || !selectedIbcCurrency) {
@@ -287,8 +279,8 @@ export default function DepositCard(): React.ReactElement {
   const additionalEvmChainOptions = useMemo(() => {
     return [
       {
-        label: "Connect EVM Wallet",
-        action: handleConnectEVMWallet,
+        label: "Connect Flame Wallet",
+        action: handleConnectEvmWallet,
         className: "has-text-primary",
         rightIconClass: "fas fa-plus",
       },
@@ -299,7 +291,7 @@ export default function DepositCard(): React.ReactElement {
         rightIconClass: "fas fa-pen-to-square",
       },
     ];
-  }, [handleConnectEVMWallet, handleEditRecipientClick]);
+  }, [handleConnectEvmWallet, handleEditRecipientClick]);
 
   return (
     <div>
@@ -409,18 +401,18 @@ export default function DepositCard(): React.ReactElement {
               )}
               {evmAccountAddress &&
                 selectedEvmChain &&
-                !isLoadingEvmBalance && (
+                !isLoadingSelectedEvmCurrencyBalance && (
                   <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                    Balance: {evmBalance}
+                    Balance: {selectedEvmCurrencyBalance}
                   </p>
                 )}
-              {evmAccountAddress && isLoadingEvmBalance && (
+              {evmAccountAddress && isLoadingSelectedEvmCurrencyBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
               {selectedEvmCurrencyOption?.value?.erc20ContractAddress && (
-                <AddERC20ToWalletButton
+                <AddErc20ToWalletButton
                   evmCurrency={selectedEvmCurrencyOption.value}
                 />
               )}

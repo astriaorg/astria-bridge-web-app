@@ -14,6 +14,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
   rpc: "https://celestia-rpc.polkachu.com:443",
   // REST endpoint of the chain.
   rest: "https://celestia-api.polkachu.com",
+  blockExplorerUrl: "https://www.mintscan.io/celestia",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -92,6 +93,7 @@ const NobleChainInfo: CosmosChainInfo = {
   chainName: "Noble",
   rpc: "https://noble-rpc.polkachu.com:443",
   rest: "https://noble-api.polkachu.com",
+  blockExplorerUrl: "https://www.mintscan.io/noble",
   stakeCurrency: {
     coinDenom: "USDC",
     coinMinimalDenom: "uusdc",
@@ -139,6 +141,7 @@ const OsmosisChainInfo: CosmosChainInfo = {
   chainName: "Osmosis",
   rpc: "https://osmosis-rpc.polkachu.com/",
   rest: "https://osmosis-api.polkachu.com/",
+  blockExplorerUrl: "https://www.mintscan.io/osmosis",
   stakeCurrency: {
     coinDenom: "milkTIA",
     coinMinimalDenom:
@@ -188,6 +191,7 @@ const StrideChainInfo: CosmosChainInfo = {
   chainName: "Stride",
   rpc: "https://stride-rpc.polkachu.com",
   rest: "https://stride-api.polkachu.com/",
+  blockExplorerUrl: "https://www.mintscan.io/stride",
   stakeCurrency: {
     coinDenom: "stTIA",
     coinMinimalDenom: "stutia",
@@ -240,6 +244,7 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 253368190,
   chainName: "Flame",
   rpcUrls: ["https://rpc.flame.astria.org"],
+  blockExplorerUrl: "https://explorer.flame.astria.org",
   currencies: [
     {
       coinDenom: "TIA",
