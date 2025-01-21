@@ -279,7 +279,7 @@ export default function DepositCard(): React.ReactElement {
   const additionalEvmChainOptions = useMemo(() => {
     return [
       {
-        label: "Connect EVM Wallet",
+        label: "Connect Flame Wallet",
         action: handleConnectEvmWallet,
         className: "has-text-primary",
         rightIconClass: "fas fa-plus",
