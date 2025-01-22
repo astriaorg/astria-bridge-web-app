@@ -42,7 +42,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
   const networksList = (
-    process.env.REACT_APP_NETWORK_LIST_OPTIONS || "dusk,mainnet"
+    process.env.REACT_APP_NETWORK_LIST_OPTIONS || "dawn,mainnet"
   ).split(",") as FlameNetwork[];
 
   // update evm and cosmos chains when the network is changed
