@@ -232,7 +232,7 @@ const StrideChainInfo: CosmosChainInfo = {
   iconClass: "i-stride",
 };
 
-const NeutronChainInfo: IbcChainInfo = {
+const NeutronChainInfo: CosmosChainInfo = {
   chainId: "neutron-1",
   chainName: "Neutron",
   // RPC endpoint of the chain

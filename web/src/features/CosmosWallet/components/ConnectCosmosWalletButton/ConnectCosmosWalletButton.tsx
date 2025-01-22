@@ -122,7 +122,9 @@ export default function ConnectCosmosWalletButton({
           {/* Top Row - Address and Actions */}
           <div className="dropdown-header">
             <div className="address-container">
-              <span className="address">{shortenAddress(cosmosAccountAddress)}</span>
+              <span className="address">
+                {shortenAddress(cosmosAccountAddress)}
+              </span>
             </div>
             <div className="action-buttons">
               <CopyToClipboardButton textToCopy={cosmosAccountAddress} />
