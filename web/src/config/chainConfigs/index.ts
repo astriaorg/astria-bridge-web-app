@@ -1,71 +1,119 @@
-import { type EvmChains, getEnvVariable, type IbcChains } from "config";
+import type { CosmosChains, EvmChainInfo, EvmChains } from "./types";
 
-import {
-  evmChains as localEvmChains,
-  ibcChains as localIbcChains,
-} from "./ChainConfigsLocal";
-import {
-  evmChains as duskEvmChains,
-  ibcChains as duskIbcChains,
-} from "./ChainConfigsDusk";
-import {
-  evmChains as dawnEvmChains,
-  ibcChains as dawnIbcChains,
-} from "./ChainConfigsDawn";
-import {
-  evmChains as mainnetEvmChains,
-  ibcChains as mainnetIbcChains,
-} from "./ChainConfigsMainnet";
+export enum FlameNetwork {
+  LOCAL = "local",
+  DUSK = "dusk",
+  DAWN = "dawn",
+  MAINNET = "mainnet",
+}
 
-// Map of environment labels to their chain configurations
-const ENV_CHAIN_CONFIGS = {
-  local: { evm: localEvmChains, ibc: localIbcChains },
-  dusk: { evm: duskEvmChains, ibc: duskIbcChains },
-  dawn: { evm: dawnEvmChains, ibc: dawnIbcChains },
-  mainnet: { evm: mainnetEvmChains, ibc: mainnetIbcChains },
-} as const;
+export interface FlameNetworkConfig {
+  name: FlameNetwork;
+  evmChains: EvmChains;
+  cosmosChains: CosmosChains;
+}
 
-type Environment = keyof typeof ENV_CHAIN_CONFIGS;
+export interface ChainConfigsObject {
+  evmChains: EvmChains;
+  cosmosChains: CosmosChains;
+}
 
-type ChainConfigs = {
-  evm: EvmChains;
-  ibc: IbcChains;
+export type NetworkConfigs = Record<FlameNetwork, FlameNetworkConfig>;
+
+import * as dawn from "./ChainConfigsDawn";
+import * as dusk from "./ChainConfigsDusk";
+import * as local from "./ChainConfigsLocal";
+import * as mainnet from "./ChainConfigsMainnet";
+
+const NETWORK_CONFIGS: NetworkConfigs = {
+  [FlameNetwork.LOCAL]: {
+    name: FlameNetwork.LOCAL,
+    evmChains: local.evmChains,
+    cosmosChains: local.cosmosChains,
+  },
+  [FlameNetwork.DUSK]: {
+    name: FlameNetwork.DUSK,
+    evmChains: dusk.evmChains,
+    cosmosChains: dusk.cosmosChains,
+  },
+  [FlameNetwork.DAWN]: {
+    name: FlameNetwork.DAWN,
+    evmChains: dawn.evmChains,
+    cosmosChains: dawn.cosmosChains,
+  },
+  [FlameNetwork.MAINNET]: {
+    name: FlameNetwork.MAINNET,
+    evmChains: mainnet.evmChains,
+    cosmosChains: mainnet.cosmosChains,
+  },
 };
 
 /**
- * Gets the chain configurations for the current environment.
- * If the chain configurations are overridden by environment variables,
- * those will be used instead.
+ * Gets the chain ID for a Flame network.
  */
-export function getEnvChainConfigs(): ChainConfigs {
-  // get environment-specific configs as base
-  const env = getEnvVariable("REACT_APP_ENV").toLowerCase() as Environment;
-  const baseConfig = ENV_CHAIN_CONFIGS[env] || ENV_CHAIN_CONFIGS.local;
+export function getFlameChainId(network: FlameNetwork): number {
+  const config = NETWORK_CONFIGS[network];
+  const evmChain = Object.values(config.evmChains)[0];
+  if (!evmChain) {
+    throw new Error(`No EVM chain found for network ${network}`);
+  }
+  return evmChain.chainId;
+}
 
-  // copy baseConfig to result
-  const result = { ...baseConfig };
+/**
+ * Gets the Flame network for a chain ID.
+ */
+export function getFlameNetworkByChainId(chainId: number): FlameNetwork {
+  const network = Object.entries(NETWORK_CONFIGS).find(([_, config]) => {
+    const evmChain = Object.values(config.evmChains)[0];
+    return evmChain && evmChain.chainId === chainId;
+  });
 
-  // try to get IBC chains override
-  try {
-    const ibcChainsOverride = getEnvVariable("REACT_APP_IBC_CHAINS");
-    if (ibcChainsOverride) {
-      result.ibc = JSON.parse(ibcChainsOverride);
-      console.debug("Using IBC chains override from environment");
-    }
-  } catch (e) {
-    console.debug("No valid IBC chains override found, using default");
+  if (!network) {
+    throw new Error(`No Flame network found for chain ID ${chainId}`);
   }
 
-  // try to get EVM chains override
-  try {
-    const evmChainsOverride = getEnvVariable("REACT_APP_EVM_CHAINS");
-    if (evmChainsOverride) {
-      result.evm = JSON.parse(evmChainsOverride);
-      console.debug("Using EVM chains override from environment");
-    }
-  } catch (e) {
-    console.debug("No valid EVM chains override found, using default");
+  return network[0] as FlameNetwork;
+}
+
+/**
+ * Gets chain configurations for the specified network.
+ * Falls back to local network config if specified network is not found.
+ */
+export function getChainConfigs(network: FlameNetwork): FlameNetworkConfig {
+  return NETWORK_CONFIGS[network] || NETWORK_CONFIGS[FlameNetwork.LOCAL];
+}
+
+/**
+ * Gets all chain configurations.
+ * Returns merged configurations to maintain compatibility with existing code.
+ */
+export function getAllChainConfigs(): ChainConfigsObject {
+  const evmChains: EvmChains = {};
+  const cosmosChains: CosmosChains = {};
+
+  for (const config of Object.values(NETWORK_CONFIGS)) {
+    Object.assign(evmChains, config.evmChains);
+    Object.assign(cosmosChains, config.cosmosChains);
   }
 
-  return result;
+  return {
+    evmChains,
+    cosmosChains,
+  };
+}
+
+/**
+ * Gets EVM chain configuration by chain ID.
+ */
+export function getEvmChainByChainId(chainId: number): EvmChainInfo {
+  const allChainConfigs = getAllChainConfigs();
+  const found = Object.values(allChainConfigs.evmChains).find(
+    (chainConfig) => chainConfig.chainId === chainId,
+  );
+
+  if (!found) {
+    throw new Error(`Chain with chainId ${chainId} not found`);
+  }
+  return found;
 }

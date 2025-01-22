@@ -4,8 +4,8 @@ import ReactGA from "react-ga4";
 import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 
+import { ConfigContextProvider } from "config";
 import App from "./App";
-import "styles/index.scss";
 
 // load ga tracking if id available
 if (process.env.REACT_APP_GA_TRACKING_ID) {
@@ -20,9 +20,11 @@ console.debug(`App Version: ${process.env.REACT_APP_VERSION}`);
 
 domRoot.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ConfigContextProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ConfigContextProvider>
   </React.StrictMode>,
 );
 

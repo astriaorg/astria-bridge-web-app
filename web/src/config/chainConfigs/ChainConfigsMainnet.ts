@@ -1,6 +1,11 @@
-import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from "./types";
+import type {
+  CosmosChainInfo,
+  CosmosChains,
+  EvmChainInfo,
+  EvmChains,
+} from "./types";
 
-const CelestiaChainInfo: IbcChainInfo = {
+const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.
   chainId: "celestia",
   // The name of the chain to be displayed to the user.
@@ -82,11 +87,12 @@ const CelestiaChainInfo: IbcChainInfo = {
   iconClass: "i-celestia",
 };
 
-const NobleChainInfo: IbcChainInfo = {
+const NobleChainInfo: CosmosChainInfo = {
   chainId: "noble-1",
   chainName: "Noble",
   rpc: "https://noble-rpc.polkachu.com:443",
   rest: "https://noble-api.polkachu.com",
+  blockExplorerUrl: "https://www.mintscan.io/noble",
   stakeCurrency: {
     coinDenom: "USDC",
     coinMinimalDenom: "uusdc",
@@ -129,11 +135,12 @@ const NobleChainInfo: IbcChainInfo = {
   iconClass: "i-noble",
 };
 
-const OsmosisChainInfo: IbcChainInfo = {
+const OsmosisChainInfo: CosmosChainInfo = {
   chainId: "osmosis-1",
   chainName: "Osmosis",
   rpc: "https://osmosis-rpc.polkachu.com/",
   rest: "https://osmosis-api.polkachu.com/",
+  blockExplorerUrl: "https://www.mintscan.io/osmosis",
   stakeCurrency: {
     coinDenom: "milkTIA",
     coinMinimalDenom:
@@ -178,11 +185,12 @@ const OsmosisChainInfo: IbcChainInfo = {
   iconClass: "i-osmosis",
 };
 
-const StrideChainInfo: IbcChainInfo = {
+const StrideChainInfo: CosmosChainInfo = {
   chainId: "stride-1",
   chainName: "Stride",
   rpc: "https://stride-rpc.polkachu.com",
   rest: "https://stride-api.polkachu.com/",
+  blockExplorerUrl: "https://www.mintscan.io/stride",
   stakeCurrency: {
     coinDenom: "stTIA",
     coinMinimalDenom: "stutia",
@@ -224,7 +232,7 @@ const StrideChainInfo: IbcChainInfo = {
   iconClass: "i-stride",
 };
 
-const NeutronChainInfo: IbcChainInfo = {
+const NeutronChainInfo: CosmosChainInfo = {
   chainId: "neutron-1",
   chainName: "Neutron",
   // RPC endpoint of the chain
@@ -307,7 +315,7 @@ const NeutronChainInfo: IbcChainInfo = {
   iconClass: "i-neutron",
 };
 
-export const ibcChains: IbcChains = {
+export const cosmosChains: CosmosChains = {
   Celestia: CelestiaChainInfo,
   Noble: NobleChainInfo,
   Osmosis: OsmosisChainInfo,
@@ -319,6 +327,7 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 253368190,
   chainName: "Flame",
   rpcUrls: ["https://rpc.flame.astria.org"],
+  blockExplorerUrl: "https://explorer.flame.astria.org",
   currencies: [
     {
       coinDenom: "TIA",
