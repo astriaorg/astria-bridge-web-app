@@ -1,6 +1,7 @@
 import type React from "react";
 import { Outlet } from "react-router-dom";
 
+import BetaBanner from "components/BetaBanner/BetaBanner";
 import Footer from "components/Footer/Footer";
 import Navbar from "components/Navbar/Navbar";
 import SideTag from "components/SideTag/SideTag";
@@ -19,6 +20,7 @@ export default function Layout(): React.ReactElement {
   return (
     <div>
       <Navbar />
+      <BetaBanner />
       <Outlet />
       {feedbackFormURL && (
         <SideTag
