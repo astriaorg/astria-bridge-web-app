@@ -1,0 +1,26 @@
+// Beta Banner styles
+.beta-banner {
+  width: 100%;
+  background-color: #e63b36; // Redder color, close to the banner in the image
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.5;
+  z-index: 40; // Above most content
+  position: relative;
+  
+  .beta-banner-link {
+    display: block;
+    padding: 0.5rem;
+    color: $astria-white;
+    width: 100%;
+    height: 100%;
+    transition: background-color 0.2s ease;
+    text-decoration: underline;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: $astria-white;
+      text-decoration: underline;
+    }
+  }
+}

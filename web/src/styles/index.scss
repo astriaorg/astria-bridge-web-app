@@ -32,6 +32,7 @@ html, body {
 // astria bulma customizations override bulma classes
 // NOTE - these css customizations must be imported AFTER bulma to override the css classes
 @import 'button-customizations';
+@import 'banner-customizations';
 @import 'card-customizations';
 @import 'columns-customizations';
 @import 'dropdown-customizations';
@@ -51,8 +52,8 @@ body {
 }
 
 .is-fullheight-with-navbar-and-footer {
-  // viewport height minus navbar and footer height
-  min-height: calc(100vh - 85px - 96px);
+  // viewport height minus navbar, beta banner, and footer height
+  min-height: calc(100vh - 85px - 40px - 96px);
 }
 
 // custom styles for the side tag component
