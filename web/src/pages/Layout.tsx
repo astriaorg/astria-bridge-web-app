@@ -19,8 +19,8 @@ export default function Layout(): React.ReactElement {
 
   return (
     <div>
-      <Navbar />
       <BetaBanner />
+      <Navbar />
       <Outlet />
       {feedbackFormURL && (
         <SideTag
