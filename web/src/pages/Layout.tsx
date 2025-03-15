@@ -1,6 +1,7 @@
 import type React from "react";
 import { Outlet, ScrollRestoration } from "react-router-dom";
 
+import BetaBanner from "components/BetaBanner/BetaBanner";
 import Navbar from "components/Navbar/Navbar";
 import Footer from "components/Footer/Footer";
 import SideTag from "components/SideTag/SideTag";
@@ -18,13 +19,16 @@ export default function Layout(): React.ReactElement {
 
   return (
     <div>
+      <BetaBanner />
       <Navbar />
       <Outlet />
-      <SideTag
-        iconClass="fa-up-right-from-square"
-        label="Get Help"
-        url={feedbackFormURL}
-      />
+      {feedbackFormURL && (
+        <SideTag
+          iconClass="fa-up-right-from-square"
+          label="Get Help"
+          url={feedbackFormURL}
+        />
+      )}
       <Footer />
       {notifications.map((notification) => (
         <Notification
