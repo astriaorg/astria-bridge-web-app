@@ -1,14 +1,23 @@
-import { Decimal } from "@cosmjs/math";
 import type React from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { Dec, DecUtils } from "@keplr-wallet/unit";
 import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
 import Dropdown from "components/Dropdown/Dropdown";
-import { sendIbcTransfer, useCosmosWallet } from "features/CosmosWallet";
-import { AddErc20ToWalletButton, useEvmWallet } from "features/EvmWallet";
+import { useConfig } from "config";
+import {
+  AddERC20ToWalletButton,
+  useEvmChainSelection,
+} from "features/EthWallet";
+import {
+  padDecimal,
+  sendIbcTransfer,
+  useIbcChainSelection,
+} from "features/KeplrWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
+  const { evmChains, ibcChains } = useConfig();
   const { addNotification } = useNotifications();
 
   const {
@@ -20,35 +29,26 @@ export default function DepositCard(): React.ReactElement {
     defaultEvmCurrencyOption,
     selectEvmCurrency,
     evmCurrencyOptions,
-    selectedEvmCurrencyBalance,
-    isLoadingSelectedEvmCurrencyBalance,
-    connectEvmWallet,
+    evmBalance,
+    isLoadingEvmBalance,
+    connectEVMWallet,
     resetState: resetEvmWalletState,
-  } = useEvmWallet();
+  } = useEvmChainSelection(evmChains);
 
   const {
-    cosmosAccountAddress: fromAddress,
-    selectCosmosChain,
-    cosmosChainsOptions,
-    selectedCosmosChain,
-    selectedCosmosChainOption,
+    ibcAccountAddress: fromAddress,
+    selectIbcChain,
+    ibcChainsOptions,
+    selectedIbcChain,
+    selectedIbcChainOption,
     defaultIbcCurrencyOption,
     selectIbcCurrency,
     selectedIbcCurrency,
     ibcCurrencyOptions,
-    cosmosBalance,
-    isLoadingCosmosBalance,
-    connectCosmosWallet,
-    getCosmosSigningClient,
-  } = useCosmosWallet();
-
-  // ensure cosmos wallet connection when selected ibc chain changes
-  useEffect(() => {
-    if (!selectedCosmosChain) {
-      return;
-    }
-    connectCosmosWallet();
-  }, [selectedCosmosChain, connectCosmosWallet]);
+    ibcBalance,
+    isLoadingIbcBalance,
+    connectKeplrWallet,
+  } = useIbcChainSelection(ibcChains);
 
   // the evm currency selection is controlled by the sender's chosen ibc currency,
   // and should be updated when an ibc currency or evm chain is selected
@@ -82,9 +82,9 @@ export default function DepositCard(): React.ReactElement {
     useState<string>("");
   const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
     useState<boolean>(false);
-  const handleEditRecipientClick = useCallback(() => {
+  const handleEditRecipientClick = () => {
     setIsRecipientAddressEditable(!isRecipientAddressEditable);
-  }, [isRecipientAddressEditable]);
+  };
   const handleEditRecipientSave = () => {
     setIsRecipientAddressEditable(false);
     // reset evmWalletState when user manually enters address
@@ -136,29 +136,32 @@ export default function DepositCard(): React.ReactElement {
     setIsRecipientAddressValid(addressValid);
   };
 
-  const handleConnectEvmWallet = useCallback(() => {
-    // clear recipient address override values when user attempts to connect evm wallet
+  const handleConnectEVMWallet = async () => {
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-    connectEvmWallet();
-  }, [connectEvmWallet]);
+    await connectEVMWallet();
+  };
 
   // ensure evm wallet connection when selected EVM chain changes
+  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
   useEffect(() => {
     if (!selectedEvmChain) {
       return;
     }
-    // FIXME - there is a bad implicit loop of logic here.
-    //  1. user can click "Connect EVM Wallet", which calls `connectEvmWallet`, before selecting a chain
-    //  2. `connectEvmWallet` will set the selected evm chain if it's not set
-    //  3. this `useEffect` is then triggered, which ultimately calls `connectEvmWallet`,
-    //     but now a chain is set so it will open the connect modal
-    console.log("useEffect handle connect evm wallet");
-    handleConnectEvmWallet();
-  }, [selectedEvmChain, handleConnectEvmWallet]);
+    handleConnectEVMWallet().then((_) => {});
+  }, [selectedEvmChain]);
+
+  // ensure keplr wallet connection when selected ibc chain changes
+  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
+  useEffect(() => {
+    if (!selectedIbcChain) {
+      return;
+    }
+    connectKeplrWallet().then((_) => {});
+  }, [selectedIbcChain]);
 
   const handleDeposit = async () => {
-    if (!selectedCosmosChain || !selectedIbcCurrency) {
+    if (!selectedIbcChain || !selectedIbcCurrency) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
@@ -185,14 +188,18 @@ export default function DepositCard(): React.ReactElement {
     setIsAnimating(true);
 
     try {
-      const formattedAmount = Decimal.fromUserInput(
-        amount,
+      // must left pad the amount with 0 if it starts with a dot because
+      // keplr's regex for a decimal is ^-?\d+.?\d*$ so it requires a leading digit
+      const amountStrPadded = padDecimal(amount);
+      const formattedAmount = DecUtils.getTenExponentN(
         selectedIbcCurrency.coinDecimals,
-      ).atomics;
+      )
+        .mul(new Dec(amountStrPadded))
+        .truncate()
+        .toString();
 
-      const signer = await getCosmosSigningClient();
       await sendIbcTransfer(
-        signer,
+        selectedIbcChain,
         fromAddress,
         recipientAddress,
         formattedAmount,
@@ -263,24 +270,24 @@ export default function DepositCard(): React.ReactElement {
     selectedEvmCurrencyOption,
   ]);
 
-  const additionalIbcChainOptions = useMemo(
+  const additionalIbcOptions = useMemo(
     () => [
       {
-        label: "Connect Cosmos Wallet",
-        action: connectCosmosWallet,
+        label: "Connect Keplr Wallet",
+        action: connectKeplrWallet,
         className: "has-text-primary",
-        leftIconClass: "i-cosmos",
+        leftIconClass: "i-keplr",
         rightIconClass: "fas fa-plus",
       },
     ],
-    [connectCosmosWallet],
+    [connectKeplrWallet],
   );
 
-  const additionalEvmChainOptions = useMemo(() => {
+  const additionalEvmOptions = useMemo(() => {
     return [
       {
-        label: "Connect Flame Wallet",
-        action: handleConnectEvmWallet,
+        label: "Connect EVM Wallet",
+        action: handleConnectEVMWallet,
         className: "has-text-primary",
         rightIconClass: "fas fa-plus",
       },
@@ -291,7 +298,7 @@ export default function DepositCard(): React.ReactElement {
         rightIconClass: "fas fa-pen-to-square",
       },
     ];
-  }, [handleConnectEvmWallet, handleEditRecipientClick]);
+  }, [handleConnectEVMWallet, handleEditRecipientClick]);
 
   return (
     <div>
@@ -302,14 +309,14 @@ export default function DepositCard(): React.ReactElement {
             <div className="is-flex-grow-1">
               <Dropdown
                 placeholder="Select..."
-                options={cosmosChainsOptions}
-                onSelect={selectCosmosChain}
+                options={ibcChainsOptions}
+                onSelect={selectIbcChain}
                 leftIconClass={"i-wallet"}
-                additionalOptions={additionalIbcChainOptions}
-                valueOverride={selectedCosmosChainOption}
+                additionalOptions={additionalIbcOptions}
+                valueOverride={selectedIbcChainOption}
               />
             </div>
-            {selectedCosmosChain && ibcCurrencyOptions && (
+            {selectedIbcChain && ibcCurrencyOptions && (
               <div className="ml-3">
                 <Dropdown
                   placeholder="Select a token"
@@ -327,14 +334,12 @@ export default function DepositCard(): React.ReactElement {
                   Address: {fromAddress}
                 </p>
               )}
-              {fromAddress &&
-                selectedIbcCurrency &&
-                !isLoadingCosmosBalance && (
-                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                    Balance: {cosmosBalance}
-                  </p>
-                )}
-              {fromAddress && isLoadingCosmosBalance && (
+              {fromAddress && !isLoadingIbcBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: {ibcBalance}
+                </p>
+              )}
+              {fromAddress && isLoadingIbcBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
@@ -366,7 +371,7 @@ export default function DepositCard(): React.ReactElement {
               options={evmChainsOptions}
               onSelect={selectEvmChain}
               leftIconClass={"i-wallet"}
-              additionalOptions={additionalEvmChainOptions}
+              additionalOptions={additionalEvmOptions}
               valueOverride={selectedEvmChainOption}
             />
           </div>
@@ -399,20 +404,18 @@ export default function DepositCard(): React.ReactElement {
                   <i className="fas fa-pen-to-square" />
                 </p>
               )}
-              {evmAccountAddress &&
-                selectedEvmChain &&
-                !isLoadingSelectedEvmCurrencyBalance && (
-                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                    Balance: {selectedEvmCurrencyBalance}
-                  </p>
-                )}
-              {evmAccountAddress && isLoadingSelectedEvmCurrencyBalance && (
+              {evmAccountAddress && !isLoadingEvmBalance && (
+                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  Balance: {evmBalance}
+                </p>
+              )}
+              {evmAccountAddress && isLoadingEvmBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
               {selectedEvmCurrencyOption?.value?.erc20ContractAddress && (
-                <AddErc20ToWalletButton
+                <AddERC20ToWalletButton
                   evmCurrency={selectedEvmCurrencyOption.value}
                 />
               )}

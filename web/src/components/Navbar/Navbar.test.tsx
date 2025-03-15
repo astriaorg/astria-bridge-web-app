@@ -1,8 +1,8 @@
-import { screen } from "@testing-library/react";
 import type React from "react";
+import { screen } from "@testing-library/react";
 
-import { renderWithRouter } from "testHelpers";
 import Navbar from "./Navbar";
+import { renderWithRouter } from "testHelpers";
 
 describe("Navbar Component", () => {
   test("renders company logo", () => {
