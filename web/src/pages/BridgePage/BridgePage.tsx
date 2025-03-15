@@ -1,6 +1,5 @@
 import type React from "react";
 import { useState } from "react";
-
 import DepositCard from "components/DepositCard/DepositCard";
 import WithdrawCard from "components/WithdrawCard/WithdrawCard";
 

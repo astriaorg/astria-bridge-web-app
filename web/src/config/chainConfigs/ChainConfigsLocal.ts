@@ -1,11 +1,6 @@
-import type {
-  CosmosChainInfo,
-  CosmosChains,
-  EvmChainInfo,
-  EvmChains,
-} from "./types";
+import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from "./types";
 
-const CelestiaChainInfo: CosmosChainInfo = {
+const CelestiaChainInfo: IbcChainInfo = {
   // Chain-id of the celestia chain.
   chainId: "celestia-local-0",
   // The name of the chain to be displayed to the user.
@@ -96,7 +91,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
   iconClass: "i-celestia",
 };
 
-const NobleChainInfo: CosmosChainInfo = {
+const NobleChainInfo: IbcChainInfo = {
   chainId: "noble-local-0",
   chainName: "noble-local-0",
   // RPC endpoint of the chain
@@ -177,16 +172,14 @@ const NobleChainInfo: CosmosChainInfo = {
   iconClass: "i-noble",
 };
 
-export const cosmosChains: CosmosChains = {
+export const ibcChains: IbcChains = {
   "Celestia Local": CelestiaChainInfo,
   "Noble Local": NobleChainInfo,
 };
 
 const FlameChainInfo: EvmChainInfo = {
-  chainId: 53, // TODO
+  chainId: 912559,
   chainName: "Flame (local)",
-  rpcUrls: ["http://localhost:8545"], // TODO
-  blockExplorerUrl: "https://explorer.evm.dusk-11.devnet.astria.org", // TODO
   currencies: [
     {
       coinDenom: "RIA",
@@ -209,9 +202,8 @@ const FlameChainInfo: EvmChainInfo = {
 };
 
 const FakeChainInfo: EvmChainInfo = {
-  chainId: 530,
+  chainId: 912559,
   chainName: "FakeChain (local)",
-  rpcUrls: ["http://localhost:8545"], // TODO
   currencies: [
     {
       coinDenom: "FAKE",

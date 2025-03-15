@@ -1,53 +1,40 @@
 import {
-  type FlameNetwork,
-  getAllChainConfigs,
-  getFlameChainId,
-  getFlameNetworkByChainId,
-} from "./chainConfigs";
-import {
-  type CosmosChainInfo,
-  type CosmosChains,
   type EvmChainInfo,
   type EvmChains,
   type EvmCurrency,
-  type IbcCurrency,
-  cosmosChainInfosToCosmosKitAssetLists,
-  cosmosChainInfosToCosmosKitChains,
-  cosmosChainNameFromId,
-  evmChainsToRainbowKitChains,
   evmCurrencyBelongsToChain,
+  type IbcChainInfo,
+  type IbcChains,
+  type IbcCurrency,
   ibcCurrencyBelongsToChain,
+  toChainInfo,
 } from "./chainConfigs/types";
-import NetworkSelector from "./components/NetworkSelector/NetworkSelector";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
 import { useConfig } from "./hooks/useConfig";
 
 /**
  * Represents the configuration object for the application.
+ *
+ * @typedef {Object} AppConfig
+ * @property {IbcChains} ibcChains - The configurations for IBC chains.
+ * @property {EvmChains} evmChains - The configurations for EVM chains.
+ * @property {string} brandURL - The URL for the brand link in the navbar.
+ * @property {string} bridgeURL - The URL for the bridge link in the navbar.
+ * @property {string} swapURL - The URL for the swap link in the navbar.
+ * @property {string} poolURL - The URL for the pool link in the navbar.
+ * @property {function} getEvmChainById - Retrieves the EVM chain with the given chain ID from the config context.
  */
-export interface AppConfig {
-  // The configurations for Cosmos chains.
-  cosmosChains: CosmosChains;
-  // The configurations for EVM chains.
+export type AppConfig = {
+  ibcChains: IbcChains;
   evmChains: EvmChains;
-  // The selected Flame network.
-  selectedFlameNetwork: FlameNetwork;
-  // Function to select the Flame network.
-  selectFlameNetwork: (network: FlameNetwork) => void;
-  // The URL for the brand link in the navbar.
   brandURL: string;
-  // The URL for the bridge link in the navbar.
   bridgeURL: string;
-  // The URL for the swap link in the navbar.
   swapURL: string;
-  // The URL for the pool link in the navbar.
   poolURL: string;
-  // The URL for the feedback form side tag. Hides side tag when null.
-  feedbackFormURL: string | null;
-  // List of networks to display in the network selector.
-  networksList: FlameNetwork[];
-}
+  feedbackFormURL: string;
+  getEvmChainById(chainIdHex: string): EvmChainInfo;
+};
 
 export {
   ConfigContextProvider,
@@ -56,17 +43,10 @@ export {
   type EvmCurrency,
   evmCurrencyBelongsToChain,
   getEnvVariable,
-  type CosmosChainInfo,
-  type CosmosChains,
+  type IbcChainInfo,
+  type IbcChains,
   type IbcCurrency,
-  NetworkSelector,
   ibcCurrencyBelongsToChain,
-  cosmosChainInfosToCosmosKitChains,
-  cosmosChainInfosToCosmosKitAssetLists,
-  cosmosChainNameFromId,
-  evmChainsToRainbowKitChains,
-  getAllChainConfigs,
-  getFlameChainId,
-  getFlameNetworkByChainId,
+  toChainInfo,
   useConfig,
 };
