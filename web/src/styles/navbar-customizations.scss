@@ -19,6 +19,25 @@ $astria-orange-navbar-soft: #EA9B57;
   padding: 1rem 2rem;
   border-bottom: 1px solid $astria-grey-dark;
 
+  // NOTE - we change some styles for navbar-burger so that we
+  // can show the network selector and wallet connector correctly
+  .navbar-burger {
+    @include touch {
+      margin-left: 0;
+    }
+  }
+
+  // NOTE - we change some styles for navbar-end so that we
+  // can show the network selector and wallet connector correctly
+  .navbar-end {
+    display: flex;
+    align-items: center;
+
+    @include touch {
+      margin-left: auto;
+    }
+  }
+
   @include mobile {
     padding: 0;
   }
@@ -74,6 +93,7 @@ $astria-orange-navbar-soft: #EA9B57;
         }
       }
     }
+
   }
 
   .navbar-placeholder-end {

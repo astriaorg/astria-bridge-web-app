@@ -1,6 +1,11 @@
-import type { EvmChainInfo, EvmChains, IbcChainInfo, IbcChains } from "./types";
+import type {
+  CosmosChainInfo,
+  CosmosChains,
+  EvmChainInfo,
+  EvmChains,
+} from "./types";
 
-const CelestiaChainInfo: IbcChainInfo = {
+const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.
   chainId: "mocha-4",
   // The name of the chain to be displayed to the user.
@@ -96,7 +101,7 @@ const CelestiaChainInfo: IbcChainInfo = {
   iconClass: "i-celestia",
 };
 
-const NobleChainInfo: IbcChainInfo = {
+const NobleChainInfo: CosmosChainInfo = {
   chainId: "grand-1",
   chainName: "Noble Testnet",
   // RPC endpoint of the chain
@@ -178,7 +183,7 @@ const NobleChainInfo: IbcChainInfo = {
   iconClass: "i-noble",
 };
 
-export const ibcChains: IbcChains = {
+export const cosmosChains: CosmosChains = {
   "Celestia Mocha-4": CelestiaChainInfo,
   "Noble Testnet": NobleChainInfo,
 };
@@ -187,6 +192,7 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 912559,
   chainName: "Flame Dusk-11",
   rpcUrls: ["https://rpc.evm.dusk-11.devnet.astria.org"],
+  blockExplorerUrl: "https://explorer.evm.dusk-11.devnet.astria.org",
   currencies: [
     {
       coinDenom: "RIA",
@@ -202,7 +208,7 @@ const FlameChainInfo: EvmChainInfo = {
       // address of erc20 contract on dusk-11
       erc20ContractAddress: "0xa4f59B3E97EC22a2b949cB5b6E8Cd6135437E857",
       // this value would only exist for native tokens
-      nativeTokenWithdrawerContractAddress: "",
+      // nativeTokenWithdrawerContractAddress: "",
       ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-noble",
     },
@@ -213,7 +219,7 @@ const FlameChainInfo: EvmChainInfo = {
       // NOTE - there is not actually a contract for this fakeTIA.
       //  just using this for testing the UI.
       erc20ContractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
-      nativeTokenWithdrawerContractAddress: "",
+      // nativeTokenWithdrawerContractAddress: "",
       ibcWithdrawalFeeWei: "10000000000000000",
       iconClass: "i-celestia",
     },

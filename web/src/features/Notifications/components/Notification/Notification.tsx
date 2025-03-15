@@ -2,8 +2,8 @@ import type React from "react";
 
 import {
   type ModalOpts,
-  type ToastOpts,
   NotificationType,
+  type ToastOpts,
   ToastPosition,
 } from "./types";
 

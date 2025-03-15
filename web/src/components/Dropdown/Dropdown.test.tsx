@@ -1,5 +1,5 @@
-import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import React from "react";
 import "@testing-library/jest-dom";
 import Dropdown, { type DropdownOption } from "./Dropdown"; // Adjust the import path as needed
 

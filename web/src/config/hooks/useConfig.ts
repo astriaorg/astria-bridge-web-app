@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { ConfigContext } from "config/contexts/ConfigContext";
+import { ConfigContext } from "../contexts/ConfigContext";
 
 /**
  * Hook to use the config context.

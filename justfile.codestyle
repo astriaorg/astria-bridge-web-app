@@ -11,7 +11,7 @@ lint lang=default_lang:
 # lint and fix issues that can be fixed. pass "unsafe" to also apply unsafe fixes.
 [group('codestyle')]
 lint-ts-apply unsafe='':
-  cd web; npm run lint-apply{{ if unsafe == "unsafe" { "-unsafe" } else { "" } }}
+  cd web; npm run lint-apply{{ if unsafe == "unsafe" { "-unsafe" } else { "" } }} && npm run check-apply{{ if unsafe == "unsafe" { "-unsafe" } else { "" } }}
 
 alias l := lint
 
@@ -29,7 +29,7 @@ _lint-md:
 
 [no-exit-message]
 _lint-ts:
-  cd web; npm run lint
+  cd web; npm run lint && npm run check
 
 # Can format 'ts', 'md', or 'all'. Defaults to all
 [group('codestyle')]

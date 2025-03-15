@@ -5,16 +5,23 @@ the Astria bridge.
 
 ## `web` application directory structure
 
+* `config-overrides.js` - used by `react-app-rewired` to override CRA's default
+  webpack config
 * `public/index.html`
   * html meta stuff, import styles and fonts
   * define React root element
 * `src/index.tsx`
   * React application setup
   * import styles
+  * ConfigContextProvider is here to provide config to App
 * `src/App.tsx`
   * main application component
   * define routes
-  * use context providers
+  * rest of context providers, e.g. notifications, rainbowkit, etc
+* `src/setupTests.tsx`
+  * most jest mocks defined here (some mocks defined in individual test files)
+  * browser global mocks defined here
+* `src/testHelpers.tsx` - helper functions for testing
 * `src/components` - More general React components for the app, e.g. Navbar,
   Dropdown, CopyToClipboardButton, etc
 * `src/config` - Configuration for the web app
@@ -26,8 +33,8 @@ the Astria bridge.
   * `src/config/index.ts` - AppConfig and exports
 * `src/features` - Organizes components, contexts, hooks, services, types, and
   utils for different features
-  * `src/features/EthWallet` - Used for interacting with EVM wallets
-  * `src/features/KeplrWallet` - User for interacting with Keplr wallet
+  * `src/features/CosmosWallet` - User for interacting with Keplr wallet
+  * `src/features/EvmWallet` - Used for interacting with EVM wallets
   * `src/features/Notifications` - Used for displaying notifications and toasts
 * `src/pages`
   * React components for each page
