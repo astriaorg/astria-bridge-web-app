@@ -40,6 +40,8 @@ describe("Chain Configs", () => {
             coinDenom: "TEST",
             coinMinimalDenom: "utest",
             coinDecimals: 6,
+            isDepositable: true,
+            isWithdrawable: true,
           },
         ],
         bech32Config: {
@@ -78,6 +80,8 @@ describe("Chain Configs", () => {
             coinMinimalDenom: "utest",
             coinDecimals: 18,
             ibcWithdrawalFeeWei: "10000000000000000",
+            isDepositable: true,
+            isWithdrawable: true,
           },
         ],
       },

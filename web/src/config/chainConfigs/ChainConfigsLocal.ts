@@ -53,6 +53,8 @@ const CelestiaChainInfo: IbcChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-1",
       sequencerBridgeAccount: "astria14wyh2u6efndllr8gup29295krc98rqas8d0ans",
+      isDepositable: true,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
     {
@@ -63,6 +65,8 @@ const CelestiaChainInfo: IbcChainInfo = {
       coinMinimalDenom: "usteeze",
       // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
+      isDepositable: false,
+      isWithdrawable: true,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -143,6 +147,8 @@ const NobleChainInfo: IbcChainInfo = {
       ibcChannel: "channel-0",
       // NOTE - noble requires bech32 address, not bech32m.
       sequencerBridgeAccount: "astria14wyh2u6efndllr8gup29295krc98rqasj3l3kj",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-noble",
     },
   ],
@@ -186,6 +192,8 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "uria",
       coinDecimals: 18,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
     {
@@ -195,6 +203,8 @@ const FlameChainInfo: EvmChainInfo = {
       nativeTokenWithdrawerContractAddress:
         "0xA58639fB5458e65E4fA917FF951C390292C24A15",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: true,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
   ],
@@ -210,6 +220,8 @@ const FakeChainInfo: EvmChainInfo = {
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
     {
@@ -220,6 +232,8 @@ const FakeChainInfo: EvmChainInfo = {
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-flame",
     },
   ],

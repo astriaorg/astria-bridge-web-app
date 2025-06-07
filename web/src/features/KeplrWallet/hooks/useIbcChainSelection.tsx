@@ -22,8 +22,12 @@ import { useBalancePolling } from "features/GetBalancePolling";
  *   or selected currency changes.
  * Updates the address when the selected chain changes.
  * @param ibcChains - The possible IBC chains to select from.
+ * @param purpose - Determines whether to filter for depositable or withdrawable assets. Defaults to 'deposit'.
  */
-export function useIbcChainSelection(ibcChains: IbcChains) {
+export function useIbcChainSelection(
+  ibcChains: IbcChains,
+  purpose: "deposit" | "withdraw" = "deposit",
+) {
   const { addNotification } = useNotifications();
 
   const [selectedIbcChain, setSelectedIbcChain] = useState<IbcChainInfo | null>(
@@ -81,14 +85,22 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
   }, [selectedIbcChain]);
 
   const ibcChainsOptions = useMemo(() => {
-    return Object.entries(ibcChains).map(
-      ([chainLabel, chain]): DropdownOption<IbcChainInfo> => ({
-        label: chainLabel,
-        value: chain,
-        leftIconClass: chain.iconClass,
-      }),
-    );
-  }, [ibcChains]);
+    return Object.entries(ibcChains)
+      .filter(([, chain]) =>
+        chain.currencies.some((currency) =>
+          purpose === "deposit"
+            ? currency.isDepositable
+            : currency.isWithdrawable,
+        ),
+      )
+      .map(
+        ([chainLabel, chain]): DropdownOption<IbcChainInfo> => ({
+          label: chainLabel,
+          value: chain,
+          leftIconClass: chain.iconClass,
+        }),
+      );
+  }, [ibcChains, purpose]);
 
   const selectIbcChain = useCallback((chain: IbcChainInfo | null) => {
     setSelectedIbcChain(chain);
@@ -98,14 +110,20 @@ export function useIbcChainSelection(ibcChains: IbcChains) {
     if (!selectedIbcChain) {
       return [];
     }
-    return selectedIbcChain.currencies?.map(
-      (currency): DropdownOption<IbcCurrency> => ({
-        label: currency.coinDenom,
-        value: currency,
-        leftIconClass: currency.iconClass,
-      }),
-    );
-  }, [selectedIbcChain]);
+    return selectedIbcChain.currencies
+      ?.filter((currency) =>
+        purpose === "deposit"
+          ? currency.isDepositable
+          : currency.isWithdrawable,
+      )
+      .map(
+        (currency): DropdownOption<IbcCurrency> => ({
+          label: currency.coinDenom,
+          value: currency,
+          leftIconClass: currency.iconClass,
+        }),
+      );
+  }, [selectedIbcChain, purpose]);
 
   const defaultIbcCurrencyOption = useMemo(() => {
     return ibcCurrencyOptions[0] || null;

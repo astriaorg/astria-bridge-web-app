@@ -25,7 +25,10 @@ import {
 import { formatBalance } from "features/EthWallet/utils/utils";
 import { useBalancePolling } from "features/GetBalancePolling";
 
-export function useEvmChainSelection(evmChains: EvmChains) {
+export function useEvmChainSelection(
+  evmChains: EvmChains,
+  purpose: "deposit" | "withdraw" = "deposit",
+) {
   const { addNotification } = useNotifications();
   const { provider, userAccount } = useEthWallet();
 
@@ -128,14 +131,22 @@ export function useEvmChainSelection(evmChains: EvmChains) {
   }, [selectedEvmChainNativeToken, selectedEvmCurrency]);
 
   const evmChainsOptions = useMemo(() => {
-    return Object.entries(evmChains).map(
-      ([chainLabel, chain]): DropdownOption<EvmChainInfo> => ({
-        label: chainLabel,
-        value: chain,
-        leftIconClass: chain.iconClass,
-      }),
-    );
-  }, [evmChains]);
+    return Object.entries(evmChains)
+      .filter(([, chain]) =>
+        chain.currencies.some((currency) =>
+          purpose === "deposit"
+            ? currency.isDepositable
+            : currency.isWithdrawable,
+        ),
+      )
+      .map(
+        ([chainLabel, chain]): DropdownOption<EvmChainInfo> => ({
+          label: chainLabel,
+          value: chain,
+          leftIconClass: chain.iconClass,
+        }),
+      );
+  }, [evmChains, purpose]);
 
   // selectedEvmChainOption allows us to ensure the label is set properly
   // in the dropdown when connecting via an "additional option"s action,
@@ -160,21 +171,23 @@ export function useEvmChainSelection(evmChains: EvmChains) {
       return [];
     }
 
-    // can only withdraw the currency if it has a withdrawer contract address defined
-    const withdrawableTokens = selectedEvmChain.currencies?.filter(
+    const filteredCurrencies = selectedEvmChain.currencies?.filter(
       (currency) =>
-        currency.erc20ContractAddress ||
-        currency.nativeTokenWithdrawerContractAddress,
+        purpose === "deposit"
+          ? currency.isDepositable
+          : currency.isWithdrawable,
     );
 
-    return withdrawableTokens.map(
-      (currency): DropdownOption<EvmCurrency> => ({
-        label: currency.coinDenom,
-        value: currency,
-        leftIconClass: currency.iconClass,
-      }),
+    return (
+      filteredCurrencies?.map(
+        (currency): DropdownOption<EvmCurrency> => ({
+          label: currency.coinDenom,
+          value: currency,
+          leftIconClass: currency.iconClass,
+        }),
+      ) || []
     );
-  }, [selectedEvmChain]);
+  }, [selectedEvmChain, purpose]);
 
   const defaultEvmCurrencyOption = useMemo(() => {
     return evmCurrencyOptions[0] || null;

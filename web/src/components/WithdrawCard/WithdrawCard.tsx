@@ -32,7 +32,7 @@ export default function WithdrawCard(): React.ReactElement {
     evmBalance,
     isLoadingEvmBalance,
     connectEVMWallet,
-  } = useEvmChainSelection(evmChains);
+  } = useEvmChainSelection(evmChains, "withdraw");
 
   const {
     ibcAccountAddress,
@@ -47,7 +47,7 @@ export default function WithdrawCard(): React.ReactElement {
     isLoadingIbcBalance,
     connectKeplrWallet,
     resetState: resetIbcWalletState,
-  } = useIbcChainSelection(ibcChains);
+  } = useIbcChainSelection(ibcChains, "withdraw");
 
   // the ibc currency selection is controlled by the sender's chosen evm currency,
   // and should be updated when an ibc currency or ibc chain is selected

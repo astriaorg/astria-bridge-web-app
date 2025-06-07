@@ -53,6 +53,8 @@ const CelestiaChainInfo: IbcChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-159",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
+      isDepositable: true,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
     {
@@ -67,6 +69,8 @@ const CelestiaChainInfo: IbcChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-420",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
   ],
@@ -149,6 +153,8 @@ const NobleChainInfo: IbcChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-231",
       sequencerBridgeAccount: "astria12saluecm8dd7hkutk83eavkl2p70lf5w7txezg",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-noble",
     },
   ],
@@ -193,6 +199,8 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "uria",
       coinDecimals: 18,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
     {
@@ -204,6 +212,8 @@ const FlameChainInfo: EvmChainInfo = {
       // this value would only exist for native tokens
       nativeTokenWithdrawerContractAddress: "",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-noble",
     },
     {
@@ -215,6 +225,8 @@ const FlameChainInfo: EvmChainInfo = {
       erc20ContractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
       nativeTokenWithdrawerContractAddress: "",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
   ],

@@ -53,6 +53,8 @@ const CelestiaChainInfo: IbcChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-48",
       sequencerBridgeAccount: "astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p",
+      isDepositable: true,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
   ],
@@ -111,6 +113,8 @@ const NobleChainInfo: IbcChainInfo = {
       ibcChannel: "channel-104",
       sequencerBridgeAccount:
         "astriacompat1eg8hhey0n4untdvqqdvlyl0e7zx8wfcaz3l6wu",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-usdc",
     },
   ],
@@ -159,6 +163,8 @@ const OsmosisChainInfo: IbcChainInfo = {
       coinDecimals: 6,
       ibcChannel: "channel-85486",
       sequencerBridgeAccount: "astria1kgxhyhvynhcwwrylkzzx6q3a8rn3tuvasxvuy8",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-milk-tia",
     },
   ],
@@ -206,6 +212,8 @@ const StrideChainInfo: IbcChainInfo = {
       coinDecimals: 6,
       ibcChannel: "channel-285",
       sequencerBridgeAccount: "astria1dllx9d9karss9ca8le25a4vqhf67a67d5d4l6r",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-stride-tia",
     },
   ],
@@ -277,6 +285,8 @@ const NeutronChainInfo: IbcChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-6236",
       sequencerBridgeAccount: "astria15juwcclg07xs38757q257evltequawcejzzs4l",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
   ],
@@ -327,6 +337,8 @@ const FlameChainInfo: EvmChainInfo = {
       nativeTokenWithdrawerContractAddress:
         "0xB086557f9B5F6fAe5081CC5850BE94e62B1dDE57",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: true,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
     {
@@ -335,6 +347,8 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-usdc",
     },
     {
@@ -344,6 +358,8 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       erc20ContractAddress: "0xcbb93e854AA4EF5Db51c3b094F28952eF0dC67bE",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-milk-tia",
     },
     {
@@ -352,6 +368,8 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       erc20ContractAddress: "0xdf941D092b10FF07eAb44bD174dEe915c13FECcd",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-stride-tia",
     },
     {
@@ -361,6 +379,8 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       erc20ContractAddress: "0x1E3b0f82d049379FEd8C0b67D915Ea925067e5f2",
       ibcWithdrawalFeeWei: "10000000000000000",
+      isDepositable: false,
+      isWithdrawable: true,
       iconClass: "i-celestia",
     },
   ],
