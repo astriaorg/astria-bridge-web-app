@@ -14,9 +14,10 @@ export default function BetaBanner(): React.ReactElement {
     >
       <div className="is-flex is-align-items-center">
         <p className={`is-size-7-mobile ${feedbackFormURL ? "mr-6" : ""}`}>
-          ⚠️ Flame is shutting down on <strong>September 30, 2025</strong>.
-          Bridge and Swap functionality will be disabled. Withdraw all assets
-          before this date.
+          ⚠️ Flame is shutting down on <strong>September 30, 2025</strong>. You
+          can still deposit TIA for gas, withdraw all assets, close LP
+          positions, and swap tokens. However, you can no longer create new LP
+          positions or add liquidity.
         </p>
         {feedbackFormURL && (
           <button
