@@ -5,8 +5,7 @@ import { useConfig } from "config";
  * A persistent banner displaying important site notices.
  */
 export default function BetaBanner(): React.ReactElement {
-  const { feedbackFormURL }
- = useConfig();
+  const { feedbackFormURL } = useConfig();
 
   return (
     <div
@@ -14,12 +13,10 @@ export default function BetaBanner(): React.ReactElement {
       style={{ borderRadius: "0px" }}
     >
       <div className="is-flex is-align-items-center">
-        <p
-          className={`is-size-7-mobile ${feedbackFormURL ? "mr-6" : ""}`}
-        >
-          ⚠️ Flame is shutting down on{" "}
-          <strong>September 30, 2025</strong>. Bridge and Swap functionality
-          will be disabled. Withdraw all assets before this date.
+        <p className={`is-size-7-mobile ${feedbackFormURL ? "mr-6" : ""}`}>
+          ⚠️ Flame is shutting down on <strong>September 30, 2025</strong>.
+          Bridge and Swap functionality will be disabled. Withdraw all assets
+          before this date.
         </p>
         {feedbackFormURL && (
           <button
