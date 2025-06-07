@@ -15,7 +15,7 @@ export default function BetaBanner(): React.ReactElement {
     >
       <div className="is-flex is-align-items-center">
         <p
-          className={`is-size-7-mobile ${feedbackFormURL ? "mr-4" : ""}`}
+          className={`is-size-7-mobile ${feedbackFormURL ? "mr-6" : ""}`}
         >
           ⚠️ Flame is shutting down on{" "}
           <strong>September 30, 2025</strong>. Bridge and Swap functionality
@@ -24,7 +24,7 @@ export default function BetaBanner(): React.ReactElement {
         {feedbackFormURL && (
           <button
             type="button"
-            className="button is-white has-text-danger is-small is-flex-shrink-0 ml-auto"
+            className="button is-white has-text-danger is-small is-flex-shrink-0 ml-auto ml-6"
             onClick={() => {
               window.open(feedbackFormURL, "_blank", "noopener,noreferrer");
             }}
