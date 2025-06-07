@@ -31,6 +31,8 @@ export type IbcCurrency = {
   coinDecimals: number;
   ibcChannel?: string;
   sequencerBridgeAccount?: string;
+  isDepositable: boolean;
+  isWithdrawable: boolean;
   iconClass?: string;
 };
 
@@ -68,6 +70,8 @@ export type EvmCurrency = {
   nativeTokenWithdrawerContractAddress?: string;
   // fee needed to pay for the ibc withdrawal, 18 decimals
   ibcWithdrawalFeeWei: string;
+  isDepositable: boolean;
+  isWithdrawable: boolean;
   iconClass?: string;
 };
 
